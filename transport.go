@@ -3,7 +3,6 @@ package marionette_client
 import (
     "net"
     "errors"
-    "strings"
     "strconv"
     "encoding/json"
 )

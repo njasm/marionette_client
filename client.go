@@ -1,7 +1,6 @@
 package marionette_client
 import (
     "encoding/json"
-    "time"
 )
 
 type Context string
@@ -222,7 +221,8 @@ func (c *Client) Close() (response, error){
         return nil, err
     }
 
-    if err = c.transport.close() && err != nil {
+    err = c.transport.close()
+    if err != nil {
         return nil, err
     }
 
