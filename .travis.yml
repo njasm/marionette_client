@@ -17,8 +17,9 @@ before_install:
   - sh -e /etc/init.d/xvfb start
 
 before_script:
-  #- sh -e /usr/local/bin/firefox --version
-  - sh -e "/usr/local/bin/firefox -marionette"
+  - "sh -e find / -name firefox"
+  - "sh -e firefox --version"
+  - "sh -e firefox -marionette"
 
 script:
     - $HOME/gopath/bin/goveralls -service=travis-ci
