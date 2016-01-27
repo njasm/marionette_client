@@ -2,6 +2,7 @@ package marionette_client
 
 import (
 	"testing"
+    "fmt"
 )
 
 func TestNewSession(t *testing.T) {
@@ -11,10 +12,11 @@ func TestNewSession(t *testing.T) {
         t.Error(err)
     }
 
-	_, err = client.NewSession("", nil)
+	r, err := client.NewSession("", nil)
 	if err != nil {
 		t.Error(err)
 	}
 
+    fmt.Println(r.Value)
     client.Close()
 }

@@ -18,7 +18,7 @@ before_install:
 
 before_script:
   #- sh -e /usr/local/bin/firefox --version
-  - sh -e /usr/local/bin/firefox -marionette
+  - sh -e "/usr/local/bin/firefox -marionette"
 
 script:
     - $HOME/gopath/bin/goveralls -service=travis-ci
