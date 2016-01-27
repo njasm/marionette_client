@@ -20,3 +20,7 @@ func TestNewSession(t *testing.T) {
     fmt.Println(r.Value)
     client.Close()
 }
+
+func TestGetSessionID(t *testing.T) {
+
+}
