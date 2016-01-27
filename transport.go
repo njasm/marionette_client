@@ -22,7 +22,7 @@ type response struct {
 
 func (t *transport) connect(host string, port int) (err error) {
 	if t.conn != nil {
-		errors.New("A Connection is already established. please disconnect before connecting.")
+		return errors.New("A Connection is already established. please disconnect before connecting.")
 	}
 
 	if host == "" {

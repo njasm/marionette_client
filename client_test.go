@@ -5,8 +5,14 @@ import (
     "fmt"
 )
 
+var client *Client
+
+func init() {
+    client = NewClient()
+}
+
 func TestNewSession(t *testing.T) {
-	client := NewClient()
+
     err := client.Connect("", 0)
     if err != nil {
         t.Error(err)
@@ -16,11 +22,35 @@ func TestNewSession(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
+    fmt.Println("using marionette protocol: ", client.transport.MarionetteProtocol)
     fmt.Println(r.Value)
     client.Close()
 }
 
 func TestGetSessionID(t *testing.T) {
+    if client.SessionId != client.GetSessionID() {
+        fmt.Println("SessionId differ...")
+        t.FailNow()
+    }
 
+    fmt.Println("session is : ", client.SessionId)
+}
+
+func TestConnectWithActiveConnection(t *testing.T) {
+    err := client.Connect("", 0)
+    if err == nil {
+        fmt.Println(err)
+    }
+
+    fmt.Println("No Error..")
+}
+
+func TestGetMarionetteID(t *testing.T) {
+    r, err := client.GetMarionetteID()
+    if err != nil {
+        fmt.Println(err)
+        t.FailNow()
+    }
+
+    fmt.Println(r.Value)
 }
