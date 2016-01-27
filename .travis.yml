@@ -23,4 +23,5 @@ before_script:
   - ps aux | grep firefox
 
 script:
-    - $HOME/gopath/bin/goveralls -service=travis-ci
+  - go test
+  - $HOME/gopath/bin/goveralls -service=travis-ci
