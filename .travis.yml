@@ -17,7 +17,7 @@ before_install:
   - sh -e /etc/init.d/xvfb start
 
 before_script:
-  - sh -e /usr/local/bin/firefox --version
+  #- sh -e /usr/local/bin/firefox --version
   - sh -e /usr/local/bin/firefox -marionette
 
 script:
