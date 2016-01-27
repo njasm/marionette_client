@@ -1,4 +1,5 @@
-package main
+package marionette_client
+
 import (
     "net"
     "fmt"
