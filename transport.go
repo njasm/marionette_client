@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net"
 	"strconv"
-    "strings"
+    "io"
 )
 
 type transport struct {
@@ -15,9 +15,9 @@ type transport struct {
 }
 
 type response struct {
-    Id      int32
-    Size    int64
-    Value   string
+	Id    int32
+	Size  int64
+	Value string
 }
 
 func (t *transport) connect(host string, port int) (err error) {
@@ -39,15 +39,15 @@ func (t *transport) connect(host string, port int) (err error) {
 		return err
 	}
 
-    r, err := t.transformResponse(t.receive())
-    if err != nil {
-        return err
-    }
+	r, err := t.transformResponse(t.receive())
+	if err != nil {
+		return err
+	}
 
-    err = json.Unmarshal([]byte(r.Value), &t)
-    if err != nil {
-        return err
-    }
+	err = json.Unmarshal([]byte(r.Value), &t)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -77,21 +77,36 @@ func (t *transport) send(command string, values interface{}) (*response, error) 
 }
 
 func (t *transport) receive() ([]byte, error) {
-	return read(t.conn, 4096)
+	return read(t.conn)
 }
 
-func read(c net.Conn, size int) ([]byte, error) {
-	if size <= 0 {
-		size = 4096
-	}
+func read(c net.Conn) ([]byte, error) {
+    var msgSize = make([]byte, 0)
+    tmp := make([]byte, 1)
+    for {
+        _, err := c.Read(tmp)
+        if err != nil {
+            if err != io.EOF {
+                return nil, err
+            }
+        }
 
-	readBuf := make([]byte, size)
-	_, err := c.Read(readBuf)
-	if err != nil {
-		return nil, err
-	}
+        if string(tmp) == ":" {
+            if size, err := strconv.Atoi(string(msgSize)); err == nil {
+                msgBuf := make([]byte, size)
+                _, err = c.Read(msgBuf)
+                if err != nil {
+                    return nil, err
+                }
 
-	return readBuf, nil
+                return msgBuf, nil
+            }
+
+            return nil, err
+        }
+
+        msgSize = append(msgSize, tmp...)
+    }
 }
 
 func (t *transport) transformCommand(command string, values interface{}) ([]byte, error) {
@@ -115,20 +130,16 @@ func write(c net.Conn, b []byte) (int, error) {
 }
 
 func (t *transport) transformResponse(buf []byte, err error) (*response, error) {
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    stringBuf := string(buf)
-    idx := strings.Index(stringBuf, ":")
-    stringLen := stringBuf[0:idx]
-    totalMessageLength, _ := strconv.Atoi(stringLen)
-    lastIdx := strings.LastIndex(stringBuf, "}")
-    stringBuf = stringBuf[idx + 1:lastIdx + 1]
+	stringBuf := string(buf)
+    totalMessageLength := len(buf)
 
-    if totalMessageLength != len(stringBuf) {
-        return nil, errors.New("Total Message Length does not match with actual message length")
-    }
+	if totalMessageLength != len(stringBuf) {
+		return nil, errors.New("Total Message Length does not match with actual message length")
+	}
 
-    return &response{Size: int64(totalMessageLength), Value: stringBuf}, nil
+	return &response{Size: int64(totalMessageLength), Value: stringBuf}, nil
 }

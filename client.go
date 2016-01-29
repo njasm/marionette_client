@@ -7,7 +7,7 @@ import (
 type Context string
 
 const (
-	CONTEXT_CHROME Context = "chrome"
+	CONTEXT_CHROME  Context = "chrome"
 	CONTEXT_CONTENT Context = "content"
 )
 
@@ -51,40 +51,40 @@ func (c *Client) GetSessionID() string {
 }
 
 func (c *Client) Connect(host string, port int) error {
-    return c.transport.connect(host, port)
+	return c.transport.connect(host, port)
 }
 
 // Protocol commands
 func (c *Client) GetMarionetteID() (*response, error) {
 	response, err := c.transport.send("getMarionetteID", nil)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    return response, nil
+	return response, nil
 }
 
 func (c *Client) SayHello() (*response, error) {
 	response, err := c.transport.send("sayHello", nil)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    return response, nil
+	return response, nil
 }
 
 func (c *Client) NewSession(sessionId string, cap *Capabilities) (*response, error) {
-	data := map[string]interface{} {
+	data := map[string]interface{}{
 		"sessionId":    sessionId,
 		"capabilities": cap,
 	}
 
 	response, err := c.transport.send("newSession", data)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    err = json.Unmarshal([]byte(response.Value), &c)
+	err = json.Unmarshal([]byte(response.Value), &c)
 	return response, nil
 }
 
@@ -102,13 +102,14 @@ func (c *Client) GetSessionCapabilities() (*Capabilities, error) {
 		return nil, err
 	}
 
-	response := &Capabilities{}
-	err = json.Unmarshal([]byte(buf.Value), response)
+	response := map[string]*Capabilities{"Capabilities": &Capabilities{}}
+	err = json.Unmarshal([]byte(buf.Value), &response)
 	if err != nil {
 		return nil, err
 	}
 
-	return response, nil
+	cap, _ := response["capabilities"]
+	return cap, nil
 }
 
 // Log message.  Accepts user defined log-level.
@@ -120,21 +121,21 @@ func (c *Client) GetSessionCapabilities() (*Capabilities, error) {
 
 func (c *Client) Log(message string, level string) (*response, error) {
 	response, err := c.transport.send("log", map[string]string{"value": message, "level": level})
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    return response, nil
+	return response, nil
 }
 
 //  Return all logged messages.
 func (c *Client) GetLogs() (*response, error) {
 	response, err := c.transport.send("getLogs", nil)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    return response, nil
+	return response, nil
 }
 
 // Sets the context of the subsequent commands to be either "chrome" or
@@ -146,30 +147,30 @@ func (c *Client) GetLogs() (*response, error) {
 
 func (c *Client) SetContext(value string) (*response, error) {
 	response, err := c.transport.send("setContext", map[string]string{"value": value})
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    return response, nil
+	return response, nil
 }
 
 //  Gets the context of the server, either "chrome" or "content".
 func (c *Client) GetContext() (*response, error) {
 	response, err := c.transport.send("getContext", nil)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    return response, nil
+	return response, nil
 }
 
 func (c *Client) ExecuteScript(value string) (*response, error) {
 	response, err := c.transport.send("executeScript", map[string]string{"value": value})
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    return response, nil
+	return response, nil
 }
 
 // Set the timeout for asynchronous script execution.
@@ -212,13 +213,12 @@ func (c *Client) timeouts(typ string, milliseconds int) (*response, error) {
 	}
 
 	response, err := c.transport.send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    return response, nil
+	return response, nil
 }
-
 
 // Find elements using the indicated search strategy.
 //
