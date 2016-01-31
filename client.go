@@ -9,6 +9,8 @@ type Context string
 const (
 	CONTEXT_CHROME  Context = "chrome"
 	CONTEXT_CONTENT Context = "content"
+	MARIONETTE_PROTOCOL_V2 = 2
+	MARIONETTE_PROTOCOL_V3 = 3
 )
 
 type session struct {
@@ -55,23 +57,24 @@ func (c *Client) Connect(host string, port int) error {
 }
 
 // Protocol commands
-func (c *Client) GetMarionetteID() (*response, error) {
-	response, err := c.transport.send("getMarionetteID", nil)
-	if err != nil {
-		return nil, err
-	}
+// NOT A COMMAND
+//func (c *Client) GetMarionetteID() (*response, error) {
+//	response, err := c.transport.send("getMarionetteID", nil)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return response, nil
+//}
 
-	return response, nil
-}
-
-func (c *Client) SayHello() (*response, error) {
-	response, err := c.transport.send("sayHello", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
-}
+//func (c *Client) SayHello() (*response, error) {
+//	response, err := c.transport.send("sayHello", nil)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return response, nil
+//}
 
 func (c *Client) NewSession(sessionId string, cap *Capabilities) (*response, error) {
 	data := map[string]interface{}{
@@ -95,7 +98,6 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*response, err
 // The return value is an immutable map of string keys
 // ("capabilities") to values, which may be of types boolean,
 // numerical or string.
-
 func (c *Client) GetSessionCapabilities() (*Capabilities, error) {
 	buf, err := c.transport.send("getSessionCapabilities", nil)
 	if err != nil {

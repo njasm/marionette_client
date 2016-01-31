@@ -12,17 +12,18 @@ func init() {
 }
 
 func TestNewSession(t *testing.T) {
-
 	err := client.Connect("", 0)
 	if err != nil {
 		t.Error(err)
 	}
 
+	fmt.Println("using marionette protocol: ", client.transport.MarionetteProtocol)
+
 	r, err := client.NewSession("", nil)
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Println("using marionette protocol: ", client.transport.MarionetteProtocol)
+
 	fmt.Println(r.Value)
 	client.Close()
 }
@@ -45,20 +46,6 @@ func TestConnectWithActiveConnection(t *testing.T) {
 	fmt.Println("No Error..")
 }
 
-func TestGetMarionetteID(t *testing.T) {
-	//not availiable command in protocol 2?
-	if client.MarionetteProtocol == 2 {
-		t.SkipNow()
-	}
-
-	r, err := client.GetMarionetteID()
-	if err != nil {
-		fmt.Println(err)
-		t.FailNow()
-	}
-
-	fmt.Println(r.Value)
-}
 
 func TestGetSessionCapabilities(t *testing.T) {
 	r, err := client.GetSessionCapabilities()
@@ -67,17 +54,17 @@ func TestGetSessionCapabilities(t *testing.T) {
 		t.FailNow()
 	}
 
-	fmt.Println(r)
+	fmt.Println(r.BrowserName)
 }
 
 func TestLog(t *testing.T) {
-    r, err := client.Log("message testing", "warning")
-    if err != nil {
-        fmt.Println(err)
-        t.FailNow()
-    }
+	r, err := client.Log("message testing", "warning")
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
 
-    fmt.Println(r.Value)
+	fmt.Println(r.Value)
 }
 
 func TestGetLogs(t *testing.T) {
@@ -87,5 +74,5 @@ func TestGetLogs(t *testing.T) {
 		t.FailNow()
 	}
 
-	fmt.Println(r)
+	fmt.Println(r.Value)
 }
