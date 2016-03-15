@@ -71,12 +71,12 @@ func (t *transport) close() error {
 }
 
 func (t *transport) send(command string, values interface{}) (*response, error) {
+    t.messageID = t.messageID+1
 	buf, err := t.transformToCommand(command, values)
 	if err != nil {
 		return nil, err
 	}
 
-	t.messageID = t.messageID + 1
 	_, err = write(t.conn, buf)
 	if err != nil {
 		return nil, err
@@ -144,7 +144,7 @@ func (t *transport) transformToCommand(command string, values interface{}) (byte
     if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V2 {
         bytes, err = makeProto2Command(command, values)
     } else if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V3 {
-        bytes, err = makeProto3Command(t.messageID+1, command, values)
+        bytes, err = makeProto3Command(t.messageID, command, values)
     } else {
         return nil, errors.New("Marionete Protocol version not supported.")
     }
