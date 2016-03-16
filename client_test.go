@@ -9,6 +9,7 @@ var client *Client
 
 func init() {
 	client = NewClient()
+	client.Get("http://www.abola.pt/")
 }
 
 func TestNewSession(t *testing.T) {
