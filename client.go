@@ -3,6 +3,7 @@ package marionette_client
 import (
 	"encoding/json"
 	"strings"
+	"errors"
 )
 
 type Context string
@@ -40,13 +41,18 @@ type Capabilities struct {
 type Client struct {
 	session
 	transport
+	navigation
 }
 
 func NewClient() *Client {
-	return &Client{
+	c := &Client{
 		session{},
 		transport{},
 	}
+
+	c.navigation = navigation{c: c}
+
+	return c
 }
 
 func (c *Client) GetSessionID() string {
@@ -228,28 +234,62 @@ func timeouts(transport *transport, typ string, milliseconds int) (*response, er
 	return response, nil
 }
 
+func (c *Client) WindowHandles() ([]string, error){
+	r, err := c.send("getWindowHandles", nil)
+	if err != nil {
+		return nil, errors.New(r.ResponseError.Message)
+	}
+
+	var d []string
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return nil, err
+	}
+
+	return d, nil
+}
+
+func (c *Client) SwitchToWindow(name string) error {
+	r, err := c.transport.send("switchToWindow", map[string]interface{}{"name": name})
+	if err != nil {
+		return errors.New(r.ResponseError.Message)
+	}
+
+	return nil
+}
+
+
+func (c *Client) CloseWindow() (*response, error) {
+	r, err := c.transport.send("close", nil)
+	if err != nil {
+		return nil, errors.New(r.ResponseError.Message)
+	}
+
+	return r, nil
+}
+
 ////////////////
 // NAVIGATION //
 ////////////////
 
 func (c *Client) Get(url string) (*response, error) {
-	response, err := c.transport.send("get", map[string]string{"url": url})
+	r, err := c.transport.send("get", map[string]string{"url": url})
 	if err != nil {
 		return nil, err
 	}
 
-	return response, nil
+	return r, nil
 }
 
 // get title
 func (c *Client) GetTitle() (string, error) {
-	response, err := c.transport.send("getTitle", map[string]string{})
+	r, err := c.transport.send("getTitle", map[string]string{})
 	if err != nil {
 		return "", err
 	}
 
 	var d = map[string]string{}
-	err = json.Unmarshal([]byte(response.Value), &d)
+	err = json.Unmarshal([]byte(r.Value), &d)
 	if err != nil {
 		return "", err
 	}
@@ -258,12 +298,44 @@ func (c *Client) GetTitle() (string, error) {
 }
 
 // get current url
+func (c *Client) CurrentUrl() error {
+	r, err := c.transport.send("goBack", nil)
+	if err != nil {
+		return errors.New(r.ResponseError.Message)
+	}
+
+	return nil
+}
 
 // refresh
+func (c *Client) Refresh() error {
+	r, err := c.transport.send("refresh", nil)
+	if err != nil {
+		return errors.New(r.ResponseError.Message)
+	}
+
+	return nil
+}
 
 // back
+func (c *Client) Back() error {
+	r, err := c.transport.send("goBack", nil)
+	if err != nil {
+		return errors.New(r.ResponseError.Message)
+	}
+
+	return nil
+}
 
 // forward
+func (c *Client) Forward() error {
+	r, err := c.transport.send("goForward", nil)
+	if err != nil {
+		return errors.New(r.ResponseError.Message)
+	}
+
+	return nil
+}
 
 //////////////////
 // WEB ELEMENTS //
@@ -506,14 +578,4 @@ func (c *Client) QuitApplication() (*response, error) {
 	}
 
 	return r, nil
-}
-
-func (c *Client) Close() (*response, error) {
-	defer c.transport.close()
-	response, err := c.transport.send("close", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
 }
