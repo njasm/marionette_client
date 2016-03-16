@@ -41,18 +41,13 @@ type Capabilities struct {
 type Client struct {
 	session
 	transport
-	navigation
 }
 
 func NewClient() *Client {
-	c := &Client{
+	return &Client{
 		session{},
 		transport{},
 	}
-
-	c.navigation = navigation{c: c}
-
-	return c
 }
 
 func (c *Client) GetSessionID() string {
