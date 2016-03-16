@@ -3,7 +3,6 @@ package marionette_client
 import (
 	"fmt"
 	"testing"
-	"strconv"
 )
 
 var client *Client
@@ -219,13 +218,13 @@ func TestFindElements(t *testing.T) {
 }
 
 // working
-//func TestQuitApplication(t *testing.T) {
-//    r, err := client.QuitApplication()
-//    if err != nil {
-//        fmt.Println(err)
-//        t.FailNow()
-//    }
-//
-//    fmt.Println(r.ResponseError)
-//}
+func TestQuitApplication(t *testing.T) {
+    r, err := client.QuitApplication()
+    if err != nil {
+        fmt.Println(err)
+        t.FailNow()
+    }
+
+    fmt.Println(r.ResponseError)
+}
 
