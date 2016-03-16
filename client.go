@@ -2,6 +2,7 @@ package marionette_client
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 type Context string
@@ -88,6 +89,10 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*response, err
 	}
 
 	err = json.Unmarshal([]byte(response.Value), &c)
+	if err != nil {
+		return nil, err
+	}
+
 	return response, nil
 }
 
@@ -120,7 +125,6 @@ func (c *Client) GetSessionCapabilities() (*Capabilities, error) {
 //     Log message.
 // param string level
 //     Arbitrary log level.
-
 func (c *Client) Log(message string, level string) (*response, error) {
 	response, err := c.transport.send("log", map[string]string{"value": message, "level": level})
 	if err != nil {
@@ -146,9 +150,8 @@ func (c *Client) GetLogs() (*response, error) {
 // param string value
 //     Name of the context to be switched to.  Must be one of "chrome" or
 //     "content".
-
-func (c *Client) SetContext(value string) (*response, error) {
-	response, err := c.transport.send("setContext", map[string]string{"value": value})
+func (c *Client) SetContext(value Context) (*response, error) {
+	response, err := c.transport.send("setContext", map[string]string{"value": string(value)})
 	if err != nil {
 		return nil, err
 	}
@@ -166,8 +169,15 @@ func (c *Client) GetContext() (*response, error) {
 	return response, nil
 }
 
-func (c *Client) ExecuteScript(value string) (*response, error) {
-	response, err := c.transport.send("executeScript", map[string]string{"value": value})
+func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, newSandbox bool) (*response, error) {
+    parameters := map[string]interface{}{}
+    parameters["scriptTimeout"] = timeout
+    parameters["script"] = script
+    parameters["args"] = args
+
+    parameters["newSandbox"] = newSandbox
+
+	response, err := c.transport.send("executeScript", parameters)
 	if err != nil {
 		return nil, err
 	}
@@ -179,27 +189,24 @@ func (c *Client) ExecuteScript(value string) (*response, error) {
 //
 // param number ms
 //     Time in milliseconds.
-
 func (c *Client) SetScriptTimeout(milliseconds int) (*response, error) {
-	return c.timeouts("script", milliseconds)
+	return timeouts(&c.transport, "script", milliseconds)
 }
 
 // Set timeout for searching for elements.
 //
 // param number ms
 //     Search timeout in milliseconds.
-
 func (c *Client) SetSearchTimeout(milliseconds int) (*response, error) {
-	return c.timeouts("implicit", milliseconds)
+	return timeouts(&c.transport, "implicit", milliseconds)
 }
 
 // Set timeout for page loading.
 //
 // param number ms
 //     Search timeout in milliseconds.
-
 func (c *Client) SetPageTimeout(milliseconds int) (*response, error) {
-	return c.timeouts("", milliseconds)
+	return timeouts(&c.transport, "", milliseconds)
 }
 
 // Set timeout for page loading, searching, and scripts.
@@ -208,18 +215,183 @@ func (c *Client) SetPageTimeout(milliseconds int) (*response, error) {
 //     Type of timeout.
 // param number ms
 //     Timeout in milliseconds.
-
-func (c *Client) timeouts(typ string, milliseconds int) (*response, error) {
+func timeouts(transport *transport, typ string, milliseconds int) (*response, error) {
 	if typ != "implicit" && typ != "script" {
 		typ = ""
 	}
 
-	response, err := c.transport.send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
+	response, err := transport.send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
 	if err != nil {
 		return nil, err
 	}
 
 	return response, nil
+}
+
+////////////////
+// NAVIGATION //
+////////////////
+
+
+func (c *Client) Get(url string) (*response, error) {
+	response, err := c.transport.send("get", map[string]string{"url": url})
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+// get title
+func (c *Client) GetTitle() (string, error) {
+	response, err := c.transport.send("getTitle", map[string]string{})
+	if err != nil {
+		return "", err
+	}
+
+	var d = map[string]string{}
+	err = json.Unmarshal([]byte(response.Value), &d)
+	if err != nil {
+		return "", err
+	}
+
+	return d["value"], nil
+}
+
+// get current url
+
+// refresh
+
+// back
+
+// forward
+
+//////////////////
+// WEB ELEMENTS //
+//////////////////
+
+func isElementEnabled(c *Client, id string) bool {
+	r, err := c.send("isElementEnabled", map[string]interface{}{"id": id})
+	if err != nil {
+		return false
+	}
+
+	return strings.Contains(r.Value, "\"value\":true")
+}
+
+func isElementSelected(c *Client, id string) bool {
+	r, err := c.send("isElementSelected", map[string]interface{}{"id": id})
+	if err != nil {
+		return false
+	}
+
+	return strings.Contains(r.Value, "\"value\":true")
+}
+
+func isElementDisplayed(c *Client, id string) bool {
+	r, err := c.send("isElementDisplayed", map[string]interface{}{"id": id})
+	if err != nil {
+		return false
+	}
+
+	return strings.Contains(r.Value, "\"value\":true")
+}
+
+func getElementTagName(c *Client, id string) string {
+	r, err := c.send("getElementTagName", map[string]interface{}{"id": id})
+	if err != nil {
+		return ""
+	}
+
+	var d = map[string]string{}
+	json.Unmarshal([]byte(r.Value), &d)
+
+	return d["value"]
+}
+
+
+func getElementText(c *Client, id string) string {
+	r, err := c.send("getElementText", map[string]interface{}{"id": id})
+	if err != nil {
+		return ""
+	}
+
+	var d = map[string]string{}
+	json.Unmarshal([]byte(r.Value), &d)
+
+	return d["value"]
+}
+
+func getElementAttribute(c *Client, id string, name string) string {
+	r, err := c.send("getElementAttribute", map[string]interface{}{"id": id, "name": name})
+	if err != nil {
+		return ""
+	}
+
+	var d = map[string]string{}
+	json.Unmarshal([]byte(r.Value), &d)
+
+	return d["value"]
+}
+
+func getElementCssPropertyValue(c *Client, id string, property string) string {
+	r, err := c.send("getElementValueOfCssProperty", map[string]interface{}{"id": id, "propertyName": property})
+	if err != nil {
+		return ""
+	}
+
+	var d = map[string]string{}
+	json.Unmarshal([]byte(r.Value), &d)
+
+	return d["value"]
+}
+
+func getElementRect(c *Client, id string) map[string]interface{} {
+	r, err := c.send("getElementRect", map[string]interface{}{"id": id})
+	if err != nil {
+		return nil
+	}
+
+	var d = map[string]interface{}{}
+	json.Unmarshal([]byte(r.Value), &d)
+
+	return d
+}
+
+func clickElement(c *Client, id string) {
+	r, err := c.send("clickElement", map[string]interface{}{"id": id})
+	if err != nil {
+		return
+	}
+
+	var d = map[string]interface{}{}
+	json.Unmarshal([]byte(r.Value), &d)
+
+	//return d
+}
+
+func sendKeysToElement(c *Client, id string, keys string) {
+	r, err := c.send("sendKeysToElement", map[string]interface{}{"id": id, "value": keys})
+	if err != nil {
+		return
+	}
+
+	var d = map[string]interface{}{}
+	json.Unmarshal([]byte(r.Value), &d)
+
+	//return d
+}
+
+func clearElement(c *Client, id string) {
+	r, err := c.send("clearElement", map[string]interface{}{"id": id})
+	if err != nil {
+		return
+	}
+
+	var d = map[string]interface{}{}
+	json.Unmarshal([]byte(r.Value), &d)
+
+	//return d
 }
 
 // Find elements using the indicated search strategy.
@@ -228,23 +400,122 @@ func (c *Client) timeouts(typ string, milliseconds int) (*response, error) {
 //     Indicates which search method to use.
 // param string value
 //     Value the client is looking for.
+func (c *Client) FindElements(by string, value string, startNode *string) ([]*webElement, error) {
+	return findElements(c, by, value, startNode)
+}
 
-//func (c *Client) FindElements(by string, value string) {
-//	buf, err := c.transport.send("findElements", map[string]interface{}{})
-//    if err != nil {
-//        return "", err
-//    }
-//
-//    return string(buf), nil
-//}
 
-func (c *Client) Close() (*response, error) {
-	response, err := c.transport.send("close", nil)
+func findElements(c *Client, by string, value string, startNode *string) ([]*webElement, error) {
+	var params map[string]interface{}
+	if startNode == nil || *startNode == "" {
+		params = map[string]interface{}{"using": by, "value" : value}
+	} else {
+		params = map[string]interface{}{"using": by, "value" : value, "element": *startNode}
+	}
+
+	response, err := c.transport.send("findElements", params)
 	if err != nil {
 		return nil, err
 	}
 
-	err = c.transport.close()
+	var d []map[string]string
+	err = json.Unmarshal([]byte(response.Value), &d)
+	if err != nil {
+		return nil, err
+	}
+
+	var e []*webElement
+	for _, v := range d {
+		e = append(e, &webElement{c: c, id: v["element-6066-11e4-a52e-4f735466cecf"]})
+	}
+
+	return e, nil
+
+	//return string(buf), nil
+}
+
+// Find an element using the indicated search strategy.
+//
+// @param {string} using
+//     Indicates which search method to use.
+// @param {string} value
+//     Value the client is looking for.
+func (c *Client) FindElement(by string, value string, startNode *string) (*webElement, error) {
+	return findElement(c, by, value, startNode)
+}
+
+func findElement(c *Client, by string, value string, startNode *string) (*webElement, error) {
+	var params map[string]interface{}
+	if startNode == nil || *startNode == "" {
+		params = map[string]interface{}{"using": by, "value" : value}
+	} else {
+		params = map[string]interface{}{"using": by, "value" : value, "element": *startNode}
+	}
+
+	response, err := c.transport.send("findElement", params)
+	if err != nil {
+		return nil, err
+	}
+
+	var e = &webElement{c: c}
+	err = json.Unmarshal([]byte(response.Value), &e)
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+/////////////
+// DIALOGS //
+/////////////
+
+func (c *Client) DismissDialog() (*responseError, bool, error) {
+	ok := false
+	r, err := c.transport.send("dismissDialog", nil)
+	if err != nil {
+		return nil, ok, err
+	}
+
+	if r.ResponseError != nil {
+		return r.ResponseError, ok, nil
+	}
+
+	return nil, true, nil
+}
+
+
+func (c *Client) AcceptDialog() (*responseError, bool, error) {
+    ok := false
+    r, err := c.transport.send("acceptDialog", nil)
+    if err != nil {
+        return nil, ok, err
+    }
+
+    if r.ResponseError != nil {
+        return r.ResponseError, ok, nil
+    }
+
+    return nil, true, nil
+}
+
+
+///////////////////////
+// DISPOSE TEAR DOWN //
+///////////////////////
+
+func (c *Client) QuitApplication() (*response, error) {
+    r, err := c.transport.send("quitApplication", map[string]string{ "flags": "eForceQuit" });
+    if err != nil {
+        return nil, err
+    }
+
+    return r, nil
+}
+
+func (c *Client) Close() (*response, error) {
+    defer c.transport.close()
+	response, err := c.transport.send("close", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -252,6 +523,3 @@ func (c *Client) Close() (*response, error) {
 	return response, nil
 }
 
-func (c *Client) GetStatus() {
-
-}

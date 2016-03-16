@@ -3,6 +3,7 @@ package marionette_client
 import (
 	"fmt"
 	"testing"
+	"strconv"
 )
 
 var client *Client
@@ -25,9 +26,10 @@ func TestNewSession(t *testing.T) {
 	}
 
 	fmt.Println(r.Value)
-	client.Close()
+	//client.Close()
 }
 
+// working
 func TestGetSessionID(t *testing.T) {
 	if client.SessionId != client.GetSessionID() {
 		fmt.Println("SessionId differ...")
@@ -37,16 +39,16 @@ func TestGetSessionID(t *testing.T) {
 	fmt.Println("session is : ", client.SessionId)
 }
 
-func TestConnectWithActiveConnection(t *testing.T) {
-	err := client.Connect("", 0)
-	if err == nil {
-		fmt.Println(err)
-	}
+//func TestConnectWithActiveConnection(t *testing.T) {
+//	err := client.Connect("", 0)
+//	if err == nil {
+//		fmt.Println(err)
+//	}
+//
+//	fmt.Println("No Error..")
+//}
 
-	fmt.Println("No Error..")
-}
-
-
+// working
 func TestGetSessionCapabilities(t *testing.T) {
 	r, err := client.GetSessionCapabilities()
 	if err != nil {
@@ -57,6 +59,7 @@ func TestGetSessionCapabilities(t *testing.T) {
 	fmt.Println(r.BrowserName)
 }
 
+// working
 func TestLog(t *testing.T) {
 	r, err := client.Log("message testing", "warning")
 	if err != nil {
@@ -67,6 +70,7 @@ func TestLog(t *testing.T) {
 	fmt.Println(r.Value)
 }
 
+// working
 func TestGetLogs(t *testing.T) {
 	r, err := client.GetLogs()
 	if err != nil {
@@ -76,3 +80,152 @@ func TestGetLogs(t *testing.T) {
 
 	fmt.Println(r.Value)
 }
+
+func TestSetContext(t *testing.T) {
+    r, err := client.SetContext(CONTEXT_CHROME)
+    if err != nil {
+        fmt.Println(err)
+        t.FailNow()
+    }
+
+    fmt.Println(r.Value)
+
+    r, err = client.SetContext(CONTEXT_CONTENT)
+    if err != nil {
+        fmt.Println(err)
+        t.FailNow()
+    }
+
+    fmt.Println(r.Value)
+}
+
+func TestGetContext(t *testing.T) {
+    r, err := client.GetContext()
+    if err != nil {
+        fmt.Println(err)
+        t.FailNow()
+    }
+
+    fmt.Println(r.Value)
+}
+
+func TestSetScriptTimout(t *testing.T) {
+    r, err := client.SetScriptTimeout(1000)
+    if err != nil {
+        fmt.Println(err)
+        t.FailNow()
+    }
+
+    fmt.Println(r.Value)
+}
+
+func TestSetPageTimout(t *testing.T) {
+    r, err := client.SetPageTimeout(1000)
+    if err != nil {
+        fmt.Println(err)
+        t.FailNow()
+    }
+
+    fmt.Println(r.Value)
+}
+
+func TestSetSearchTimout(t *testing.T) {
+    r, err := client.SetSearchTimeout(1000)
+    if err != nil {
+        fmt.Println(err)
+        t.FailNow()
+    }
+
+    fmt.Println(r.Value)
+}
+
+func TestGetPage(t *testing.T) {
+    r, err := client.Get("http://www.abola.pt/")
+    if err != nil {
+        fmt.Println(err)
+        t.FailNow()
+    }
+
+    fmt.Println(r.Value)
+}
+
+func TestExecuteScript(t *testing.T) {
+	script := "function testMyGoMarionetteClient() { alert('yes'); } testMyGoMarionetteClient();"
+	args := []interface{}{}
+	r, err := client.ExecuteScript(script, args, 1000, false)
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
+
+	fmt.Println(r.Value)
+
+	client.DismissDialog();
+}
+
+func TestExecuteScriptWithArgs(t *testing.T) {
+	script := "function testMyGoMarionetteClientArgs(a, b) { alert(a + b); }; testMyGoMarionetteClientArgs(arguments[0], arguments[1]);"
+    args := []interface{}{1, 3}
+    r, err := client.ExecuteScript(script, args, 1000, false)
+    if err != nil {
+        fmt.Println(err)
+        t.FailNow()
+    }
+
+    fmt.Println(r.Value)
+}
+
+func TestGetTitle(t *testing.T) {
+	title, err := client.GetTitle()
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
+
+	fmt.Println(title)
+
+}
+func TestFindElement(t *testing.T) {
+	element, err := client.FindElement("id", "clubes-hp", nil)
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
+
+	collection, err := element.FindElements("css selector", "li");
+	if 18 != len(collection) {
+		t.FailNow()
+	}
+}
+
+func TestFindElements(t *testing.T) {
+	elements, err := client.FindElements("css selector", "li", nil)
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
+
+	for _, e := range elements {
+		fmt.Println(e.Id())
+		fmt.Println(e.IsEnabled())
+		fmt.Println(e.IsSelected())
+		fmt.Println(e.IsDisplayed())
+		fmt.Println(e.TagName())
+		fmt.Println(e.Text())
+		fmt.Println(e.Attribute("id"))
+		fmt.Println(e.CssValue("text-decoration"))
+		fmt.Println(e.Rect())
+	}
+}
+
+// working
+//func TestQuitApplication(t *testing.T) {
+//    r, err := client.QuitApplication()
+//    if err != nil {
+//        fmt.Println(err)
+//        t.FailNow()
+//    }
+//
+//    fmt.Println(r.ResponseError)
+//}
+
