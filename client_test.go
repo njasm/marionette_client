@@ -81,71 +81,71 @@ func TestGetLogs(t *testing.T) {
 }
 
 func TestSetContext(t *testing.T) {
-    r, err := client.SetContext(CONTEXT_CHROME)
-    if err != nil {
-        fmt.Println(err)
-        t.FailNow()
-    }
+	r, err := client.SetContext(CONTEXT_CHROME)
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
 
-    fmt.Println(r.Value)
+	fmt.Println(r.Value)
 
-    r, err = client.SetContext(CONTEXT_CONTENT)
-    if err != nil {
-        fmt.Println(err)
-        t.FailNow()
-    }
+	r, err = client.SetContext(CONTEXT_CONTENT)
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
 
-    fmt.Println(r.Value)
+	fmt.Println(r.Value)
 }
 
 func TestGetContext(t *testing.T) {
-    r, err := client.GetContext()
-    if err != nil {
-        fmt.Println(err)
-        t.FailNow()
-    }
+	r, err := client.GetContext()
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
 
-    fmt.Println(r.Value)
+	fmt.Println(r.Value)
 }
 
 func TestSetScriptTimout(t *testing.T) {
-    r, err := client.SetScriptTimeout(1000)
-    if err != nil {
-        fmt.Println(err)
-        t.FailNow()
-    }
+	r, err := client.SetScriptTimeout(1000)
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
 
-    fmt.Println(r.Value)
+	fmt.Println(r.Value)
 }
 
 func TestSetPageTimout(t *testing.T) {
-    r, err := client.SetPageTimeout(1000)
-    if err != nil {
-        fmt.Println(err)
-        t.FailNow()
-    }
+	r, err := client.SetPageTimeout(1000)
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
 
-    fmt.Println(r.Value)
+	fmt.Println(r.Value)
 }
 
 func TestSetSearchTimout(t *testing.T) {
-    r, err := client.SetSearchTimeout(1000)
-    if err != nil {
-        fmt.Println(err)
-        t.FailNow()
-    }
+	r, err := client.SetSearchTimeout(1000)
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
 
-    fmt.Println(r.Value)
+	fmt.Println(r.Value)
 }
 
 func TestGetPage(t *testing.T) {
-    r, err := client.Get("http://www.abola.pt/")
-    if err != nil {
-        fmt.Println(err)
-        t.FailNow()
-    }
+	r, err := client.Get("http://www.abola.pt/")
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
 
-    fmt.Println(r.Value)
+	fmt.Println(r.Value)
 }
 
 func TestExecuteScript(t *testing.T) {
@@ -159,19 +159,19 @@ func TestExecuteScript(t *testing.T) {
 
 	fmt.Println(r.Value)
 
-	client.DismissDialog();
+	client.DismissDialog()
 }
 
 func TestExecuteScriptWithArgs(t *testing.T) {
 	script := "function testMyGoMarionetteClientArgs(a, b) { alert(a + b); }; testMyGoMarionetteClientArgs(arguments[0], arguments[1]);"
-    args := []interface{}{1, 3}
-    r, err := client.ExecuteScript(script, args, 1000, false)
-    if err != nil {
-        fmt.Println(err)
-        t.FailNow()
-    }
+	args := []interface{}{1, 3}
+	r, err := client.ExecuteScript(script, args, 1000, false)
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
 
-    fmt.Println(r.Value)
+	fmt.Println(r.Value)
 }
 
 func TestGetTitle(t *testing.T) {
@@ -191,7 +191,17 @@ func TestFindElement(t *testing.T) {
 		t.FailNow()
 	}
 
-	collection, err := element.FindElements("css selector", "li");
+	fmt.Println(element.Id())
+	fmt.Println(element.IsEnabled())
+	fmt.Println(element.IsSelected())
+	fmt.Println(element.IsDisplayed())
+	fmt.Println(element.TagName())
+	fmt.Println(element.Text())
+	fmt.Println(element.Attribute("id"))
+	fmt.Println(element.CssValue("text-decoration"))
+	fmt.Println(element.Rect())
+
+	collection, err := element.FindElements("css selector", "li")
 	if 18 != len(collection) {
 		t.FailNow()
 	}
@@ -204,27 +214,16 @@ func TestFindElements(t *testing.T) {
 		t.FailNow()
 	}
 
-	for _, e := range elements {
-		fmt.Println(e.Id())
-		fmt.Println(e.IsEnabled())
-		fmt.Println(e.IsSelected())
-		fmt.Println(e.IsDisplayed())
-		fmt.Println(e.TagName())
-		fmt.Println(e.Text())
-		fmt.Println(e.Attribute("id"))
-		fmt.Println(e.CssValue("text-decoration"))
-		fmt.Println(e.Rect())
-	}
+	fmt.Println(len(elements))
 }
 
 // working
-func TestQuitApplication(t *testing.T) {
-    r, err := client.QuitApplication()
-    if err != nil {
-        fmt.Println(err)
-        t.FailNow()
-    }
-
-    fmt.Println(r.ResponseError)
-}
-
+//func TestQuitApplication(t *testing.T) {
+//	r, err := client.QuitApplication()
+//	if err != nil {
+//		fmt.Println(err)
+//		t.FailNow()
+//	}
+//
+//	fmt.Println(r.ResponseError)
+//}

@@ -71,7 +71,7 @@ func (t *transport) close() error {
 }
 
 func (t *transport) send(command string, values interface{}) (*response, error) {
-    t.messageID = t.messageID+1
+	t.messageID = t.messageID + 1
 	buf, err := t.transformToCommand(command, values)
 	if err != nil {
 		return nil, err
@@ -140,21 +140,21 @@ func getMessageLength(c net.Conn) (int, error) {
 }
 
 func (t *transport) transformToCommand(command string, values interface{}) (bytes []byte, err error) {
-    var size int
-    if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V2 {
-        bytes, err = makeProto2Command(command, values)
-    } else if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V3 {
-        bytes, err = makeProto3Command(t.messageID, command, values)
-    } else {
-        return nil, errors.New("Marionete Protocol version not supported.")
-    }
+	var size int
+	if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V2 {
+		bytes, err = makeProto2Command(command, values)
+	} else if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V3 {
+		bytes, err = makeProto3Command(t.messageID, command, values)
+	} else {
+		return nil, errors.New("Marionete Protocol version not supported.")
+	}
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    size = len(bytes)
-    return []byte(strconv.Itoa(size) + ":" + string(bytes)), nil
+	size = len(bytes)
+	return []byte(strconv.Itoa(size) + ":" + string(bytes)), nil
 }
 
 func (t *transport) transformToResponse(buf []byte, err error) (*response, error) {
@@ -170,4 +170,3 @@ func (t *transport) transformToResponse(buf []byte, err error) (*response, error
 
 	return nil, errors.New("Unable to decode Protocol version for message decoding.")
 }
-

@@ -5,5 +5,4 @@ type Navigater interface {
 }
 
 type navigation struct {
-
 }

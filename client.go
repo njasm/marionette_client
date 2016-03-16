@@ -8,10 +8,10 @@ import (
 type Context string
 
 const (
-	CONTEXT_CHROME  Context = "chrome"
-	CONTEXT_CONTENT Context = "content"
-	MARIONETTE_PROTOCOL_V2 = 2
-	MARIONETTE_PROTOCOL_V3 = 3
+	CONTEXT_CHROME         Context = "chrome"
+	CONTEXT_CONTENT        Context = "content"
+	MARIONETTE_PROTOCOL_V2         = 2
+	MARIONETTE_PROTOCOL_V3         = 3
 )
 
 type session struct {
@@ -170,12 +170,12 @@ func (c *Client) GetContext() (*response, error) {
 }
 
 func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, newSandbox bool) (*response, error) {
-    parameters := map[string]interface{}{}
-    parameters["scriptTimeout"] = timeout
-    parameters["script"] = script
-    parameters["args"] = args
+	parameters := map[string]interface{}{}
+	parameters["scriptTimeout"] = timeout
+	parameters["script"] = script
+	parameters["args"] = args
 
-    parameters["newSandbox"] = newSandbox
+	parameters["newSandbox"] = newSandbox
 
 	response, err := c.transport.send("executeScript", parameters)
 	if err != nil {
@@ -231,7 +231,6 @@ func timeouts(transport *transport, typ string, milliseconds int) (*response, er
 ////////////////
 // NAVIGATION //
 ////////////////
-
 
 func (c *Client) Get(url string) (*response, error) {
 	response, err := c.transport.send("get", map[string]string{"url": url})
@@ -308,7 +307,6 @@ func getElementTagName(c *Client, id string) string {
 
 	return d["value"]
 }
-
 
 func getElementText(c *Client, id string) string {
 	r, err := c.send("getElementText", map[string]interface{}{"id": id})
@@ -404,13 +402,12 @@ func (c *Client) FindElements(by string, value string, startNode *string) ([]*we
 	return findElements(c, by, value, startNode)
 }
 
-
 func findElements(c *Client, by string, value string, startNode *string) ([]*webElement, error) {
 	var params map[string]interface{}
 	if startNode == nil || *startNode == "" {
-		params = map[string]interface{}{"using": by, "value" : value}
+		params = map[string]interface{}{"using": by, "value": value}
 	} else {
-		params = map[string]interface{}{"using": by, "value" : value, "element": *startNode}
+		params = map[string]interface{}{"using": by, "value": value, "element": *startNode}
 	}
 
 	response, err := c.transport.send("findElements", params)
@@ -447,9 +444,9 @@ func (c *Client) FindElement(by string, value string, startNode *string) (*webEl
 func findElement(c *Client, by string, value string, startNode *string) (*webElement, error) {
 	var params map[string]interface{}
 	if startNode == nil || *startNode == "" {
-		params = map[string]interface{}{"using": by, "value" : value}
+		params = map[string]interface{}{"using": by, "value": value}
 	} else {
-		params = map[string]interface{}{"using": by, "value" : value, "element": *startNode}
+		params = map[string]interface{}{"using": by, "value": value, "element": *startNode}
 	}
 
 	response, err := c.transport.send("findElement", params)
@@ -484,37 +481,35 @@ func (c *Client) DismissDialog() (*responseError, bool, error) {
 	return nil, true, nil
 }
 
-
 func (c *Client) AcceptDialog() (*responseError, bool, error) {
-    ok := false
-    r, err := c.transport.send("acceptDialog", nil)
-    if err != nil {
-        return nil, ok, err
-    }
+	ok := false
+	r, err := c.transport.send("acceptDialog", nil)
+	if err != nil {
+		return nil, ok, err
+	}
 
-    if r.ResponseError != nil {
-        return r.ResponseError, ok, nil
-    }
+	if r.ResponseError != nil {
+		return r.ResponseError, ok, nil
+	}
 
-    return nil, true, nil
+	return nil, true, nil
 }
-
 
 ///////////////////////
 // DISPOSE TEAR DOWN //
 ///////////////////////
 
 func (c *Client) QuitApplication() (*response, error) {
-    r, err := c.transport.send("quitApplication", map[string]string{ "flags": "eForceQuit" });
-    if err != nil {
-        return nil, err
-    }
+	r, err := c.transport.send("quitApplication", map[string]string{"flags": "eForceQuit"})
+	if err != nil {
+		return nil, err
+	}
 
-    return r, nil
+	return r, nil
 }
 
 func (c *Client) Close() (*response, error) {
-    defer c.transport.close()
+	defer c.transport.close()
 	response, err := c.transport.send("close", nil)
 	if err != nil {
 		return nil, err
@@ -522,4 +517,3 @@ func (c *Client) Close() (*response, error) {
 
 	return response, nil
 }
-
