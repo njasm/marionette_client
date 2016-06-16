@@ -30,11 +30,9 @@ func TestNewSession(t *testing.T) {
 }
 
 func TestScreenshot(t *testing.T) {
-	resp, err := client.Screenshot()
+	_, err := client.Screenshot()
 	if err != nil {
 		t.Errorf(err.Error())
-	} else {
-		t.Log(resp.Value)
 	}
 }
 
