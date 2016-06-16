@@ -2,8 +2,8 @@ package marionette_client
 
 import (
 	"encoding/json"
-	"strings"
 	"errors"
+	"strings"
 )
 
 type Context string
@@ -229,7 +229,7 @@ func timeouts(transport *transport, typ string, milliseconds int) (*response, er
 	return response, nil
 }
 
-func (c *Client) WindowHandles() ([]string, error){
+func (c *Client) WindowHandles() ([]string, error) {
 	r, err := c.send("getWindowHandles", nil)
 	if err != nil {
 		return nil, errors.New(r.ResponseError.Message)
@@ -252,7 +252,6 @@ func (c *Client) SwitchToWindow(name string) error {
 
 	return nil
 }
-
 
 func (c *Client) CloseWindow() (*response, error) {
 	r, err := c.transport.send("close", nil)
@@ -573,4 +572,14 @@ func (c *Client) QuitApplication() (*response, error) {
 	}
 
 	return r, nil
+}
+
+func (c *Client) Screenshot() (*response, error) {
+	r, err := c.transport.send("screenShot", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+
 }
