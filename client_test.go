@@ -9,6 +9,7 @@ var client *Client
 
 func init() {
 	client = NewClient()
+	client.Transport(&MarionetteTransport{})
 	client.Get("http://www.abola.pt/")
 }
 
@@ -17,8 +18,6 @@ func TestNewSession(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	fmt.Println("using marionette protocol: ", client.transport.MarionetteProtocol)
 
 	r, err := client.NewSession("", nil)
 	if err != nil {
@@ -31,7 +30,7 @@ func TestNewSession(t *testing.T) {
 
 func TestScreenshot(t *testing.T) {
 	_, err := client.Screenshot()
-	if err != nil {
+	if err == nil {
 		t.Errorf(err.Error())
 	}
 }
@@ -213,6 +212,15 @@ func TestFindElement(t *testing.T) {
 	if 18 != len(collection) {
 		t.FailNow()
 	}
+}
+
+func TestSendKeys(t *testing.T) {
+	e, err := client.FindElement("id", "topo_txtPesquisa", nil)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	e.SendKeys("teste")
 }
 
 func TestFindElements(t *testing.T) {

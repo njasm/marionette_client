@@ -3,6 +3,7 @@ package marionette_client
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -19,35 +20,20 @@ type session struct {
 	SessionId string
 }
 
-type Capabilities struct {
-	BrowserName                   string
-	BrowserVersion                string
-	PlatformName                  string
-	PlatformVersion               string
-	SpecificationLevel            string
-	RaisesAccessibilityExceptions bool
-	Rotatable                     bool
-	AcceptSslCerts                bool
-	TakesElementScreenshot        bool
-	TakesScreenshot               bool
-	Proxy                         interface{}
-	Platform                      string
-	XULappId                      string
-	AppBuildId                    string
-	Device                        string
-	Version                       string
-}
-
 type Client struct {
 	session
-	transport
+	transport Transporter
 }
 
 func NewClient() *Client {
 	return &Client{
 		session{},
-		transport{},
+		&MarionetteTransport{},
 	}
+}
+
+func (c *Client) Transport(t Transporter) {
+	c.transport = t
 }
 
 func (c *Client) GetSessionID() string {
@@ -55,13 +41,13 @@ func (c *Client) GetSessionID() string {
 }
 
 func (c *Client) Connect(host string, port int) error {
-	return c.transport.connect(host, port)
+	return c.transport.Connect(host, port)
 }
 
 // Protocol commands
 // NOT A COMMAND
 //func (c *Client) GetMarionetteID() (*response, error) {
-//	response, err := c.transport.send("getMarionetteID", nil)
+//	response, err := c.transport.Send("getMarionetteID", nil)
 //	if err != nil {
 //		return nil, err
 //	}
@@ -70,7 +56,7 @@ func (c *Client) Connect(host string, port int) error {
 //}
 
 //func (c *Client) SayHello() (*response, error) {
-//	response, err := c.transport.send("sayHello", nil)
+//	response, err := c.transport.Send("sayHello", nil)
 //	if err != nil {
 //		return nil, err
 //	}
@@ -84,7 +70,7 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*response, err
 		"capabilities": cap,
 	}
 
-	response, err := c.transport.send("newSession", data)
+	response, err := c.transport.Send("newSession", data)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +91,7 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*response, err
 // ("capabilities") to values, which may be of types boolean,
 // numerical or string.
 func (c *Client) GetSessionCapabilities() (*Capabilities, error) {
-	buf, err := c.transport.send("getSessionCapabilities", nil)
+	buf, err := c.transport.Send("getSessionCapabilities", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +113,7 @@ func (c *Client) GetSessionCapabilities() (*Capabilities, error) {
 // param string level
 //     Arbitrary log level.
 func (c *Client) Log(message string, level string) (*response, error) {
-	response, err := c.transport.send("log", map[string]string{"value": message, "level": level})
+	response, err := c.transport.Send("log", map[string]string{"value": message, "level": level})
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +123,7 @@ func (c *Client) Log(message string, level string) (*response, error) {
 
 //  Return all logged messages.
 func (c *Client) GetLogs() (*response, error) {
-	response, err := c.transport.send("getLogs", nil)
+	response, err := c.transport.Send("getLogs", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +138,7 @@ func (c *Client) GetLogs() (*response, error) {
 //     Name of the context to be switched to.  Must be one of "chrome" or
 //     "content".
 func (c *Client) SetContext(value Context) (*response, error) {
-	response, err := c.transport.send("setContext", map[string]string{"value": string(value)})
+	response, err := c.transport.Send("setContext", map[string]string{"value": string(value)})
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +148,7 @@ func (c *Client) SetContext(value Context) (*response, error) {
 
 //  Gets the context of the server, either "chrome" or "content".
 func (c *Client) GetContext() (*response, error) {
-	response, err := c.transport.send("getContext", nil)
+	response, err := c.transport.Send("getContext", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +164,7 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 
 	parameters["newSandbox"] = newSandbox
 
-	response, err := c.transport.send("executeScript", parameters)
+	response, err := c.transport.Send("executeScript", parameters)
 	if err != nil {
 		return nil, err
 	}
@@ -216,12 +202,12 @@ func (c *Client) SetPageTimeout(milliseconds int) (*response, error) {
 //     Type of timeout.
 // param number ms
 //     Timeout in milliseconds.
-func timeouts(transport *transport, typ string, milliseconds int) (*response, error) {
+func timeouts(transport *Transporter, typ string, milliseconds int) (*response, error) {
 	if typ != "implicit" && typ != "script" {
 		typ = ""
 	}
 
-	response, err := transport.send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
+	response, err := (*transport).Send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
 	if err != nil {
 		return nil, err
 	}
@@ -230,7 +216,7 @@ func timeouts(transport *transport, typ string, milliseconds int) (*response, er
 }
 
 func (c *Client) WindowHandles() ([]string, error) {
-	r, err := c.send("getWindowHandles", nil)
+	r, err := c.transport.Send("getWindowHandles", nil)
 	if err != nil {
 		return nil, errors.New(r.ResponseError.Message)
 	}
@@ -245,7 +231,7 @@ func (c *Client) WindowHandles() ([]string, error) {
 }
 
 func (c *Client) SwitchToWindow(name string) error {
-	r, err := c.transport.send("switchToWindow", map[string]interface{}{"name": name})
+	r, err := c.transport.Send("switchToWindow", map[string]interface{}{"name": name})
 	if err != nil {
 		return errors.New(r.ResponseError.Message)
 	}
@@ -254,7 +240,7 @@ func (c *Client) SwitchToWindow(name string) error {
 }
 
 func (c *Client) CloseWindow() (*response, error) {
-	r, err := c.transport.send("close", nil)
+	r, err := c.transport.Send("close", nil)
 	if err != nil {
 		return nil, errors.New(r.ResponseError.Message)
 	}
@@ -267,7 +253,7 @@ func (c *Client) CloseWindow() (*response, error) {
 ////////////////
 
 func (c *Client) Get(url string) (*response, error) {
-	r, err := c.transport.send("get", map[string]string{"url": url})
+	r, err := c.transport.Send("get", map[string]string{"url": url})
 	if err != nil {
 		return nil, err
 	}
@@ -277,7 +263,7 @@ func (c *Client) Get(url string) (*response, error) {
 
 // get title
 func (c *Client) GetTitle() (string, error) {
-	r, err := c.transport.send("getTitle", map[string]string{})
+	r, err := c.transport.Send("getTitle", map[string]string{})
 	if err != nil {
 		return "", err
 	}
@@ -293,7 +279,7 @@ func (c *Client) GetTitle() (string, error) {
 
 // get current url
 func (c *Client) CurrentUrl() error {
-	r, err := c.transport.send("goBack", nil)
+	r, err := c.transport.Send("goBack", nil)
 	if err != nil {
 		return errors.New(r.ResponseError.Message)
 	}
@@ -303,7 +289,7 @@ func (c *Client) CurrentUrl() error {
 
 // refresh
 func (c *Client) Refresh() error {
-	r, err := c.transport.send("refresh", nil)
+	r, err := c.transport.Send("refresh", nil)
 	if err != nil {
 		return errors.New(r.ResponseError.Message)
 	}
@@ -313,7 +299,7 @@ func (c *Client) Refresh() error {
 
 // back
 func (c *Client) Back() error {
-	r, err := c.transport.send("goBack", nil)
+	r, err := c.transport.Send("goBack", nil)
 	if err != nil {
 		return errors.New(r.ResponseError.Message)
 	}
@@ -323,7 +309,7 @@ func (c *Client) Back() error {
 
 // forward
 func (c *Client) Forward() error {
-	r, err := c.transport.send("goForward", nil)
+	r, err := c.transport.Send("goForward", nil)
 	if err != nil {
 		return errors.New(r.ResponseError.Message)
 	}
@@ -336,7 +322,7 @@ func (c *Client) Forward() error {
 //////////////////
 
 func isElementEnabled(c *Client, id string) bool {
-	r, err := c.send("isElementEnabled", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("isElementEnabled", map[string]interface{}{"id": id})
 	if err != nil {
 		return false
 	}
@@ -345,7 +331,7 @@ func isElementEnabled(c *Client, id string) bool {
 }
 
 func isElementSelected(c *Client, id string) bool {
-	r, err := c.send("isElementSelected", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("isElementSelected", map[string]interface{}{"id": id})
 	if err != nil {
 		return false
 	}
@@ -354,7 +340,7 @@ func isElementSelected(c *Client, id string) bool {
 }
 
 func isElementDisplayed(c *Client, id string) bool {
-	r, err := c.send("isElementDisplayed", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("isElementDisplayed", map[string]interface{}{"id": id})
 	if err != nil {
 		return false
 	}
@@ -363,7 +349,7 @@ func isElementDisplayed(c *Client, id string) bool {
 }
 
 func getElementTagName(c *Client, id string) string {
-	r, err := c.send("getElementTagName", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("getElementTagName", map[string]interface{}{"id": id})
 	if err != nil {
 		return ""
 	}
@@ -375,7 +361,7 @@ func getElementTagName(c *Client, id string) string {
 }
 
 func getElementText(c *Client, id string) string {
-	r, err := c.send("getElementText", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("getElementText", map[string]interface{}{"id": id})
 	if err != nil {
 		return ""
 	}
@@ -387,7 +373,7 @@ func getElementText(c *Client, id string) string {
 }
 
 func getElementAttribute(c *Client, id string, name string) string {
-	r, err := c.send("getElementAttribute", map[string]interface{}{"id": id, "name": name})
+	r, err := c.transport.Send("getElementAttribute", map[string]interface{}{"id": id, "name": name})
 	if err != nil {
 		return ""
 	}
@@ -399,7 +385,7 @@ func getElementAttribute(c *Client, id string, name string) string {
 }
 
 func getElementCssPropertyValue(c *Client, id string, property string) string {
-	r, err := c.send("getElementValueOfCssProperty", map[string]interface{}{"id": id, "propertyName": property})
+	r, err := c.transport.Send("getElementValueOfCssProperty", map[string]interface{}{"id": id, "propertyName": property})
 	if err != nil {
 		return ""
 	}
@@ -411,7 +397,7 @@ func getElementCssPropertyValue(c *Client, id string, property string) string {
 }
 
 func getElementRect(c *Client, id string) map[string]interface{} {
-	r, err := c.send("getElementRect", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("getElementRect", map[string]interface{}{"id": id})
 	if err != nil {
 		return nil
 	}
@@ -423,7 +409,7 @@ func getElementRect(c *Client, id string) map[string]interface{} {
 }
 
 func clickElement(c *Client, id string) {
-	r, err := c.send("clickElement", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("clickElement", map[string]interface{}{"id": id})
 	if err != nil {
 		return
 	}
@@ -435,7 +421,12 @@ func clickElement(c *Client, id string) {
 }
 
 func sendKeysToElement(c *Client, id string, keys string) {
-	r, err := c.send("sendKeysToElement", map[string]interface{}{"id": id, "value": keys})
+	slice := make([]string, 0)
+	for _, v := range keys {
+		slice = append(slice, fmt.Sprintf("%c", v))
+	}
+
+	r, err := c.transport.Send("sendKeysToElement", map[string]interface{}{"id": id, "value": slice})
 	if err != nil {
 		return
 	}
@@ -447,7 +438,7 @@ func sendKeysToElement(c *Client, id string, keys string) {
 }
 
 func clearElement(c *Client, id string) {
-	r, err := c.send("clearElement", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("clearElement", map[string]interface{}{"id": id})
 	if err != nil {
 		return
 	}
@@ -476,7 +467,7 @@ func findElements(c *Client, by string, value string, startNode *string) ([]*web
 		params = map[string]interface{}{"using": by, "value": value, "element": *startNode}
 	}
 
-	response, err := c.transport.send("findElements", params)
+	response, err := c.transport.Send("findElements", params)
 	if err != nil {
 		return nil, err
 	}
@@ -515,7 +506,7 @@ func findElement(c *Client, by string, value string, startNode *string) (*webEle
 		params = map[string]interface{}{"using": by, "value": value, "element": *startNode}
 	}
 
-	response, err := c.transport.send("findElement", params)
+	response, err := c.transport.Send("findElement", params)
 	if err != nil {
 		return nil, err
 	}
@@ -535,7 +526,7 @@ func findElement(c *Client, by string, value string, startNode *string) (*webEle
 
 func (c *Client) DismissDialog() (*responseError, bool, error) {
 	ok := false
-	r, err := c.transport.send("dismissDialog", nil)
+	r, err := c.transport.Send("dismissDialog", nil)
 	if err != nil {
 		return nil, ok, err
 	}
@@ -549,7 +540,7 @@ func (c *Client) DismissDialog() (*responseError, bool, error) {
 
 func (c *Client) AcceptDialog() (*responseError, bool, error) {
 	ok := false
-	r, err := c.transport.send("acceptDialog", nil)
+	r, err := c.transport.Send("acceptDialog", nil)
 	if err != nil {
 		return nil, ok, err
 	}
@@ -566,7 +557,7 @@ func (c *Client) AcceptDialog() (*responseError, bool, error) {
 ///////////////////////
 
 func (c *Client) QuitApplication() (*response, error) {
-	r, err := c.transport.send("quitApplication", map[string]string{"flags": "eForceQuit"})
+	r, err := c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
 	if err != nil {
 		return nil, err
 	}
@@ -575,7 +566,7 @@ func (c *Client) QuitApplication() (*response, error) {
 }
 
 func (c *Client) Screenshot() (string, error) {
-	r, err := c.transport.send("screenShot", map[string]string{})
+	r, err := c.transport.Send("ScreenShot", map[string]string{})
 	if err != nil {
 		return "", err
 	}
