@@ -565,17 +565,20 @@ func (c *Client) QuitApplication() (*response, error) {
 	return r, nil
 }
 
-func (c *Client) Screenshot() (string, error) {
-	r, err := c.transport.Send("ScreenShot", map[string]string{})
+func (c *Client) Screenshot() (*response, error) {
+	r, err := c.transport.Send("screenShot", map[string]string{})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	var d = map[string]string{}
-	err = json.Unmarshal([]byte(r.Value), &d)
-	if err != nil {
-		return "", err
-	}
+	return r, nil
+	/*
+		var d = map[string]string{}
+		err = json.Unmarshal([]byte(r.Value), &d)
+		if err != nil {
+			return "", err
+		}
 
-	return d["value"], nil
+		return d["value"], nil
+	*/
 }
