@@ -8,7 +8,14 @@ import (
 	"strconv"
 )
 
-type transport struct {
+type Transporter interface {
+	Connect(host string, port int) error
+	Close() error
+	Send(command string, values interface{}) (*response, error)
+	Receive() ([]byte, error)
+}
+
+type MarionetteTransport struct {
 	ApplicationType    string
 	MarionetteProtocol int32
 	messageID          int
@@ -28,7 +35,7 @@ type responseError struct {
 	Stacktrace *string
 }
 
-func (t *transport) connect(host string, port int) (err error) {
+func (t *MarionetteTransport) Connect(host string, port int) error {
 	if t.conn != nil {
 		return errors.New("A Connection is already established. please disconnect before connecting.")
 	}
@@ -42,12 +49,13 @@ func (t *transport) connect(host string, port int) (err error) {
 	}
 
 	hostname := host + ":" + strconv.Itoa(port)
-	t.conn, err = net.Dial("tcp", hostname)
+	c, err := net.Dial("tcp", hostname)
 	if err != nil {
 		return err
 	}
 
-	r, err := t.receive()
+	t.conn = c
+	r, err := t.Receive()
 	if err != nil {
 		return err
 	}
@@ -60,7 +68,7 @@ func (t *transport) connect(host string, port int) (err error) {
 	return nil
 }
 
-func (t *transport) close() error {
+func (t *MarionetteTransport) Close() error {
 	err := t.conn.Close()
 	if err != nil {
 		return err
@@ -70,7 +78,7 @@ func (t *transport) close() error {
 	return err
 }
 
-func (t *transport) send(command string, values interface{}) (*response, error) {
+func (t *MarionetteTransport) Send(command string, values interface{}) (*response, error) {
 	t.messageID = t.messageID + 1
 	buf, err := t.transformToCommand(command, values)
 	if err != nil {
@@ -83,14 +91,14 @@ func (t *transport) send(command string, values interface{}) (*response, error) 
 	}
 
 	// get response to sent command.
-	return t.transformToResponse(t.receive())
+	return t.transformToResponse(t.Receive())
 }
 
 func write(c net.Conn, b []byte) (int, error) {
 	return c.Write(b)
 }
 
-func (t *transport) receive() ([]byte, error) {
+func (t *MarionetteTransport) Receive() ([]byte, error) {
 	return read(t.conn)
 }
 
@@ -139,7 +147,7 @@ func getMessageLength(c net.Conn) (int, error) {
 	}
 }
 
-func (t *transport) transformToCommand(command string, values interface{}) (bytes []byte, err error) {
+func (t *MarionetteTransport) transformToCommand(command string, values interface{}) (bytes []byte, err error) {
 	var size int
 	if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V2 {
 		bytes, err = makeProto2Command(command, values)
@@ -157,7 +165,7 @@ func (t *transport) transformToCommand(command string, values interface{}) (byte
 	return []byte(strconv.Itoa(size) + ":" + string(bytes)), nil
 }
 
-func (t *transport) transformToResponse(buf []byte, err error) (*response, error) {
+func (t *MarionetteTransport) transformToResponse(buf []byte, err error) (*response, error) {
 	if err != nil {
 		return nil, err
 	}
