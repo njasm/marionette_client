@@ -10,7 +10,7 @@ var client *Client
 func init() {
 	client = NewClient()
 	client.Transport(&MarionetteTransport{})
-	client.Get("http://www.abola.pt/")
+	client.Get("http://www.google.com/")
 }
 
 func TestNewSession(t *testing.T) {
@@ -26,13 +26,6 @@ func TestNewSession(t *testing.T) {
 
 	fmt.Println(r.Value)
 	//client.Close()
-}
-
-func TestScreenshot(t *testing.T) {
-	_, err := client.Screenshot()
-	if err == nil {
-		t.Errorf(err.Error())
-	}
 }
 
 // working
@@ -64,6 +57,15 @@ func TestGetSessionCapabilities(t *testing.T) {
 
 	fmt.Println(r.BrowserName)
 }
+
+/*
+func TestScreenshot(t *testing.T) {
+	_, err := client.Screenshot()
+	if err == nil {
+		t.Log(err)
+	}
+}
+*/
 
 // working
 func TestLog(t *testing.T) {
@@ -179,6 +181,8 @@ func TestExecuteScriptWithArgs(t *testing.T) {
 	}
 
 	fmt.Println(r.Value)
+
+	client.DismissDialog()
 }
 
 func TestGetTitle(t *testing.T) {

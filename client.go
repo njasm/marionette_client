@@ -566,7 +566,7 @@ func (c *Client) QuitApplication() (*response, error) {
 }
 
 func (c *Client) Screenshot() (*response, error) {
-	r, err := c.transport.Send("screenShot", map[string]string{})
+	r, err := c.transport.Send("takeScreenshot", map[string]string{})
 	if err != nil {
 		return nil, err
 	}
