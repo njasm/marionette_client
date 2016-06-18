@@ -28,6 +28,13 @@ func TestNewSession(t *testing.T) {
 	//client.Close()
 }
 
+func TestScreenshot(t *testing.T) {
+	_, err := client.Screenshot()
+	if err == nil {
+		t.Errorf(err.Error())
+	}
+}
+
 // working
 func TestGetSessionID(t *testing.T) {
 	if client.SessionId != client.GetSessionID() {

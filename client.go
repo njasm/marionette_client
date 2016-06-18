@@ -2,9 +2,9 @@ package marionette_client
 
 import (
 	"encoding/json"
-	"strings"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Context string
@@ -20,10 +20,9 @@ type session struct {
 	SessionId string
 }
 
-
 type Client struct {
 	session
-	transport   Transporter
+	transport Transporter
 }
 
 func NewClient() *Client {
@@ -216,7 +215,7 @@ func timeouts(transport *Transporter, typ string, milliseconds int) (*response, 
 	return response, nil
 }
 
-func (c *Client) WindowHandles() ([]string, error){
+func (c *Client) WindowHandles() ([]string, error) {
 	r, err := c.transport.Send("getWindowHandles", nil)
 	if err != nil {
 		return nil, errors.New(r.ResponseError.Message)
@@ -239,7 +238,6 @@ func (c *Client) SwitchToWindow(name string) error {
 
 	return nil
 }
-
 
 func (c *Client) CloseWindow() (*response, error) {
 	r, err := c.transport.Send("close", nil)
@@ -565,4 +563,22 @@ func (c *Client) QuitApplication() (*response, error) {
 	}
 
 	return r, nil
+}
+
+func (c *Client) Screenshot() (*response, error) {
+	r, err := c.transport.Send("screenShot", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+	/*
+		var d = map[string]string{}
+		err = json.Unmarshal([]byte(r.Value), &d)
+		if err != nil {
+			return "", err
+		}
+
+		return d["value"], nil
+	*/
 }
