@@ -564,3 +564,21 @@ func (c *Client) QuitApplication() (*response, error) {
 
 	return r, nil
 }
+
+func (c *Client) Screenshot() (*response, error) {
+	r, err := c.transport.Send("screenShot", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+	/*
+		var d = map[string]string{}
+		err = json.Unmarshal([]byte(r.Value), &d)
+		if err != nil {
+			return "", err
+		}
+
+		return d["value"], nil
+	*/
+}
