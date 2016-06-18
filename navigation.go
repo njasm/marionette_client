@@ -5,5 +5,5 @@ type Navigater interface {
 }
 
 type navigation struct {
-	c   *Client
+	c *Client
 }

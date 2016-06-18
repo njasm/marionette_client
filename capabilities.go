@@ -19,4 +19,3 @@ type Capabilities struct {
 	Version                       string
 	Command_id                    uint32
 }
-
