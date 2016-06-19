@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/njasm/marionette_client.svg?branch=master)](https://travis-ci.org/njasm/marionette_client)
+[![Coverage Status](https://coveralls.io/repos/github/njasm/marionette_client/badge.svg?branch=master)](https://coveralls.io/github/njasm/marionette_client?branch=master)
 # marionette_client
 Mozilla's Gecko Marionette client in golang
 
