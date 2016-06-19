@@ -50,7 +50,7 @@ func (t *MarionetteTransport) Connect(host string, port int) error {
 	}
 
 	t.conn = c
-	t.conn.SetDeadline(time.Now().Add(time.Minute)) // default read and write time out
+	t.conn.SetDeadline(time.Now().Add(time.Minute * 5)) // default read and write time out
 	r, err := t.Receive()
 	if err != nil {
 		return err
