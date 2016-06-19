@@ -76,7 +76,7 @@ func TestScreenshot(t *testing.T) {
 	}
 
 	println(r.MessageID)
-	println(r.ResponseError)
+	println(r.DriverError)
 	println(r.Size)
 	//this print ise a problem for travis builds, since it can surpass the 4 MB of log size.
 	// don't print the base64 encoded image.
