@@ -70,7 +70,7 @@ func TestGetSessionCapabilities(t *testing.T) {
 
 func TestScreenshot(t *testing.T) {
 	r, err := client.Screenshot()
-	if err == nil {
+	if err != nil {
 		t.Log(err)
 		t.FailNow()
 	}
