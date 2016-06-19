@@ -226,7 +226,7 @@ func timeouts(transport *Transporter, typ string, milliseconds int) (*response, 
 func (c *Client) GetCurrentWindowHandle() (*response, error) {
 	r, err := c.transport.Send("getCurrentWindowHandle", nil)
 	if err != nil {
-		return nil, errors.New(r.ResponseError.Message)
+		return nil, errors.New(r.DriverError.Message)
 	}
 
 	return r, nil
@@ -238,7 +238,7 @@ func (c *Client) GetCurrentWindowHandle() (*response, error) {
 func (c *Client) GetCurrentChromeWindowHandle() (*response, error) {
 	r, err := c.transport.Send("getCurrentChromeWindowHandle", nil)
 	if err != nil {
-		return nil, errors.New(r.ResponseError.Message)
+		return nil, errors.New(r.DriverError.Message)
 	}
 
 	return r, nil
@@ -248,7 +248,7 @@ func (c *Client) GetCurrentChromeWindowHandle() (*response, error) {
 func (c *Client) WindowHandles() ([]string, error) {
 	r, err := c.transport.Send("getWindowHandles", nil)
 	if err != nil {
-		return nil, errors.New(r.ResponseError.Message)
+		return nil, errors.New(r.DriverError.Message)
 	}
 
 	var d []string
@@ -263,7 +263,7 @@ func (c *Client) WindowHandles() ([]string, error) {
 func (c *Client) SwitchToWindow(name string) error {
 	r, err := c.transport.Send("switchToWindow", map[string]interface{}{"name": name})
 	if err != nil {
-		return errors.New(r.ResponseError.Message)
+		return errors.New(r.DriverError.Message)
 	}
 
 	return nil
@@ -272,7 +272,7 @@ func (c *Client) SwitchToWindow(name string) error {
 func (c *Client) CloseWindow() (*response, error) {
 	r, err := c.transport.Send("close", nil)
 	if err != nil {
-		return nil, errors.New(r.ResponseError.Message)
+		return nil, errors.New(r.DriverError.Message)
 	}
 
 	return r, nil
@@ -320,7 +320,7 @@ func (c *Client) GetTitle() (string, error) {
 func (c *Client) CurrentUrl() error {
 	r, err := c.transport.Send("goBack", nil)
 	if err != nil {
-		return errors.New(r.ResponseError.Message)
+		return errors.New(r.DriverError.Message)
 	}
 
 	return nil
@@ -330,7 +330,7 @@ func (c *Client) CurrentUrl() error {
 func (c *Client) Refresh() error {
 	r, err := c.transport.Send("refresh", nil)
 	if err != nil {
-		return errors.New(r.ResponseError.Message)
+		return errors.New(r.DriverError.Message)
 	}
 
 	return nil
@@ -340,7 +340,7 @@ func (c *Client) Refresh() error {
 func (c *Client) Back() error {
 	r, err := c.transport.Send("goBack", nil)
 	if err != nil {
-		return errors.New(r.ResponseError.Message)
+		return errors.New(r.DriverError.Message)
 	}
 
 	return nil
@@ -350,7 +350,7 @@ func (c *Client) Back() error {
 func (c *Client) Forward() error {
 	r, err := c.transport.Send("goForward", nil)
 	if err != nil {
-		return errors.New(r.ResponseError.Message)
+		return errors.New(r.DriverError.Message)
 	}
 
 	return nil
@@ -563,29 +563,29 @@ func findElement(c *Client, by string, value string, startNode *string) (*webEle
 // DIALOGS //
 /////////////
 
-func (c *Client) DismissDialog() (*responseError, bool, error) {
+func (c *Client) DismissDialog() (*DriverError, bool, error) {
 	ok := false
 	r, err := c.transport.Send("dismissDialog", nil)
 	if err != nil {
 		return nil, ok, err
 	}
 
-	if r.ResponseError != nil {
-		return r.ResponseError, ok, nil
+	if r.DriverError != nil {
+		return r.DriverError, ok, nil
 	}
 
 	return nil, true, nil
 }
 
-func (c *Client) AcceptDialog() (*responseError, bool, error) {
+func (c *Client) AcceptDialog() (*DriverError, bool, error) {
 	ok := false
 	r, err := c.transport.Send("acceptDialog", nil)
 	if err != nil {
 		return nil, ok, err
 	}
 
-	if r.ResponseError != nil {
-		return r.ResponseError, ok, nil
+	if r.DriverError != nil {
+		return r.DriverError, ok, nil
 	}
 
 	return nil, true, nil
