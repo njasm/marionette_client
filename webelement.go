@@ -13,11 +13,11 @@ func (e *webElement) Id() string {
 	return e.id
 }
 
-func (e *webElement) FindElement(by string, value string) (*webElement, error) {
+func (e *webElement) FindElement(by By, value string) (*webElement, error) {
 	return e.c.FindElement(by, value, &e.id)
 }
 
-func (e *webElement) FindElements(by string, value string) ([]*webElement, error) {
+func (e *webElement) FindElements(by By, value string) ([]*webElement, error) {
 	return findElements(e.c, by, value, &e.id)
 }
 
@@ -72,7 +72,7 @@ func (e *webElement) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	e.id = d["value"]["element-6066-11e4-a52e-4f735466cecf"]
+	e.id = d["value"][WEBDRIVER_ELEMENT_KEY]
 
 	return nil
 }

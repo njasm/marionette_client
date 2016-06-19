@@ -8,13 +8,11 @@ import (
 	"log"
 )
 
-type Context string
-
 const (
-	CONTEXT_CHROME         Context = "chrome"
-	CONTEXT_CONTENT        Context = "content"
-	MARIONETTE_PROTOCOL_V2         = 2
-	MARIONETTE_PROTOCOL_V3         = 3
+	MARIONETTE_PROTOCOL_V2          = 2
+	MARIONETTE_PROTOCOL_V3          = 3
+
+	WEBDRIVER_ELEMENT_KEY           = "element-6066-11e4-a52e-4f735466cecf"
 )
 
 type session struct {
@@ -44,26 +42,6 @@ func (c *Client) GetSessionID() string {
 func (c *Client) Connect(host string, port int) error {
 	return c.transport.Connect(host, port)
 }
-
-// Protocol commands
-// NOT A COMMAND
-//func (c *Client) GetMarionetteID() (*response, error) {
-//	response, err := c.transport.Send("getMarionetteID", nil)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	return response, nil
-//}
-
-//func (c *Client) SayHello() (*response, error) {
-//	response, err := c.transport.Send("sayHello", nil)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	return response, nil
-//}
 
 func (c *Client) NewSession(sessionId string, cap *Capabilities) (*response, error) {
 	data := map[string]interface{}{
@@ -139,7 +117,7 @@ func (c *Client) GetLogs() (*response, error) {
 //     Name of the context to be switched to.  Must be one of "chrome" or
 //     "content".
 func (c *Client) SetContext(value Context) (*response, error) {
-	response, err := c.transport.Send("setContext", map[string]string{"value": string(value)})
+	response, err := c.transport.Send("setContext", map[string]string{"value": fmt.Sprint(value)})
 	if err != nil {
 		return nil, err
 	}
@@ -494,16 +472,16 @@ func clearElement(c *Client, id string) {
 //     Indicates which search method to use.
 // param string value
 //     Value the client is looking for.
-func (c *Client) FindElements(by string, value string, startNode *string) ([]*webElement, error) {
+func (c *Client) FindElements(by By, value string, startNode *string) ([]*webElement, error) {
 	return findElements(c, by, value, startNode)
 }
 
-func findElements(c *Client, by string, value string, startNode *string) ([]*webElement, error) {
+func findElements(c *Client, by By, value string, startNode *string) ([]*webElement, error) {
 	var params map[string]interface{}
 	if startNode == nil || *startNode == "" {
-		params = map[string]interface{}{"using": by, "value": value}
+		params = map[string]interface{}{"using": fmt.Sprint(by), "value": value}
 	} else {
-		params = map[string]interface{}{"using": by, "value": value, "element": *startNode}
+		params = map[string]interface{}{"using": fmt.Sprint(by), "value": value, "element": *startNode}
 	}
 
 	response, err := c.transport.Send("findElements", params)
@@ -519,7 +497,7 @@ func findElements(c *Client, by string, value string, startNode *string) ([]*web
 
 	var e []*webElement
 	for _, v := range d {
-		e = append(e, &webElement{c: c, id: v["element-6066-11e4-a52e-4f735466cecf"]})
+		e = append(e, &webElement{c: c, id: v[WEBDRIVER_ELEMENT_KEY]})
 	}
 
 	return e, nil
@@ -533,16 +511,16 @@ func findElements(c *Client, by string, value string, startNode *string) ([]*web
 //     Indicates which search method to use.
 // @param {string} value
 //     Value the client is looking for.
-func (c *Client) FindElement(by string, value string, startNode *string) (*webElement, error) {
+func (c *Client) FindElement(by By, value string, startNode *string) (*webElement, error) {
 	return findElement(c, by, value, startNode)
 }
 
-func findElement(c *Client, by string, value string, startNode *string) (*webElement, error) {
+func findElement(c *Client, by By, value string, startNode *string) (*webElement, error) {
 	var params map[string]interface{}
 	if startNode == nil || *startNode == "" {
-		params = map[string]interface{}{"using": by, "value": value}
+		params = map[string]interface{}{"using": fmt.Sprint(by), "value": value}
 	} else {
-		params = map[string]interface{}{"using": by, "value": value, "element": *startNode}
+		params = map[string]interface{}{"using": fmt.Sprint(by), "value": value, "element": *startNode}
 	}
 
 	response, err := c.transport.Send("findElement", params)

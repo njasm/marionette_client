@@ -107,7 +107,7 @@ func TestGetLogs(t *testing.T) {
 }
 
 func TestSetContext(t *testing.T) {
-	r, err := client.SetContext(CONTEXT_CHROME)
+	r, err := client.SetContext(Context(CHROME))
 	if err != nil {
 		fmt.Println(err)
 		t.FailNow()
@@ -115,7 +115,7 @@ func TestSetContext(t *testing.T) {
 
 	fmt.Println(r.Value)
 
-	r, err = client.SetContext(CONTEXT_CONTENT)
+	r, err = client.SetContext(Context(CONTENT))
 	if err != nil {
 		fmt.Println(err)
 		t.FailNow()
@@ -203,7 +203,7 @@ func TestGetTitle(t *testing.T) {
 
 }
 func TestFindElement(t *testing.T) {
-	element, err := client.FindElement("id", "clubes-hp", nil)
+	element, err := client.FindElement(By(ID), "clubes-hp", nil)
 	if err != nil {
 		fmt.Println(err)
 		t.FailNow()
@@ -219,14 +219,14 @@ func TestFindElement(t *testing.T) {
 	fmt.Println(element.CssValue("text-decoration"))
 	fmt.Println(element.Rect())
 
-	collection, err := element.FindElements("css selector", "li")
+	collection, err := element.FindElements(By(CSS_SELECTOR), "li")
 	if 18 != len(collection) {
 		t.FailNow()
 	}
 }
 
 func TestSendKeys(t *testing.T) {
-	e, err := client.FindElement("id", "topo_txtPesquisa", nil)
+	e, err := client.FindElement(By(ID), "topo_txtPesquisa", nil)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -235,7 +235,7 @@ func TestSendKeys(t *testing.T) {
 }
 
 func TestFindElements(t *testing.T) {
-	elements, err := client.FindElements("css selector", "li", nil)
+	elements, err := client.FindElements(By(CSS_SELECTOR), "li", nil)
 	if err != nil {
 		fmt.Println(err)
 		t.FailNow()

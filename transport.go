@@ -112,14 +112,11 @@ func read(c net.Conn) ([]byte, error) {
 	// If an EOF happens after reading some but not all the bytes,
 	// ReadFull returns ErrUnexpectedEOF.
 	// On return, n == len(buf) if and only if err == nil.
-	n, err := io.ReadFull(c, msgBuf)
+	_, err = io.ReadFull(c, msgBuf)
 	if err != nil {
 		return nil, err
 	}
 
-	if n != len(msgBuf) {
-
-	}
 	return msgBuf, nil
 }
 
