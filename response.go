@@ -36,11 +36,11 @@ func makeProto3Response(buf []byte) (*response, error) {
 	r.Size = int32(len(buf))
 
 	if v[2] != nil {
-		re := &responseError{}
+		re := &DriverError{}
 		// JSON Object?
 		for key, value := range v[2].(map[string]interface{}) {
 			if key == "error" {
-				re.Error = value.(string)
+				re.ErrorType = value.(string)
 			}
 
 			if key == "message" {
@@ -53,7 +53,7 @@ func makeProto3Response(buf []byte) (*response, error) {
 			}
 		}
 
-		r.ResponseError = re
+		r.DriverError = re
 	}
 
 	// It's a JSON Object

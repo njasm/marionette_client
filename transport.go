@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"strconv"
+	"time"
 )
 
 type Transporter interface {
@@ -23,16 +24,10 @@ type MarionetteTransport struct {
 }
 
 type response struct {
-	MessageID     int32
-	Size          int32
-	Value         string
-	ResponseError *responseError
-}
-
-type responseError struct {
-	Error      string
-	Message    string
-	Stacktrace *string
+	MessageID   int32
+	Size        int32
+	Value       string
+	DriverError *DriverError
 }
 
 func (t *MarionetteTransport) Connect(host string, port int) error {
@@ -55,6 +50,7 @@ func (t *MarionetteTransport) Connect(host string, port int) error {
 	}
 
 	t.conn = c
+	t.conn.SetDeadline(time.Now().Add(time.Minute)) // default read and write time out
 	r, err := t.Receive()
 	if err != nil {
 		return err
