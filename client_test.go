@@ -241,6 +241,35 @@ func TestFindElements(t *testing.T) {
 	fmt.Println(len(elements))
 }
 
+func TestCurrentWindowHandle(t *testing.T) {
+	r, err := client.GetCurrentWindowHandle()
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
+
+	fmt.Println(r.Value)
+}
+
+func TestCurrentChromeWindowHandle(t *testing.T) {
+	r, err := client.GetCurrentChromeWindowHandle()
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
+
+	fmt.Println(r.Value)
+}
+
+func TestWindowHandles(t *testing.T) {
+	r, err := client.WindowHandles()
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
+
+	fmt.Println(r)
+}
 // working
 //func TestQuitApplication(t *testing.T) {
 //	r, err := client.QuitApplication()

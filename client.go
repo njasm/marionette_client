@@ -216,6 +216,35 @@ func timeouts(transport *Transporter, typ string, milliseconds int) (*response, 
 	return response, nil
 }
 
+
+/////////////////////
+// WINDOWS HANDLES //
+/////////////////////
+
+//"getWindowHandle": GeckoDriver.prototype.getWindowHandle,
+//"getCurrentWindowHandle":  GeckoDriver.prototype.getWindowHandle,  // Selenium 2 compat
+func (c *Client) GetCurrentWindowHandle() (*response, error) {
+	r, err := c.transport.Send("getCurrentWindowHandle", nil)
+	if err != nil {
+		return nil, errors.New(r.ResponseError.Message)
+	}
+
+	return r, nil
+}
+
+
+//"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
+//"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
+func (c *Client) GetCurrentChromeWindowHandle() (*response, error) {
+	r, err := c.transport.Send("getCurrentChromeWindowHandle", nil)
+	if err != nil {
+		return nil, errors.New(r.ResponseError.Message)
+	}
+
+	return r, nil
+}
+
+
 func (c *Client) WindowHandles() ([]string, error) {
 	r, err := c.transport.Send("getWindowHandles", nil)
 	if err != nil {
@@ -252,6 +281,15 @@ func (c *Client) CloseWindow() (*response, error) {
 ////////////////
 // NAVIGATION //
 ////////////////
+
+func (c *Client) GetPageSource() (*response, error) {
+	response, err := c.transport.Send("getPageSource", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
 
 func (c *Client) Get(url string) (*response, error) {
 	r, err := c.transport.Send("get", map[string]string{"url": url})

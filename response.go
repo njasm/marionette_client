@@ -21,11 +21,13 @@ func makeProto2Response(buf []byte) (*response, error) {
 }
 
 func makeProto3Response(buf []byte) (*response, error) {
+	//TODO: Debug only
 	if (len(buf) >= 24){
 		log.Println(string(buf)[0:24] + " - END - " + string(buf)[len(buf) - 24:])
 	} else {
 		log.Println(string(buf))
 	}
+	//TODO: Debug only end
 
 	var v []interface{}
 
