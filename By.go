@@ -16,6 +16,6 @@ var bys = [...]string {
 	"xpath",
 }
 
-// String returns the English name of the month ("css selector", "link text", ...).
+// String returns the English name of the strategy ("css selector", "link text", ...).
 func (b By) String() string { return bys[b-1] }
 
