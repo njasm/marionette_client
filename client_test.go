@@ -68,7 +68,7 @@ func TestGetSessionCapabilities(t *testing.T) {
 }
 
 
-/*func TestScreenshot(t *testing.T) {
+func TestScreenshot(t *testing.T) {
 	r, err := client.Screenshot()
 	if err == nil {
 		t.Log(err)
@@ -78,7 +78,7 @@ func TestGetSessionCapabilities(t *testing.T) {
 	println(r.ResponseError)
 	println(r.Size)
 	println(r.Value)
-}*/
+}
 
 
 // working
@@ -270,6 +270,7 @@ func TestWindowHandles(t *testing.T) {
 
 	fmt.Println(r)
 }
+
 // working
 //func TestQuitApplication(t *testing.T) {
 //	r, err := client.QuitApplication()

@@ -28,7 +28,7 @@ func makeProto3Command(msgID int, command string, values interface{}) ([]byte, e
 		return nil, err
 	}
 
-	fmt.Println(string(b)) //TODO: debug only.
+	//fmt.Println(string(b)) //debug only.
 
 	return b, nil
 }

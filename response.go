@@ -9,25 +9,20 @@ func makeProto2Response(buf []byte) (*response, error) {
 	r := &response{}
 	r.Size = int32(len(buf))
 	r.Value = string(buf)
-	//    if value, ok := data["error"]; ok {
-	//        re := &responseError{Error: value}
-	//        re.Message = data["message"]
-	//        re.Stacktrace = data["stacktrace"]
-	//
-	//        r.ResponseError = re
-	//    }
 
 	return r, nil
 }
 
 func makeProto3Response(buf []byte) (*response, error) {
-	//TODO: Debug only
+	//Debug only
+	/*
 	if (len(buf) >= 24){
 		log.Println(string(buf)[0:24] + " - END - " + string(buf)[len(buf) - 24:])
 	} else {
 		log.Println(string(buf))
 	}
-	//TODO: Debug only end
+	*/
+	//Debug only end
 
 	var v []interface{}
 

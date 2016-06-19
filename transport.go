@@ -109,11 +109,21 @@ func read(c net.Conn) ([]byte, error) {
 	}
 
 	msgBuf := make([]byte, msgSize)
-	_, err = c.Read(msgBuf)
+	//_, err = c.Read(msgBuf)
+	// ReadFull reads exactly len(buf) bytes from r into buf.
+	// It returns the number of bytes copied and an error if fewer bytes were read.
+	// The error is EOF only if no bytes were read.
+	// If an EOF happens after reading some but not all the bytes,
+	// ReadFull returns ErrUnexpectedEOF.
+	// On return, n == len(buf) if and only if err == nil.
+	n, err := io.ReadFull(c, msgBuf)
 	if err != nil {
 		return nil, err
 	}
 
+	if n != len(msgBuf) {
+
+	}
 	return msgBuf, nil
 }
 
