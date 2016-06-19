@@ -2,7 +2,7 @@ package marionette_client
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 )
 
 func makeProto2Response(buf []byte) (*response, error) {
@@ -21,9 +21,16 @@ func makeProto2Response(buf []byte) (*response, error) {
 }
 
 func makeProto3Response(buf []byte) (*response, error) {
-	fmt.Println(string(buf))
+	if (len(buf) >= 24){
+		log.Println(string(buf)[0:24] + " - END - " + string(buf)[len(buf) - 24:])
+	} else {
+		log.Println(string(buf))
+	}
+
 	var v []interface{}
+
 	if err := json.Unmarshal(buf, &v); err != nil {
+		log.Printf("%#v", err)
 		return nil, err
 	}
 

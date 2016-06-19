@@ -10,7 +10,6 @@ var client *Client
 func init() {
 	client = NewClient()
 	client.Transport(&MarionetteTransport{})
-	client.Get("http://www.google.com/")
 }
 
 func TestNewSession(t *testing.T) {
@@ -38,6 +37,16 @@ func TestGetSessionID(t *testing.T) {
 	fmt.Println("session is : ", client.SessionId)
 }
 
+func TestGetPage(t *testing.T) {
+	r, err := client.Get("http://www.abola.pt/")
+	if err != nil {
+		fmt.Println(err)
+		t.FailNow()
+	}
+
+	fmt.Println(r.Value)
+}
+
 //func TestConnectWithActiveConnection(t *testing.T) {
 //	err := client.Connect("", 0)
 //	if err == nil {
@@ -58,14 +67,19 @@ func TestGetSessionCapabilities(t *testing.T) {
 	fmt.Println(r.BrowserName)
 }
 
-/*
-func TestScreenshot(t *testing.T) {
-	_, err := client.Screenshot()
+
+/*func TestScreenshot(t *testing.T) {
+	r, err := client.Screenshot()
 	if err == nil {
 		t.Log(err)
 	}
-}
-*/
+
+	println(r.MessageID)
+	println(r.ResponseError)
+	println(r.Size)
+	println(r.Value)
+}*/
+
 
 // working
 func TestLog(t *testing.T) {
@@ -139,16 +153,6 @@ func TestSetPageTimout(t *testing.T) {
 
 func TestSetSearchTimout(t *testing.T) {
 	r, err := client.SetSearchTimeout(1000)
-	if err != nil {
-		fmt.Println(err)
-		t.FailNow()
-	}
-
-	fmt.Println(r.Value)
-}
-
-func TestGetPage(t *testing.T) {
-	r, err := client.Get("http://www.abola.pt/")
 	if err != nil {
 		fmt.Println(err)
 		t.FailNow()

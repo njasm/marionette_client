@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"log"
 )
 
 type Context string
@@ -568,17 +569,9 @@ func (c *Client) QuitApplication() (*response, error) {
 func (c *Client) Screenshot() (*response, error) {
 	r, err := c.transport.Send("takeScreenshot", map[string]string{})
 	if err != nil {
+		log.Printf("%#v", err)
 		return nil, err
 	}
 
 	return r, nil
-	/*
-		var d = map[string]string{}
-		err = json.Unmarshal([]byte(r.Value), &d)
-		if err != nil {
-			return "", err
-		}
-
-		return d["value"], nil
-	*/
 }
