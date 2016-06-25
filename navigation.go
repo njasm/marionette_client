@@ -4,7 +4,7 @@ type Navigater interface {
 	Get(url string) (*response, error)
 	GetPageSource() (*response, error)
 	GetTitle() (string, error)
-	CurrentUrl() error
+	CurrentUrl() (string, error)
 	Refresh() error
 	Back() error
 	Forward() error

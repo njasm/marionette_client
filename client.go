@@ -331,13 +331,19 @@ func (c *Client) GetTitle() (string, error) {
 }
 
 // get current url
-func (c *Client) CurrentUrl() error {
-	r, err := c.transport.Send("goBack", nil)
+func (c *Client) CurrentUrl() (string, error) {
+	r, err := c.transport.Send("getCurrentUrl", nil)
 	if err != nil {
-		return errors.New(r.DriverError.Message)
+		return "", err
 	}
 
-	return nil
+	var url map[string]string
+	err = json.Unmarshal([]byte(r.Value), &url)
+	if err != nil {
+		return "", err
+	}
+
+	return url["value"], nil
 }
 
 // refresh

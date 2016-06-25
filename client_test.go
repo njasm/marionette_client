@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	TARGET_URL = "http://www.abola.pt"
+	TARGET_URL = "http://www.abola.pt/"
 	ID_SELECTOR = "clubes-hp"
 	CSS_SELECTOR_LI = "li"
 	ID_SELECTOR_INPUT = "topo_txtPesquisa"
@@ -47,6 +47,18 @@ func TestGetPage(t *testing.T) {
 	}
 
 	t.Log(r.Value)
+}
+
+func TestCurrentUrl(t *testing.T) {
+	url, err := client.CurrentUrl()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	if url != TARGET_URL {
+		t.Fatalf("Current Url %v not equal to target url %v", url, TARGET_URL)
+	}
+
 }
 
 func TestGetCookies(t *testing.T) {
