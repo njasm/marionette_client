@@ -41,7 +41,7 @@ func TestGetSessionID(t *testing.T) {
 }
 
 func TestGetPage(t *testing.T) {
-	r, err := client.Get(TARGET_URL)
+	r, err := client.Navigate(TARGET_URL)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -307,7 +307,6 @@ func TestWindowHandles(t *testing.T) {
 //	r, err := client.QuitApplication()
 //	if err != nil {
 //		t.Fatalf("%#v", err)
-//		t.FailNow()
 //	}
 //
 //	t.Log(r.ResponseError)

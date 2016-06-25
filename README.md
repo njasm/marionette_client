@@ -16,3 +16,46 @@ Selenium does for web content: to enable the tester to have the ability to send 
 
 ## Resources
 https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette
+
+## Examples
+Incomplete list. Check the tests for more examples.
+
+#### Instantiate the client
+```go
+	client := NewClient()
+	client.Connect("", 0) // this are the default marionette values for hostname, and port 
+	client.NewSession("", nil) // let marionette generate the Session ID with it's default Capabilities
+	
+```
+
+#### Navigate to page
+```go
+	cliente.Navigate("http://www.google.com/")
+```
+
+#### Change Contexts
+```go
+    client.SetContext(Context(CHROME))
+    //or
+	client.SetContext(Context(CONTENT))
+	
+```
+
+#### Wait(), Until() Expected condition is true.
+```go
+	client.Navigate("http://www.w3schools.com/ajax/tryit.asp?filename=tryajax_get")
+	
+	timeout := time.Duration(10) * time.Second
+	condition := ElementIsPresent(By(ID), "stackH")
+	ok, webElement, _ := Wait(client).For(timeout).Until(condition)
+
+	if !ok {
+		log.Printf("%#v", err)
+		// do your error stuff
+		return
+	}
+
+    // cool, we've the element, let's click on it!
+	webElement.Click()
+	
+```

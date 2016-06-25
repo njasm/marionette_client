@@ -296,6 +296,21 @@ func (c *Client) SwitchToParentFrame() error {
 // NAVIGATION //
 ////////////////
 
+// deprecated use Navigate()
+func (c *Client) Get(url string) (*response, error) {
+	return c.Navigate(url)
+}
+
+// open url
+func (c *Client) Navigate(url string) (*response, error) {
+	r, err := c.transport.Send("get", map[string]string{"url": url})
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
 func (c *Client) GetPageSource() (*response, error) {
 	response, err := c.transport.Send("getPageSource", nil)
 	if err != nil {
@@ -303,15 +318,6 @@ func (c *Client) GetPageSource() (*response, error) {
 	}
 
 	return response, nil
-}
-
-func (c *Client) Get(url string) (*response, error) {
-	r, err := c.transport.Send("get", map[string]string{"url": url})
-	if err != nil {
-		return nil, err
-	}
-
-	return r, nil
 }
 
 // get title

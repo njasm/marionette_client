@@ -8,7 +8,7 @@ import (
 
 func TestWait(t *testing.T) {
 	client.SetContext(Context(CONTENT))
-	client.Get("http://www.w3schools.com/ajax/tryit.asp?filename=tryajax_get")
+	client.Navigate("http://www.w3schools.com/ajax/tryit.asp?filename=tryajax_get")
 
 	timeout := time.Duration(10) * time.Second
 	condition := ElementIsPresent(By(ID), "stackH")
