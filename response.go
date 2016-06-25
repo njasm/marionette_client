@@ -15,13 +15,13 @@ func makeProto2Response(buf []byte) (*response, error) {
 
 func makeProto3Response(buf []byte) (*response, error) {
 	//Debug only
-	/*
-	if (len(buf) >= 24){
-		log.Println(string(buf)[0:24] + " - END - " + string(buf)[len(buf) - 24:])
-	} else {
-		log.Println(string(buf))
-	}
-	*/
+
+		//if (len(buf) >= 24){
+		//	log.Println(string(buf)[0:24] + " - END - " + string(buf)[len(buf) - 24:])
+		//} else {
+		//	log.Println(string(buf))
+		//}
+
 	//Debug only end
 
 	var v []interface{}
@@ -53,7 +53,7 @@ func makeProto3Response(buf []byte) (*response, error) {
 			}
 		}
 
-		r.DriverError = re
+		return nil, re
 	}
 
 	// It's a JSON Object

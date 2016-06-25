@@ -2,6 +2,7 @@ package marionette_client
 
 import (
 	"encoding/json"
+	//"fmt"
 )
 
 func makeProto2Command(command string, values interface{}) ([]byte, error) {
