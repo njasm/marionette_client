@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 	"log"
+	"strings"
 )
 
 const (
-	MARIONETTE_PROTOCOL_V2          = 2
-	MARIONETTE_PROTOCOL_V3          = 3
+	MARIONETTE_PROTOCOL_V2 = 2
+	MARIONETTE_PROTOCOL_V3 = 3
 
-	WEBDRIVER_ELEMENT_KEY           = "element-6066-11e4-a52e-4f735466cecf"
+	WEBDRIVER_ELEMENT_KEY = "element-6066-11e4-a52e-4f735466cecf"
 )
 
 type session struct {
@@ -194,7 +194,6 @@ func timeouts(transport *Transporter, typ string, milliseconds int) (*response, 
 	return response, nil
 }
 
-
 /////////////////////
 // WINDOWS HANDLES //
 /////////////////////
@@ -210,7 +209,6 @@ func (c *Client) GetCurrentWindowHandle() (*response, error) {
 	return r, nil
 }
 
-
 //"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 //"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 func (c *Client) GetCurrentChromeWindowHandle() (*response, error) {
@@ -221,7 +219,6 @@ func (c *Client) GetCurrentChromeWindowHandle() (*response, error) {
 
 	return r, nil
 }
-
 
 func (c *Client) WindowHandles() ([]string, error) {
 	r, err := c.transport.Send("getWindowHandles", nil)
@@ -255,6 +252,45 @@ func (c *Client) CloseWindow() (*response, error) {
 
 	return r, nil
 }
+
+////////////
+// FRAMES //
+////////////
+
+func (c *Client) GetActiveFrame() (*WebElement, error) {
+	r, err := c.transport.Send("getActiveFrame", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	e := &WebElement{c: c}
+	err = json.Unmarshal([]byte(r.Value), e)
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+// use By(ID), By(NAME) or name only.
+func (c *Client) SwitchToFrame(by By, value string ) error {
+	_, err := c.transport.Send("switchToFrame", map[string]interface{}{fmt.Sprint(by): value, "focus": true})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) SwitchToParentFrame() error {
+	_, err := c.transport.Send("switchToParentFrame", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 
 ////////////////
 // NAVIGATION //
@@ -332,6 +368,30 @@ func (c *Client) Forward() error {
 	}
 
 	return nil
+}
+
+/////////////
+// COOKIES //
+/////////////
+
+// Get all cookies
+func (c *Client) GetCookies() (*response, error) {
+	r, err := c.transport.Send("getCookies", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+// Get all cookies
+func (c *Client) GetCookie(name string) (*response, error) {
+	r, err := c.transport.Send("getCookies", map[string]interface{}{"name": name})
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
 }
 
 //////////////////
@@ -472,11 +532,11 @@ func clearElement(c *Client, id string) {
 //     Indicates which search method to use.
 // param string value
 //     Value the client is looking for.
-func (c *Client) FindElements(by By, value string, startNode *string) ([]*webElement, error) {
-	return findElements(c, by, value, startNode)
+func (c *Client) FindElements(by By, value string) ([]*WebElement, error) {
+	return findElements(c, by, value, nil)
 }
 
-func findElements(c *Client, by By, value string, startNode *string) ([]*webElement, error) {
+func findElements(c *Client, by By, value string, startNode *string) ([]*WebElement, error) {
 	var params map[string]interface{}
 	if startNode == nil || *startNode == "" {
 		params = map[string]interface{}{"using": fmt.Sprint(by), "value": value}
@@ -489,15 +549,19 @@ func findElements(c *Client, by By, value string, startNode *string) ([]*webElem
 		return nil, err
 	}
 
+	if response.DriverError != nil {
+		return nil, response.DriverError
+	}
+
 	var d []map[string]string
 	err = json.Unmarshal([]byte(response.Value), &d)
 	if err != nil {
 		return nil, err
 	}
 
-	var e []*webElement
+	var e []*WebElement
 	for _, v := range d {
-		e = append(e, &webElement{c: c, id: v[WEBDRIVER_ELEMENT_KEY]})
+		e = append(e, &WebElement{c: c, id: v[WEBDRIVER_ELEMENT_KEY]})
 	}
 
 	return e, nil
@@ -511,16 +575,16 @@ func findElements(c *Client, by By, value string, startNode *string) ([]*webElem
 //     Indicates which search method to use.
 // @param {string} value
 //     Value the client is looking for.
-func (c *Client) FindElement(by By, value string, startNode *string) (*webElement, error) {
-	return findElement(c, by, value, startNode)
+func (c *Client) FindElement(by By, value string) (*WebElement, error) {
+	return findElement(c, by, value, nil)
 }
 
-func findElement(c *Client, by By, value string, startNode *string) (*webElement, error) {
-	var params map[string]interface{}
+func findElement(c *Client, by By, value string, startNode *string) (*WebElement, error) {
+	var params map[string]string
 	if startNode == nil || *startNode == "" {
-		params = map[string]interface{}{"using": fmt.Sprint(by), "value": value}
+		params = map[string]string {"using": fmt.Sprint(by), "value": value}
 	} else {
-		params = map[string]interface{}{"using": fmt.Sprint(by), "value": value, "element": *startNode}
+		params = map[string]string {"using": fmt.Sprint(by), "value": value, "element": *startNode}
 	}
 
 	response, err := c.transport.Send("findElement", params)
@@ -528,7 +592,11 @@ func findElement(c *Client, by By, value string, startNode *string) (*webElement
 		return nil, err
 	}
 
-	var e = &webElement{c: c}
+	if response.DriverError != nil {
+		return nil, response.DriverError
+	}
+
+	var e = &WebElement{c: c}
 	err = json.Unmarshal([]byte(response.Value), &e)
 	if err != nil {
 		return nil, err
