@@ -1,12 +1,13 @@
 package marionette_client
 
 type Context int
+
 const (
 	CHROME Context = 1 + iota
 	CONTENT
 )
 
-var contexts = [...]string {
+var contexts = [...]string{
 	"chrome",
 	"content",
 }
