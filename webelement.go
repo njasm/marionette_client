@@ -4,68 +4,68 @@ import (
 	"encoding/json"
 )
 
-type webElement struct {
+type WebElement struct {
 	id string //`json:"element-6066-11e4-a52e-4f735466cecf"`
 	c  *Client
 }
 
-func (e *webElement) Id() string {
+func (e *WebElement) Id() string {
 	return e.id
 }
 
-func (e *webElement) FindElement(by By, value string) (*webElement, error) {
-	return e.c.FindElement(by, value, &e.id)
+func (e *WebElement) FindElement(by By, value string) (*WebElement, error) {
+	return findElement(e.c, by, value, &e.id)
 }
 
-func (e *webElement) FindElements(by By, value string) ([]*webElement, error) {
+func (e *WebElement) FindElements(by By, value string) ([]*WebElement, error) {
 	return findElements(e.c, by, value, &e.id)
 }
 
-func (e *webElement) IsEnabled() bool {
+func (e *WebElement) IsEnabled() bool {
 	return isElementEnabled(e.c, e.id)
 }
 
-func (e *webElement) IsSelected() bool {
+func (e *WebElement) IsSelected() bool {
 	return isElementSelected(e.c, e.id)
 }
 
-func (e *webElement) IsDisplayed() bool {
+func (e *WebElement) IsDisplayed() bool {
 	return isElementDisplayed(e.c, e.id)
 }
 
-func (e *webElement) TagName() string {
+func (e *WebElement) TagName() string {
 	return getElementTagName(e.c, e.id)
 }
 
-func (e *webElement) Text() string {
+func (e *WebElement) Text() string {
 	return getElementText(e.c, e.id)
 }
 
-func (e *webElement) Attribute(name string) string {
+func (e *WebElement) Attribute(name string) string {
 	return getElementAttribute(e.c, e.id, name)
 }
 
-func (e *webElement) CssValue(property string) string {
+func (e *WebElement) CssValue(property string) string {
 	return getElementCssPropertyValue(e.c, e.id, property)
 }
 
-func (e *webElement) Rect() map[string]interface{} {
+func (e *WebElement) Rect() map[string]interface{} {
 	return getElementRect(e.c, e.id)
 }
 
-func (e *webElement) Click() {
+func (e *WebElement) Click() {
 	clickElement(e.c, e.id)
 }
 
-func (e *webElement) SendKeys(keys string) {
+func (e *WebElement) SendKeys(keys string) {
 	sendKeysToElement(e.c, e.id, keys)
 }
 
-func (e *webElement) Clear() {
+func (e *WebElement) Clear() {
 	clearElement(e.c, e.id)
 }
 
-func (e *webElement) UnmarshalJSON(data []byte) error {
+func (e *WebElement) UnmarshalJSON(data []byte) error {
 	var d map[string]map[string]string
 	err := json.Unmarshal([]byte(data), &d)
 	if err != nil {
