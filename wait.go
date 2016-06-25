@@ -3,7 +3,6 @@ package marionette_client
 import (
 	"time"
 	"errors"
-	"fmt"
 )
 
 type Waiter struct {
