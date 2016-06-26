@@ -1,8 +1,8 @@
 package marionette_client
 
 import (
-	"time"
 	"errors"
+	"time"
 )
 
 type Waiter struct {
@@ -15,12 +15,12 @@ type Finder interface {
 	FindElements(by By, value string) ([]*WebElement, error)
 }
 
-func Wait(f Finder) (*Waiter) {
+func Wait(f Finder) *Waiter {
 	return &Waiter{f, time.Duration(1)}
 }
 
 func (w *Waiter) For(d time.Duration) *Waiter {
-	if d < 0 || d > time.Minute * 10 {
+	if d < 0 || d > time.Minute*10 {
 		w.d = time.Duration(time.Second)
 		return w
 	}

@@ -2,7 +2,7 @@ package marionette_client
 
 import (
 	"encoding/json"
-	//"fmt"
+	"fmt"
 )
 
 func makeProto2Command(command string, values interface{}) ([]byte, error) {
@@ -28,7 +28,10 @@ func makeProto3Command(msgID int, command string, values interface{}) ([]byte, e
 		return nil, err
 	}
 
-	//fmt.Println(string(b)) //debug only.
+	if RunningInDebugMode {
+		fmt.Println(string(b))
+	}
+
 
 	return b, nil
 }

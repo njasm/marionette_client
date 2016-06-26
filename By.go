@@ -3,18 +3,18 @@ package marionette_client
 type By int
 
 /*
-        :param method: The method to use to locate the element; one of:
-            "id", "name", "class name", "tag name", "css selector",
-            "link text", "partial link text", "xpath", "anon" and "anon
-            attribute". Note that the "name", "link text" and "partial
-            link test" methods are not supported in the chrome DOM.
-        :param target: The target of the search.  For example, if method =
-            "tag", target might equal "div".  If method = "id", target would
-            be an element id.
-        :param id: If specified, search for elements only inside the element
-            with the specified id.
-        """
- */
+   :param method: The method to use to locate the element; one of:
+       "id", "name", "class name", "tag name", "css selector",
+       "link text", "partial link text", "xpath", "anon" and "anon
+       attribute". Note that the "name", "link text" and "partial
+       link test" methods are not supported in the chrome DOM.
+   :param target: The target of the search.  For example, if method =
+       "tag", target might equal "div".  If method = "id", target would
+       be an element id.
+   :param id: If specified, search for elements only inside the element
+       with the specified id.
+   """
+*/
 const (
 	ID By = 1 + iota
 	NAME
@@ -26,7 +26,7 @@ const (
 	XPATH
 	ANON
 	ANON_ATTRIBUTE
-
+	WEBELEMENT_ID       // workaround to make switchToFrame work - https://bugzilla.mozilla.org/show_bug.cgi?id=1143908
 )
 
 var bys = [...]string{
@@ -40,6 +40,7 @@ var bys = [...]string{
 	"xpath",
 	"anon",
 	"anon attribute",
+	"element",          // workaround to make switchToFrame work - https://bugzilla.mozilla.org/show_bug.cgi?id=1143908
 }
 
 // String returns the English name of the strategy ("css selector", "link text", ...).

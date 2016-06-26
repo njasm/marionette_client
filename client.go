@@ -15,6 +15,8 @@ const (
 	WEBDRIVER_ELEMENT_KEY = "element-6066-11e4-a52e-4f735466cecf"
 )
 
+var RunningInDebugMode bool = false
+
 type session struct {
 	SessionId string
 }
@@ -35,7 +37,7 @@ func (c *Client) Transport(t Transporter) {
 	c.transport = t
 }
 
-func (c *Client) GetSessionID() string {
+func (c *Client) SessionID() string {
 	return c.SessionId
 }
 
@@ -69,7 +71,7 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*response, err
 // The return value is an immutable map of string keys
 // ("capabilities") to values, which may be of types boolean,
 // numerical or string.
-func (c *Client) GetSessionCapabilities() (*Capabilities, error) {
+func (c *Client) Capabilities() (*Capabilities, error) {
 	buf, err := c.transport.Send("getSessionCapabilities", nil)
 	if err != nil {
 		return nil, err
@@ -101,7 +103,7 @@ func (c *Client) Log(message string, level string) (*response, error) {
 }
 
 //  Return all logged messages.
-func (c *Client) GetLogs() (*response, error) {
+func (c *Client) Logs() (*response, error) {
 	response, err := c.transport.Send("getLogs", nil)
 	if err != nil {
 		return nil, err
@@ -126,7 +128,7 @@ func (c *Client) SetContext(value Context) (*response, error) {
 }
 
 //  Gets the context of the server, either "chrome" or "content".
-func (c *Client) GetContext() (*response, error) {
+func (c *Client) Context() (*response, error) {
 	response, err := c.transport.Send("getContext", nil)
 	if err != nil {
 		return nil, err
@@ -200,18 +202,23 @@ func timeouts(transport *Transporter, typ string, milliseconds int) (*response, 
 
 //"getWindowHandle": GeckoDriver.prototype.getWindowHandle,
 //"getCurrentWindowHandle":  GeckoDriver.prototype.getWindowHandle,  // Selenium 2 compat
-func (c *Client) GetCurrentWindowHandle() (*response, error) {
+func (c *Client) CurrentWindowHandle() (string, error) {
 	r, err := c.transport.Send("getCurrentWindowHandle", nil)
 	if err != nil {
-		return nil, errors.New(r.DriverError.Message)
+		return "", errors.New(r.DriverError.Message)
 	}
 
-	return r, nil
+	var d map[string]string
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return "", err
+	}
+	return d["value"], nil
 }
 
 //"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 //"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-func (c *Client) GetCurrentChromeWindowHandle() (*response, error) {
+func (c *Client) CurrentChromeWindowHandle() (*response, error) {
 	r, err := c.transport.Send("getCurrentChromeWindowHandle", nil)
 	if err != nil {
 		return nil, errors.New(r.DriverError.Message)
@@ -257,7 +264,7 @@ func (c *Client) CloseWindow() (*response, error) {
 // FRAMES //
 ////////////
 
-func (c *Client) GetActiveFrame() (*WebElement, error) {
+func (c *Client) ActiveFrame() (*WebElement, error) {
 	r, err := c.transport.Send("getActiveFrame", nil)
 	if err != nil {
 		return nil, err
@@ -273,7 +280,7 @@ func (c *Client) GetActiveFrame() (*WebElement, error) {
 }
 
 // use By(ID), By(NAME) or name only.
-func (c *Client) SwitchToFrame(by By, value string ) error {
+func (c *Client) SwitchToFrame(by By, value string) error {
 	_, err := c.transport.Send("switchToFrame", map[string]interface{}{fmt.Sprint(by): value, "focus": true})
 	if err != nil {
 		return err
@@ -290,7 +297,6 @@ func (c *Client) SwitchToParentFrame() error {
 
 	return nil
 }
-
 
 ////////////////
 // NAVIGATION //
@@ -311,7 +317,7 @@ func (c *Client) Navigate(url string) (*response, error) {
 	return r, nil
 }
 
-func (c *Client) GetPageSource() (*response, error) {
+func (c *Client) PageSource() (*response, error) {
 	response, err := c.transport.Send("getPageSource", nil)
 	if err != nil {
 		return nil, err
@@ -321,7 +327,7 @@ func (c *Client) GetPageSource() (*response, error) {
 }
 
 // get title
-func (c *Client) GetTitle() (string, error) {
+func (c *Client) Title() (string, error) {
 	r, err := c.transport.Send("getTitle", map[string]string{})
 	if err != nil {
 		return "", err
@@ -387,7 +393,7 @@ func (c *Client) Forward() error {
 /////////////
 
 // Get all cookies
-func (c *Client) GetCookies() (*response, error) {
+func (c *Client) Cookies() (*response, error) {
 	r, err := c.transport.Send("getCookies", nil)
 	if err != nil {
 		return nil, err
@@ -397,7 +403,7 @@ func (c *Client) GetCookies() (*response, error) {
 }
 
 // Get all cookies
-func (c *Client) GetCookie(name string) (*response, error) {
+func (c *Client) Cookie(name string) (*response, error) {
 	r, err := c.transport.Send("getCookies", map[string]interface{}{"name": name})
 	if err != nil {
 		return nil, err
@@ -594,9 +600,9 @@ func (c *Client) FindElement(by By, value string) (*WebElement, error) {
 func findElement(c *Client, by By, value string, startNode *string) (*WebElement, error) {
 	var params map[string]string
 	if startNode == nil || *startNode == "" {
-		params = map[string]string {"using": fmt.Sprint(by), "value": value}
+		params = map[string]string{"using": fmt.Sprint(by), "value": value}
 	} else {
-		params = map[string]string {"using": fmt.Sprint(by), "value": value, "element": *startNode}
+		params = map[string]string{"using": fmt.Sprint(by), "value": value, "element": *startNode}
 	}
 
 	response, err := c.transport.Send("findElement", params)

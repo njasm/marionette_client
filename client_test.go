@@ -2,19 +2,22 @@ package marionette_client
 
 import (
 	"testing"
+	"time"
 )
 
 const (
-	TARGET_URL = "http://www.abola.pt/"
-	ID_SELECTOR = "clubes-hp"
-	CSS_SELECTOR_LI = "li"
+	TARGET_URL        = "http://www.abola.pt/"
+	ID_SELECTOR       = "clubes-hp"
+	CSS_SELECTOR_LI   = "li"
 	ID_SELECTOR_INPUT = "topo_txtPesquisa"
 )
+
 var client *Client
 
 func init() {
 	client = NewClient()
 	client.Transport(&MarionetteTransport{})
+	RunningInDebugMode = true
 }
 
 func TestNewSession(t *testing.T) {
@@ -33,7 +36,7 @@ func TestNewSession(t *testing.T) {
 
 // working
 func TestGetSessionID(t *testing.T) {
-	if client.SessionId != client.GetSessionID() {
+	if client.SessionId != client.SessionID() {
 		t.Fatalf("SessionId differ...")
 	}
 
@@ -62,7 +65,7 @@ func TestCurrentUrl(t *testing.T) {
 }
 
 func TestGetCookies(t *testing.T) {
-	r, err := client.GetCookies()
+	r, err := client.Cookies()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -71,7 +74,7 @@ func TestGetCookies(t *testing.T) {
 }
 
 func TestGetCookie(t *testing.T) {
-	r, err := client.GetCookie("abolaCookie")
+	r, err := client.Cookie("abolaCookie")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -90,7 +93,7 @@ func TestGetCookie(t *testing.T) {
 
 // working
 func TestGetSessionCapabilities(t *testing.T) {
-	r, err := client.GetSessionCapabilities()
+	r, err := client.Capabilities()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -125,7 +128,7 @@ func TestLog(t *testing.T) {
 
 // working
 func TestGetLogs(t *testing.T) {
-	r, err := client.GetLogs()
+	r, err := client.Logs()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -150,7 +153,7 @@ func TestSetContext(t *testing.T) {
 }
 
 func TestGetContext(t *testing.T) {
-	r, err := client.GetContext()
+	r, err := client.Context()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -202,8 +205,19 @@ func TestSetSearchTimout(t *testing.T) {
 	t.Log(r.Value)
 }
 
+func TestExecuteScriptWithoutFunction(t *testing.T) {
+	script := "return (document.readyState == 'complete');"
+	args := []interface{}{}
+	r, err := client.ExecuteScript(script, args, 1000, false)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log(r.Value)
+}
+
 func TestExecuteScript(t *testing.T) {
-	script := "function testMyGoMarionetteClient() { return 'yes'; } testMyGoMarionetteClient();"
+	script := "function testMyGoMarionetteClient() { return 'yes'; } return testMyGoMarionetteClient();"
 	args := []interface{}{}
 	r, err := client.ExecuteScript(script, args, 1000, false)
 	if err != nil {
@@ -214,7 +228,7 @@ func TestExecuteScript(t *testing.T) {
 }
 
 func TestExecuteScriptWithArgs(t *testing.T) {
-	script := "function testMyGoMarionetteClientArgs(a, b) { return a + b; }; testMyGoMarionetteClientArgs(arguments[0], arguments[1]);"
+	script := "function testMyGoMarionetteClientArgs(a, b) { return a + b; }; return testMyGoMarionetteClientArgs(arguments[0], arguments[1]);"
 	args := []interface{}{1, 3}
 	r, err := client.ExecuteScript(script, args, 1000, false)
 	if err != nil {
@@ -225,7 +239,7 @@ func TestExecuteScriptWithArgs(t *testing.T) {
 }
 
 func TestGetTitle(t *testing.T) {
-	title, err := client.GetTitle()
+	title, err := client.Title()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -237,8 +251,6 @@ func TestFindElement(t *testing.T) {
 	element, err := client.FindElement(By(ID), ID_SELECTOR)
 	if err != nil {
 		t.Fatalf("%#v", err)
-		t.Log(element)
-		t.FailNow()
 	}
 
 	t.Log(element.Id())
@@ -255,6 +267,8 @@ func TestFindElement(t *testing.T) {
 	if 18 != len(collection) {
 		t.FailNow()
 	}
+
+	t.Logf("%T %#V", collection, collection)
 }
 
 func TestSendKeys(t *testing.T) {
@@ -275,17 +289,8 @@ func TestFindElements(t *testing.T) {
 	t.Log(len(elements))
 }
 
-func TestCurrentWindowHandle(t *testing.T) {
-	r, err := client.GetCurrentWindowHandle()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	t.Log(r.Value)
-}
-
 func TestCurrentChromeWindowHandle(t *testing.T) {
-	r, err := client.GetCurrentChromeWindowHandle()
+	r, err := client.CurrentChromeWindowHandle()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -294,13 +299,40 @@ func TestCurrentChromeWindowHandle(t *testing.T) {
 }
 
 func TestWindowHandles(t *testing.T) {
+	w, err := client.CurrentWindowHandle()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log(w)
+
 	r, err := client.WindowHandles()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Log(r)
+	for _, w := range r {
+		err := client.SwitchToWindow(w)
+		if err != nil {
+			t.Fatalf("%#v", err)
+		}
+
+		time.Sleep(time.Duration(time.Second))
+	}
+
+	// return to original window.
+	client.SwitchToWindow(w)
 }
+
+// working - if called before other tests all hell will break loose
+//func TestCloseWindow(t *testing.T) {
+//	r, err := client.CloseWindow()
+//	if err != nil {
+//		t.Fatalf("%#v", err)
+//	}
+//
+//	t.Log(r.Value)
+//}
 
 // working
 //func TestQuitApplication(t *testing.T) {
