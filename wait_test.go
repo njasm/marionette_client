@@ -19,13 +19,7 @@ func TestWait(t *testing.T) {
 
 	v.Click()
 
-	// find iframe switch to and click button
-	frame, err := client.FindElement(By(ID), "iframeResult")
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	err = client.SwitchToFrame(By(WEBELEMENT_ID), frame.Id())
+	err = client.SwitchToFrame(By(ID), "iframeResult")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}

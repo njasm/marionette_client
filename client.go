@@ -281,7 +281,16 @@ func (c *Client) ActiveFrame() (*WebElement, error) {
 
 // use By(ID), By(NAME) or name only.
 func (c *Client) SwitchToFrame(by By, value string) error {
-	_, err := c.transport.Send("switchToFrame", map[string]interface{}{fmt.Sprint(by): value, "focus": true})
+
+	//with current marionette implementation we have to find the element first and send the switchToFrame
+	//command with the UUID, else it wont work.
+	//https://bugzilla.mozilla.org/show_bug.cgi?id=1143908
+	frame, err := c.FindElement(by, value)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.transport.Send("switchToFrame", map[string]interface{}{"element": frame.Id(), "focus": true})
 	if err != nil {
 		return err
 	}

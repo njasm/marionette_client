@@ -26,7 +26,6 @@ const (
 	XPATH
 	ANON
 	ANON_ATTRIBUTE
-	WEBELEMENT_ID       // workaround to make switchToFrame work - https://bugzilla.mozilla.org/show_bug.cgi?id=1143908
 )
 
 var bys = [...]string{
@@ -40,7 +39,6 @@ var bys = [...]string{
 	"xpath",
 	"anon",
 	"anon attribute",
-	"element",          // workaround to make switchToFrame work - https://bugzilla.mozilla.org/show_bug.cgi?id=1143908
 }
 
 // String returns the English name of the strategy ("css selector", "link text", ...).
