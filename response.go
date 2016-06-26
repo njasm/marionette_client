@@ -27,7 +27,6 @@ func makeProto3Response(buf []byte) (*response, error) {
 	var v []interface{}
 
 	if err := json.Unmarshal(buf, &v); err != nil {
-		log.Printf("%#v", err)
 		return nil, err
 	}
 
