@@ -21,15 +21,15 @@ func (e *WebElement) FindElements(by By, value string) ([]*WebElement, error) {
 	return findElements(e.c, by, value, &e.id)
 }
 
-func (e *WebElement) IsEnabled() bool {
+func (e *WebElement) Enabled() bool {
 	return isElementEnabled(e.c, e.id)
 }
 
-func (e *WebElement) IsSelected() bool {
+func (e *WebElement) Selected() bool {
 	return isElementSelected(e.c, e.id)
 }
 
-func (e *WebElement) IsDisplayed() bool {
+func (e *WebElement) Displayed() bool {
 	return isElementDisplayed(e.c, e.id)
 }
 

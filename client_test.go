@@ -254,9 +254,9 @@ func TestFindElement(t *testing.T) {
 	}
 
 	t.Log(element.Id())
-	t.Log(element.IsEnabled())
-	t.Log(element.IsSelected())
-	t.Log(element.IsDisplayed())
+	t.Log(element.Enabled())
+	t.Log(element.Selected())
+	t.Log(element.Displayed())
 	t.Log(element.TagName())
 	t.Log(element.Text())
 	t.Log(element.Attribute("id"))

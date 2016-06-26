@@ -99,7 +99,7 @@ func (t *MarionetteTransport) Receive() ([]byte, error) {
 }
 
 func read(c net.Conn) ([]byte, error) {
-	var msgSize, err = getMessageLength(c)
+	var msgSize, err = messageLength(c)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func read(c net.Conn) ([]byte, error) {
 // marionette's protocol.
 // the protocol say's that message length is the first part for the message until ":" is found.
 // this signals the next bytes as the message
-func getMessageLength(c net.Conn) (int, error) {
+func messageLength(c net.Conn) (int, error) {
 	var byteSize = make([]byte, 0)
 	tmp := make([]byte, 1)
 	for {
