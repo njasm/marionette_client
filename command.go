@@ -32,6 +32,5 @@ func makeProto3Command(msgID int, command string, values interface{}) ([]byte, e
 		fmt.Println(string(b))
 	}
 
-
 	return b, nil
 }

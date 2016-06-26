@@ -2,9 +2,7 @@ package marionette_client
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"log"
 	"strings"
 )
 
@@ -205,7 +203,7 @@ func timeouts(transport *Transporter, typ string, milliseconds int) (*response, 
 func (c *Client) CurrentWindowHandle() (string, error) {
 	r, err := c.transport.Send("getCurrentWindowHandle", nil)
 	if err != nil {
-		return "", errors.New(r.DriverError.Message)
+		return "", err
 	}
 
 	var d map[string]string
@@ -221,7 +219,7 @@ func (c *Client) CurrentWindowHandle() (string, error) {
 func (c *Client) CurrentChromeWindowHandle() (*response, error) {
 	r, err := c.transport.Send("getCurrentChromeWindowHandle", nil)
 	if err != nil {
-		return nil, errors.New(r.DriverError.Message)
+		return nil, err
 	}
 
 	return r, nil
@@ -230,7 +228,7 @@ func (c *Client) CurrentChromeWindowHandle() (*response, error) {
 func (c *Client) WindowHandles() ([]string, error) {
 	r, err := c.transport.Send("getWindowHandles", nil)
 	if err != nil {
-		return nil, errors.New(r.DriverError.Message)
+		return nil, err
 	}
 
 	var d []string
@@ -243,9 +241,9 @@ func (c *Client) WindowHandles() ([]string, error) {
 }
 
 func (c *Client) SwitchToWindow(name string) error {
-	r, err := c.transport.Send("switchToWindow", map[string]interface{}{"name": name})
+	_, err := c.transport.Send("switchToWindow", map[string]interface{}{"name": name})
 	if err != nil {
-		return errors.New(r.DriverError.Message)
+		return err
 	}
 
 	return nil
@@ -254,7 +252,7 @@ func (c *Client) SwitchToWindow(name string) error {
 func (c *Client) CloseWindow() (*response, error) {
 	r, err := c.transport.Send("close", nil)
 	if err != nil {
-		return nil, errors.New(r.DriverError.Message)
+		return nil, err
 	}
 
 	return r, nil
@@ -369,9 +367,9 @@ func (c *Client) CurrentUrl() (string, error) {
 
 // refresh
 func (c *Client) Refresh() error {
-	r, err := c.transport.Send("refresh", nil)
+	_, err := c.transport.Send("refresh", nil)
 	if err != nil {
-		return errors.New(r.DriverError.Message)
+		return err
 	}
 
 	return nil
@@ -379,9 +377,9 @@ func (c *Client) Refresh() error {
 
 // back
 func (c *Client) Back() error {
-	r, err := c.transport.Send("goBack", nil)
+	_, err := c.transport.Send("goBack", nil)
 	if err != nil {
-		return errors.New(r.DriverError.Message)
+		return err
 	}
 
 	return nil
@@ -389,9 +387,9 @@ func (c *Client) Back() error {
 
 // forward
 func (c *Client) Forward() error {
-	r, err := c.transport.Send("goForward", nil)
+	_, err := c.transport.Send("goForward", nil)
 	if err != nil {
-		return errors.New(r.DriverError.Message)
+		return err
 	}
 
 	return nil
@@ -576,10 +574,6 @@ func findElements(c *Client, by By, value string, startNode *string) ([]*WebElem
 		return nil, err
 	}
 
-	if response.DriverError != nil {
-		return nil, response.DriverError
-	}
-
 	var d []map[string]string
 	err = json.Unmarshal([]byte(response.Value), &d)
 	if err != nil {
@@ -619,10 +613,6 @@ func findElement(c *Client, by By, value string, startNode *string) (*WebElement
 		return nil, err
 	}
 
-	if response.DriverError != nil {
-		return nil, response.DriverError
-	}
-
 	var e = &WebElement{c: c}
 	err = json.Unmarshal([]byte(response.Value), &e)
 	if err != nil {
@@ -636,32 +626,22 @@ func findElement(c *Client, by By, value string, startNode *string) (*WebElement
 // DIALOGS //
 /////////////
 
-func (c *Client) DismissDialog() (*DriverError, bool, error) {
-	ok := false
-	r, err := c.transport.Send("dismissDialog", nil)
+func (c *Client) DismissDialog() error {
+	_, err := c.transport.Send("dismissDialog", nil)
 	if err != nil {
-		return nil, ok, err
+		return err
 	}
 
-	if r.DriverError != nil {
-		return r.DriverError, ok, nil
-	}
-
-	return nil, true, nil
+	return nil
 }
 
-func (c *Client) AcceptDialog() (*DriverError, bool, error) {
-	ok := false
-	r, err := c.transport.Send("acceptDialog", nil)
+func (c *Client) AcceptDialog() error {
+	_, err := c.transport.Send("acceptDialog", nil)
 	if err != nil {
-		return nil, ok, err
+		return err
 	}
 
-	if r.DriverError != nil {
-		return r.DriverError, ok, nil
-	}
-
-	return nil, true, nil
+	return nil
 }
 
 ///////////////////////
@@ -680,7 +660,6 @@ func (c *Client) QuitApplication() (*response, error) {
 func (c *Client) Screenshot() (*response, error) {
 	r, err := c.transport.Send("takeScreenshot", map[string]string{})
 	if err != nil {
-		log.Printf("%#v", err)
 		return nil, err
 	}
 

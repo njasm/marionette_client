@@ -16,8 +16,8 @@ func makeProto2Response(buf []byte) (*response, error) {
 func makeProto3Response(buf []byte) (*response, error) {
 	//Debug only
 	if RunningInDebugMode {
-		if (len(buf) >= 512){
-			log.Println(string(buf)[0:512] + " - END - " + string(buf)[len(buf) - 512:])
+		if len(buf) >= 512 {
+			log.Println(string(buf)[0:512] + " - END - " + string(buf)[len(buf)-512:])
 		} else {
 			log.Println(string(buf))
 		}
