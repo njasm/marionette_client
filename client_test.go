@@ -323,8 +323,8 @@ func TestWindowHandles(t *testing.T) {
 
 func TestNavigatorMethods(t *testing.T) {
 	client.SetContext(Context(CONTENT))
-	url1 := "http://www.google.com/"
-	url2 := "http://www.bing.com/"
+	url1 := "https://www.google.pt/"
+	url2 := "https://www.bing.com/"
 
 	client.Navigate(url1)
 	sleep := time.Duration(2) * time.Second
@@ -343,7 +343,7 @@ func TestNavigatorMethods(t *testing.T) {
 	}
 
 	if firstUrl != url1 {
-		t.Fatalf("Expected url %v - received url %v", url1, firstUrl)
+		t.Fatalf("Expected url %v - received url %v", url1, firstUrl[0:len(url1)])
 	}
 
 	client.Forward()
@@ -353,7 +353,7 @@ func TestNavigatorMethods(t *testing.T) {
 	}
 
 	if secondUrl != url2 {
-		t.Fatalf("Expected url %v - received url %v", url2, secondUrl)
+		t.Fatalf("Expected url %v - received url %v", url2, secondUrl[:len(url2)])
 	}
 }
 
