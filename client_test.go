@@ -103,17 +103,14 @@ func TestGetSessionCapabilities(t *testing.T) {
 
 // working
 func TestScreenshot(t *testing.T) {
-	r, err := client.Screenshot()
+	_, err := client.Screenshot()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	println(r.MessageID)
-	println(r.DriverError)
-	println(r.Size)
 	//this print ise a problem for travis builds, since it can surpass the 4 MB of log size.
 	// don't print the base64 encoded image.
-	//println(r.Value)
+	//println(base64encoded)
 }
 
 // working
@@ -322,6 +319,40 @@ func TestWindowHandles(t *testing.T) {
 
 	// return to original window.
 	client.SwitchToWindow(w)
+}
+
+func TestNavigatorMethods(t *testing.T) {
+	client.SetContext(Context(CONTENT))
+	url1 := "http://www.google.com/"
+	url2 := "http://www.bing.com/"
+
+	client.Navigate(url1)
+	sleep := time.Duration(2) * time.Second
+	time.Sleep(sleep)
+
+	client.Navigate(url2)
+	time.Sleep(sleep)
+
+	client.Back()
+	client.Refresh()
+	firstUrl, err := client.CurrentUrl()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	if firstUrl != url1 {
+		t.Fatalf("Expected url %v - received url %v", url1, firstUrl)
+	}
+
+	client.Forward()
+	secondUrl, err := client.CurrentUrl()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	if secondUrl != url2 {
+		t.Fatalf("Expected url %v - received url %v", url2, secondUrl)
+	}
 }
 
 // working - if called before other tests all hell will break loose

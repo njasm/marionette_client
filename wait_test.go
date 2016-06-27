@@ -34,8 +34,7 @@ func TestWait(t *testing.T) {
 
 func TestNotPresent(t *testing.T) {
 	client.SwitchToParentFrame()
-	//f, _ := client.GetActiveFrame()
-	//t.Log(f.Attribute("id"))
+	client.ActiveFrame()
 
 	timeout := time.Duration(10) * time.Second
 	condition := ElementIsNotPresent(By(ID), "non-existing-element")

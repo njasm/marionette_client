@@ -657,11 +657,11 @@ func (c *Client) QuitApplication() (*response, error) {
 	return r, nil
 }
 
-func (c *Client) Screenshot() (*response, error) {
+func (c *Client) Screenshot() (string, error) {
 	r, err := c.transport.Send("takeScreenshot", map[string]string{})
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return r, nil
+	return r.Value, nil
 }
