@@ -335,6 +335,8 @@ func TestNavigatorMethods(t *testing.T) {
 
 	client.Back()
 	client.Refresh()
+	time.Sleep(sleep)
+
 	firstUrl, err := client.CurrentUrl()
 	if err != nil {
 		t.Fatalf("%#v", err)
