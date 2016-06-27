@@ -202,6 +202,13 @@ func TestSetSearchTimout(t *testing.T) {
 	t.Log(r.Value)
 }
 
+func TestPageSource(t *testing.T) {
+	r, err := client.PageSource()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+}
+
 func TestExecuteScriptWithoutFunction(t *testing.T) {
 	script := "return (document.readyState == 'complete');"
 	args := []interface{}{}
@@ -258,7 +265,28 @@ func TestFindElement(t *testing.T) {
 	t.Log(element.Text())
 	t.Log(element.Attribute("id"))
 	t.Log(element.CssValue("text-decoration"))
-	t.Log(element.Rect())
+	rect, err := element.Rect()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log(rect)
+
+	// size
+	w, h, err := element.Location()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log("width: %f, height: %f", w, h)
+
+	//location
+	x, y, err := element.Size()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log("x: %f, y: %f", x, y)
 
 	collection, err := element.FindElements(By(CSS_SELECTOR), CSS_SELECTOR_LI)
 	if 18 != len(collection) {
@@ -356,23 +384,3 @@ func TestNavigatorMethods(t *testing.T) {
 		t.Fatalf("Expected url %v - received url %v", url2, secondUrl[:len(url2)])
 	}
 }
-
-// working - if called before other tests all hell will break loose
-//func TestCloseWindow(t *testing.T) {
-//	r, err := client.CloseWindow()
-//	if err != nil {
-//		t.Fatalf("%#v", err)
-//	}
-//
-//	t.Log(r.Value)
-//}
-
-// working
-//func TestQuitApplication(t *testing.T) {
-//	r, err := client.QuitApplication()
-//	if err != nil {
-//		t.Fatalf("%#v", err)
-//	}
-//
-//	t.Log(r.ResponseError)
-//}

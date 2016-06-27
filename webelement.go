@@ -4,6 +4,13 @@ import (
 	"encoding/json"
 )
 
+type ElementRect struct {
+	X      float32
+	Y      float32
+	Width  float32
+	Height float32
+}
+
 type WebElement struct {
 	id string //`json:"element-6066-11e4-a52e-4f735466cecf"`
 	c  *Client
@@ -49,7 +56,7 @@ func (e *WebElement) CssValue(property string) string {
 	return getElementCssPropertyValue(e.c, e.id, property)
 }
 
-func (e *WebElement) Rect() map[string]interface{} {
+func (e *WebElement) Rect() (*ElementRect, error) {
 	return getElementRect(e.c, e.id)
 }
 
@@ -63,6 +70,24 @@ func (e *WebElement) SendKeys(keys string) {
 
 func (e *WebElement) Clear() {
 	clearElement(e.c, e.id)
+}
+
+func (e *WebElement) Location() (x float32, y float32, err error) {
+	r, err := getElementRect(e.c, e.id)
+	if err != nil {
+		return x, y, err
+	}
+
+	return r.X, r.Y, nil
+}
+
+func (e *WebElement) Size() (w float32, h float32, err error) {
+	r, err := getElementRect(e.c, e.id)
+	if err != nil {
+		return w, h, err
+	}
+
+	return r.Width, r.Height, nil
 }
 
 func (e *WebElement) UnmarshalJSON(data []byte) error {

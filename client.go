@@ -498,16 +498,19 @@ func getElementCssPropertyValue(c *Client, id string, property string) string {
 	return d["value"]
 }
 
-func getElementRect(c *Client, id string) map[string]interface{} {
+func getElementRect(c *Client, id string) (*ElementRect, error) {
 	r, err := c.transport.Send("getElementRect", map[string]interface{}{"id": id})
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	var d = map[string]interface{}{}
-	json.Unmarshal([]byte(r.Value), &d)
+	var d = &ElementRect{}
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return nil, err
+	}
 
-	return d
+	return d, nil
 }
 
 func clickElement(c *Client, id string) {

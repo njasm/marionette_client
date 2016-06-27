@@ -44,3 +44,23 @@ func TestNotPresent(t *testing.T) {
 		t.Fatal("Element Was Found in ElementIsNotPresent test.")
 	}
 }
+
+// working - if called before other tests all hell will break loose
+func TestCloseWindow(t *testing.T) {
+	r, err := client.CloseWindow()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log(r.Value)
+}
+
+// working
+func TestQuitApplication(t *testing.T) {
+	r, err := client.QuitApplication()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log(r.Value)
+}
