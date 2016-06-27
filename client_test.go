@@ -203,7 +203,7 @@ func TestSetSearchTimout(t *testing.T) {
 }
 
 func TestPageSource(t *testing.T) {
-	r, err := client.PageSource()
+	_, err := client.PageSource()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
