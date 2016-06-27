@@ -56,11 +56,11 @@ func TestCloseWindow(t *testing.T) {
 }
 
 // working
-func TestQuitApplication(t *testing.T) {
-	r, err := client.QuitApplication()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	t.Log(r.Value)
-}
+//func TestQuitApplication(t *testing.T) {
+//	r, err := client.QuitApplication()
+//	if err != nil {
+//		t.Fatalf("%#v", err)
+//	}
+//
+//	t.Log(r.Value)
+//}
