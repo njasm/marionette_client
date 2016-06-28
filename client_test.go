@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	TARGET_URL        = "http://www.abola.pt/"
-	ID_SELECTOR       = "clubes-hp"
-	CSS_SELECTOR_LI   = "li"
-	ID_SELECTOR_INPUT = "topo_txtPesquisa"
+	TARGET_URL          = "http://www.abola.pt/"
+	ID_SELECTOR         = "clubes-hp"
+	CSS_SELECTOR_LI     = "li"
+	ID_SELECTOR_INPUT   = "topo_txtPesquisa"
+	TIMEOUT             = 10000 // milliseconds
 )
 
 var client *Client
@@ -176,7 +177,7 @@ func TestGetPageSource(t *testing.T) {
 }
 
 func TestSetScriptTimout(t *testing.T) {
-	r, err := client.SetScriptTimeout(1000)
+	r, err := client.SetScriptTimeout(TIMEOUT)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -185,7 +186,7 @@ func TestSetScriptTimout(t *testing.T) {
 }
 
 func TestSetPageTimout(t *testing.T) {
-	r, err := client.SetPageTimeout(1000)
+	r, err := client.SetPageTimeout(TIMEOUT)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -194,7 +195,7 @@ func TestSetPageTimout(t *testing.T) {
 }
 
 func TestSetSearchTimout(t *testing.T) {
-	r, err := client.SetSearchTimeout(1000)
+	r, err := client.SetSearchTimeout(TIMEOUT)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
