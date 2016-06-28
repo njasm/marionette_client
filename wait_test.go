@@ -32,6 +32,34 @@ func TestWait(t *testing.T) {
 	e.Click()
 }
 
+func TestAlert(t *testing.T) {
+	client.Get("http://www.abola.pt")
+	var text string = "marionette is cool or what?"
+	var script string = "alert('" + text + "');"
+	args := []interface{}{}
+	r, err := client.ExecuteScript(script, args, 1000, false)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	err = client.AcceptDialog()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	r, err = client.ExecuteScript(script, args, 1000, false)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	err = client.AcceptDialog()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log(r.Value)
+}
+
 func TestNotPresent(t *testing.T) {
 	client.SwitchToParentFrame()
 	client.ActiveFrame()
