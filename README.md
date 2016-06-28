@@ -85,22 +85,22 @@ Incomplete list. Check the tests for more examples.
 
 #### Find Elements
 ```go
-	collection, err := element.FindElements(By(CSS_SELECTOR), CSS_SELECTOR_LI)
+	collection, err := element.FindElements(By(TAG_NAME), "li")
 	if err != nil {
 		// handle your errors
 	}
 
     // else
     for var e := range collection {
-    	println(element.Id())
-    	println(element.Enabled())
-    	println(element.Selected())
-    	println(element.Displayed())
-    	println(element.TagName())
-    	println(element.Text())
-    	println(element.Attribute("id"))
-    	println(element.CssValue("text-decoration"))
-    	element.Click()
+    	println(e.Id())
+    	println(e.Enabled())
+    	println(e.Selected())
+    	println(e.Displayed())
+    	println(e.TagName())
+    	println(e.Text())
+    	println(e.Attribute("id"))
+    	println(e.CssValue("text-decoration"))
+    	e.Click()
     }
 ```
 
