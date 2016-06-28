@@ -41,6 +41,69 @@ Incomplete list. Check the tests for more examples.
 	
 ```
 
+#### Find Element
+```go
+	element, err := client.FindElement(By(ID), "html-element-id-attribute")
+	if err != nil {
+		// handle your errors
+	}
+
+    // else
+	println(element.Id())
+	println(element.Enabled())
+	println(element.Selected())
+	println(element.Displayed())
+	println(element.TagName())
+	println(element.Text())
+	println(element.Attribute("id"))
+	println(element.CssValue("text-decoration"))
+	
+	// width, height, x and y
+	rect, err := element.Rect()
+	if err != nil {
+        // handle your errors
+	}
+
+	fmt.Printf("%#v", rect)
+	
+	// size
+	w, h, err := element.Size()
+	if err != nil {
+		// handle your errors
+	}
+	
+    fmt.Printf("width: %f, height: %f", w, h)
+    
+	//location
+	x, y, err := element.Location()
+	if err != nil {
+	    // handle your errors
+	}
+	
+	fmt.Printf("x: %v, y: %v", x, y)
+```
+
+#### Find Elements
+```go
+	collection, err := element.FindElements(By(CSS_SELECTOR), CSS_SELECTOR_LI)
+	if err != nil {
+		// handle your errors
+	}
+
+    // else
+    for var e := range collection {
+    	println(element.Id())
+    	println(element.Enabled())
+    	println(element.Selected())
+    	println(element.Displayed())
+    	println(element.TagName())
+    	println(element.Text())
+    	println(element.Attribute("id"))
+    	println(element.CssValue("text-decoration"))
+    	element.Click()
+    }
+```
+
 #### Execute JS Script
 ```go
 	script := "function mySum(a, b) { return a + b; }; return mySum(arguments[0], arguments[1]);"
