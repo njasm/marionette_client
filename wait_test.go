@@ -52,7 +52,7 @@ func TestAlert(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	err = client.AcceptDialog()
+	err = client.DismissDialog()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
