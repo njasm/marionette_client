@@ -41,6 +41,18 @@ Incomplete list. Check the tests for more examples.
 	
 ```
 
+#### Execute JS Script
+```go
+	script := "function mySum(a, b) { return a + b; }; return mySum(arguments[0], arguments[1]);"
+	args := []int{1, 3} // arguments to be passed to the function
+	timeout := 1000     // milliseconds
+	sandbox := false    // new Sandbox
+	r, err := client.ExecuteScript(script, args, timeout, sandbox)
+	if err == nil {
+	    println(r.Value)    // 4 
+	}
+```
+
 #### Wait(), Until() Expected condition is true.
 ```go
 	client.Navigate("http://www.w3schools.com/ajax/tryit.asp?filename=tryajax_get")
