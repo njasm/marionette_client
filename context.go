@@ -12,5 +12,7 @@ var contexts = [...]string{
 	"content",
 }
 
-// String returns the English name of the context ("chrome", "content").
-func (c Context) String() string { return contexts[c-1] }
+// String returns the value name of the context ("chrome", "content").
+func (c Context) String() string {
+	return contexts[c-1]
+}

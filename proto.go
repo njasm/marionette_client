@@ -47,6 +47,10 @@ func (e ProtoV3DecoderEncoder) Encode(t Transporter, command string, values inte
 		return nil, err
 	}
 
+	if RunningInDebugMode {
+		fmt.Println(string(b))
+	}
+
 	return []byte(strconv.Itoa(len(b)) + ":" + string(b)), nil
 
 }

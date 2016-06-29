@@ -89,20 +89,6 @@ func (t *MarionetteTransport) Close() error {
 }
 
 func (t *MarionetteTransport) Send(command string, values interface{}) (*Response, error) {
-	//t.messageID = t.messageID + 1
-	//buf, err := t.transformToCommand(command, values)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//_, err = write(t.conn, buf)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//// get response to sent command.
-	//return t.transformToResponse(t.Receive())
-
 	buf, err := t.de.Encode(t, command, values)
 	if err != nil {
 		return nil, err
@@ -117,6 +103,7 @@ func (t *MarionetteTransport) Send(command string, values interface{}) (*Respons
 	if err != nil {
 		return nil, err
 	}
+
 	//Debug only
 	if RunningInDebugMode {
 		if len(buf) >= 512 {
@@ -144,6 +131,12 @@ func (t *MarionetteTransport) Receive() ([]byte, error) {
 	return read(t.conn)
 }
 
+// ReadFull reads exactly len(buf) bytes from r into buf.
+// It returns the number of bytes copied and an error if fewer bytes were read.
+// The error is EOF only if no bytes were read.
+// If an EOF happens after reading some but not all the bytes,
+// ReadFull returns ErrUnexpectedEOF.
+// On return, n == len(buf) if and only if err == nil.
 func read(c net.Conn) ([]byte, error) {
 	var msgSize, err = messageLength(c)
 	if err != nil {
@@ -151,13 +144,6 @@ func read(c net.Conn) ([]byte, error) {
 	}
 
 	msgBuf := make([]byte, msgSize)
-	//_, err = c.Read(msgBuf)
-	// ReadFull reads exactly len(buf) bytes from r into buf.
-	// It returns the number of bytes copied and an error if fewer bytes were read.
-	// The error is EOF only if no bytes were read.
-	// If an EOF happens after reading some but not all the bytes,
-	// ReadFull returns ErrUnexpectedEOF.
-	// On return, n == len(buf) if and only if err == nil.
 	_, err = io.ReadFull(c, msgBuf)
 	if err != nil {
 		return nil, err
@@ -195,35 +181,3 @@ func messageLength(c net.Conn) (int, error) {
 		return intSize, err
 	}
 }
-
-//func (t *MarionetteTransport) transformToCommand(command string, values interface{}) (bytes []byte, err error) {
-//	var size int
-//	if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V2 {
-//		bytes, err = makeProto2Command(command, values)
-//	} else if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V3 {
-//		bytes, err = makeProto3Command(t.messageID, command, values)
-//	} else {
-//		return nil, errors.New("Marionete Protocol version not supported.")
-//	}
-//
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	size = len(bytes)
-//	return []byte(strconv.Itoa(size) + ":" + string(bytes)), nil
-//}
-//
-//func (t *MarionetteTransport) transformToResponse(buf []byte, err error) (*Response, error) {
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V2 {
-//		return makeProto2Response(buf)
-//	} else if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V3 {
-//		return makeProto3Response(buf)
-//	}
-//
-//	return nil, errors.New("Unable to decode Protocol version for message decoding.")
-//}
