@@ -43,7 +43,7 @@ func (c *Client) Connect(host string, port int) error {
 	return c.transport.Connect(host, port)
 }
 
-func (c *Client) NewSession(sessionId string, cap *Capabilities) (*response, error) {
+func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, error) {
 	data := map[string]interface{}{
 		"sessionId":    sessionId,
 		"capabilities": cap,
@@ -91,7 +91,7 @@ func (c *Client) Capabilities() (*Capabilities, error) {
 //     Log message.
 // param string level
 //     Arbitrary log level.
-func (c *Client) Log(message string, level string) (*response, error) {
+func (c *Client) Log(message string, level string) (*Response, error) {
 	response, err := c.transport.Send("log", map[string]string{"value": message, "level": level})
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func (c *Client) Log(message string, level string) (*response, error) {
 }
 
 //  Return all logged messages.
-func (c *Client) Logs() (*response, error) {
+func (c *Client) Logs() (*Response, error) {
 	response, err := c.transport.Send("getLogs", nil)
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func (c *Client) Logs() (*response, error) {
 // param string value
 //     Name of the context to be switched to.  Must be one of "chrome" or
 //     "content".
-func (c *Client) SetContext(value Context) (*response, error) {
+func (c *Client) SetContext(value Context) (*Response, error) {
 	response, err := c.transport.Send("setContext", map[string]string{"value": fmt.Sprint(value)})
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (c *Client) SetContext(value Context) (*response, error) {
 }
 
 //  Gets the context of the server, either "chrome" or "content".
-func (c *Client) Context() (*response, error) {
+func (c *Client) Context() (*Response, error) {
 	response, err := c.transport.Send("getContext", nil)
 	if err != nil {
 		return nil, err
@@ -135,7 +135,7 @@ func (c *Client) Context() (*response, error) {
 	return response, nil
 }
 
-func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, newSandbox bool) (*response, error) {
+func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, newSandbox bool) (*Response, error) {
 	parameters := map[string]interface{}{}
 	parameters["scriptTimeout"] = timeout
 	parameters["script"] = script
@@ -155,7 +155,7 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 //
 // param number ms
 //     Time in milliseconds.
-func (c *Client) SetScriptTimeout(milliseconds int) (*response, error) {
+func (c *Client) SetScriptTimeout(milliseconds int) (*Response, error) {
 	return timeouts(&c.transport, "script", milliseconds)
 }
 
@@ -163,7 +163,7 @@ func (c *Client) SetScriptTimeout(milliseconds int) (*response, error) {
 //
 // param number ms
 //     Search timeout in milliseconds.
-func (c *Client) SetSearchTimeout(milliseconds int) (*response, error) {
+func (c *Client) SetSearchTimeout(milliseconds int) (*Response, error) {
 	return timeouts(&c.transport, "implicit", milliseconds)
 }
 
@@ -171,7 +171,7 @@ func (c *Client) SetSearchTimeout(milliseconds int) (*response, error) {
 //
 // param number ms
 //     Search timeout in milliseconds.
-func (c *Client) SetPageTimeout(milliseconds int) (*response, error) {
+func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
 	return timeouts(&c.transport, "", milliseconds)
 }
 
@@ -181,7 +181,7 @@ func (c *Client) SetPageTimeout(milliseconds int) (*response, error) {
 //     Type of timeout.
 // param number ms
 //     Timeout in milliseconds.
-func timeouts(transport *Transporter, typ string, milliseconds int) (*response, error) {
+func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, error) {
 	if typ != "implicit" && typ != "script" {
 		typ = ""
 	}
@@ -216,7 +216,7 @@ func (c *Client) CurrentWindowHandle() (string, error) {
 
 //"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 //"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-func (c *Client) CurrentChromeWindowHandle() (*response, error) {
+func (c *Client) CurrentChromeWindowHandle() (*Response, error) {
 	r, err := c.transport.Send("getCurrentChromeWindowHandle", nil)
 	if err != nil {
 		return nil, err
@@ -249,7 +249,7 @@ func (c *Client) SwitchToWindow(name string) error {
 	return nil
 }
 
-func (c *Client) CloseWindow() (*response, error) {
+func (c *Client) CloseWindow() (*Response, error) {
 	r, err := c.transport.Send("close", nil)
 	if err != nil {
 		return nil, err
@@ -310,12 +310,12 @@ func (c *Client) SwitchToParentFrame() error {
 ////////////////
 
 // deprecated use Navigate()
-func (c *Client) Get(url string) (*response, error) {
+func (c *Client) Get(url string) (*Response, error) {
 	return c.Navigate(url)
 }
 
 // open url
-func (c *Client) Navigate(url string) (*response, error) {
+func (c *Client) Navigate(url string) (*Response, error) {
 	r, err := c.transport.Send("get", map[string]string{"url": url})
 	if err != nil {
 		return nil, err
@@ -324,7 +324,7 @@ func (c *Client) Navigate(url string) (*response, error) {
 	return r, nil
 }
 
-func (c *Client) PageSource() (*response, error) {
+func (c *Client) PageSource() (*Response, error) {
 	response, err := c.transport.Send("getPageSource", nil)
 	if err != nil {
 		return nil, err
@@ -400,7 +400,7 @@ func (c *Client) Forward() error {
 /////////////
 
 // Get all cookies
-func (c *Client) Cookies() (*response, error) {
+func (c *Client) Cookies() (*Response, error) {
 	r, err := c.transport.Send("getCookies", nil)
 	if err != nil {
 		return nil, err
@@ -410,7 +410,7 @@ func (c *Client) Cookies() (*response, error) {
 }
 
 // Get all cookies
-func (c *Client) Cookie(name string) (*response, error) {
+func (c *Client) Cookie(name string) (*Response, error) {
 	r, err := c.transport.Send("getCookies", map[string]interface{}{"name": name})
 	if err != nil {
 		return nil, err
@@ -651,7 +651,7 @@ func (c *Client) AcceptDialog() error {
 // DISPOSE TEAR DOWN //
 ///////////////////////
 
-func (c *Client) QuitApplication() (*response, error) {
+func (c *Client) QuitApplication() (*Response, error) {
 	r, err := c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
 	if err != nil {
 		return nil, err

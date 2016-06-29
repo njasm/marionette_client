@@ -1,8 +1,8 @@
 package marionette_client
 
 type Navigator interface {
-	Navigate(url string) (*response, error)
-	PageSource() (*response, error)
+	Navigate(url string) (*Response, error)
+	PageSource() (*Response, error)
 	Title() (string, error)
 	CurrentUrl() (string, error)
 	Refresh() error

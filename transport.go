@@ -4,15 +4,17 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net"
 	"strconv"
 	"time"
 )
 
 type Transporter interface {
+	MessageID() int
 	Connect(host string, port int) error
 	Close() error
-	Send(command string, values interface{}) (*response, error)
+	Send(command string, values interface{}) (*Response, error)
 	Receive() ([]byte, error)
 }
 
@@ -21,13 +23,18 @@ type MarionetteTransport struct {
 	MarionetteProtocol int32
 	messageID          int
 	conn               net.Conn
+	de                 DecoderEncoder
 }
 
-type response struct {
+type Response struct {
 	MessageID   int32
 	Size        int32
 	Value       string
 	DriverError *DriverError
+}
+
+func (t *MarionetteTransport) MessageID() int {
+	return t.messageID
 }
 
 func (t *MarionetteTransport) Connect(host string, port int) error {
@@ -61,6 +68,13 @@ func (t *MarionetteTransport) Connect(host string, port int) error {
 		return err
 	}
 
+	d, err := NewDecoderEncoder(t.MarionetteProtocol)
+	if err != nil {
+		return err
+	}
+
+	t.de = d
+
 	return nil
 }
 
@@ -74,9 +88,22 @@ func (t *MarionetteTransport) Close() error {
 	return err
 }
 
-func (t *MarionetteTransport) Send(command string, values interface{}) (*response, error) {
-	t.messageID = t.messageID + 1
-	buf, err := t.transformToCommand(command, values)
+func (t *MarionetteTransport) Send(command string, values interface{}) (*Response, error) {
+	//t.messageID = t.messageID + 1
+	//buf, err := t.transformToCommand(command, values)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//_, err = write(t.conn, buf)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//// get response to sent command.
+	//return t.transformToResponse(t.Receive())
+
+	buf, err := t.de.Encode(t, command, values)
 	if err != nil {
 		return nil, err
 	}
@@ -86,8 +113,27 @@ func (t *MarionetteTransport) Send(command string, values interface{}) (*respons
 		return nil, err
 	}
 
-	// get response to sent command.
-	return t.transformToResponse(t.Receive())
+	rBuf, err := t.Receive()
+	if err != nil {
+		return nil, err
+	}
+	//Debug only
+	if RunningInDebugMode {
+		if len(buf) >= 512 {
+			log.Println(string(buf)[0:512] + " - END - " + string(buf)[len(buf)-512:])
+		} else {
+			log.Println(string(buf))
+		}
+	}
+	//Debug only end
+
+	data := &Response{}
+	err = t.de.Decode(rBuf, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }
 
 func write(c net.Conn, b []byte) (int, error) {
@@ -150,34 +196,34 @@ func messageLength(c net.Conn) (int, error) {
 	}
 }
 
-func (t *MarionetteTransport) transformToCommand(command string, values interface{}) (bytes []byte, err error) {
-	var size int
-	if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V2 {
-		bytes, err = makeProto2Command(command, values)
-	} else if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V3 {
-		bytes, err = makeProto3Command(t.messageID, command, values)
-	} else {
-		return nil, errors.New("Marionete Protocol version not supported.")
-	}
-
-	if err != nil {
-		return nil, err
-	}
-
-	size = len(bytes)
-	return []byte(strconv.Itoa(size) + ":" + string(bytes)), nil
-}
-
-func (t *MarionetteTransport) transformToResponse(buf []byte, err error) (*response, error) {
-	if err != nil {
-		return nil, err
-	}
-
-	if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V2 {
-		return makeProto2Response(buf)
-	} else if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V3 {
-		return makeProto3Response(buf)
-	}
-
-	return nil, errors.New("Unable to decode Protocol version for message decoding.")
-}
+//func (t *MarionetteTransport) transformToCommand(command string, values interface{}) (bytes []byte, err error) {
+//	var size int
+//	if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V2 {
+//		bytes, err = makeProto2Command(command, values)
+//	} else if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V3 {
+//		bytes, err = makeProto3Command(t.messageID, command, values)
+//	} else {
+//		return nil, errors.New("Marionete Protocol version not supported.")
+//	}
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	size = len(bytes)
+//	return []byte(strconv.Itoa(size) + ":" + string(bytes)), nil
+//}
+//
+//func (t *MarionetteTransport) transformToResponse(buf []byte, err error) (*Response, error) {
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V2 {
+//		return makeProto2Response(buf)
+//	} else if t.MarionetteProtocol == MARIONETTE_PROTOCOL_V3 {
+//		return makeProto3Response(buf)
+//	}
+//
+//	return nil, errors.New("Unable to decode Protocol version for message decoding.")
+//}

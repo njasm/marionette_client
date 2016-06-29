@@ -6,11 +6,11 @@ import (
 )
 
 const (
-	TARGET_URL          = "http://www.abola.pt/"
-	ID_SELECTOR         = "clubes-hp"
-	CSS_SELECTOR_LI     = "li"
-	ID_SELECTOR_INPUT   = "topo_txtPesquisa"
-	TIMEOUT             = 10000 // milliseconds
+	TARGET_URL        = "http://www.abola.pt/"
+	ID_SELECTOR       = "clubes-hp"
+	CSS_SELECTOR_LI   = "li"
+	ID_SELECTOR_INPUT = "topo_txtPesquisa"
+	TIMEOUT           = 10000 // milliseconds
 )
 
 var client *Client
@@ -26,7 +26,7 @@ func TestNewSession(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
+	t.Log("got here")
 	r, err := client.NewSession("", nil)
 	if err != nil {
 		t.Error(err)
