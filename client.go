@@ -43,25 +43,6 @@ func (c *Client) Connect(host string, port int) error {
 	return c.transport.Connect(host, port)
 }
 
-func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, error) {
-	data := map[string]interface{}{
-		"sessionId":    sessionId,
-		"capabilities": cap,
-	}
-
-	response, err := c.transport.Send("newSession", data)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal([]byte(response.Value), &c)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
-}
-
 // Send the current session's capabilities to the client.
 // Capabilities informs the client of which WebDriver features are
 // supported by Firefox and Marionette.  They are immutable for the
@@ -83,6 +64,40 @@ func (c *Client) Capabilities() (*Capabilities, error) {
 
 	cap, _ := response["capabilities"]
 	return cap, nil
+}
+
+/////////////
+// SESSION //
+/////////////
+
+// create new session
+func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, error) {
+	data := map[string]interface{}{
+		"sessionId":    sessionId,
+		"capabilities": cap,
+	}
+
+	response, err := c.transport.Send("newSession", data)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal([]byte(response.Value), &c)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+//  Deletes session
+func (c *Client) DeleteSession() (error) {
+	_, err := c.transport.Send("deleteSession", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Log message.  Accepts user defined log-level.
