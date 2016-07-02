@@ -360,6 +360,24 @@ func (c *Client) SwitchToWindow(name string) error {
 	return nil
 }
 
+func (c *Client) WindowSize() (width float32, height float32, err error) {
+	r, err := c.transport.Send("getWindowSize", nil)
+	if err != nil {
+		return width, height, err
+	}
+
+	rv := new(Size)
+	err = json.Unmarshal([]byte(r.Value), &rv)
+	if err != nil {
+		return width, height, err
+	}
+
+	width = rv.Width
+	height = rv.Height
+
+	return
+}
+
 func (c *Client) CloseWindow() (*Response, error) {
 	r, err := c.transport.Send("close", nil)
 	if err != nil {

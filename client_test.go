@@ -455,6 +455,15 @@ func TestNotPresent(t *testing.T) {
 	}
 }
 
+func TestWindowSize(t *testing.T) {
+	w, h, err := client.WindowSize()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Logf("w: %v, h: %v", w, h)
+}
+
 // working - if called before other tests all hell will break loose
 func TestCloseWindow(t *testing.T) {
 	r, err := client.CloseWindow()
