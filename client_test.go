@@ -279,7 +279,7 @@ func TestFindElement(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Log("width: %f, height: %f", w, h)
+	t.Logf("width: %f, height: %f", w, h)
 
 	//location
 	x, y, err := element.Size()
@@ -287,14 +287,14 @@ func TestFindElement(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Log("x: %f, y: %f", x, y)
+	t.Logf("x: %f, y: %f", x, y)
 
 	collection, err := element.FindElements(By(CSS_SELECTOR), CSS_SELECTOR_LI)
 	if 18 != len(collection) {
 		t.FailNow()
 	}
 
-	t.Logf("%T %#V", collection, collection)
+	t.Logf("%T %#v", collection, collection)
 }
 
 func TestSendKeys(t *testing.T) {
@@ -408,7 +408,7 @@ func TestWait(t *testing.T) {
 
 	e, err := client.FindElement(By(TAG_NAME), "button")
 	if err != nil {
-		t.Fatal("%#v", err)
+		t.Fatalf("%#v", err)
 	}
 
 	e.Click()

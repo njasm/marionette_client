@@ -1,9 +1,9 @@
 package marionette_client
 
 type DriverError struct {
-	ErrorType  string `json:="Error"`
-	Message    string
-	Stacktrace *string
+	ErrorType   string  `json:"Error"`
+	Message     string
+	Stacktrace  *string
 }
 
 func (e DriverError) Error() string {
