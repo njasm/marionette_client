@@ -100,6 +100,144 @@ func (c *Client) DeleteSession() (error) {
 	return nil
 }
 
+// Set the timeout for asynchronous script execution.
+//
+// param number ms
+//     Time in milliseconds.
+func (c *Client) SetScriptTimeout(milliseconds int) (*Response, error) {
+	return timeouts(&c.transport, "script", milliseconds)
+}
+
+// Set timeout for searching for elements.
+//
+// param number ms
+//     Search timeout in milliseconds.
+func (c *Client) SetSearchTimeout(milliseconds int) (*Response, error) {
+	return timeouts(&c.transport, "implicit", milliseconds)
+}
+
+// Set timeout for page loading.
+//
+// param number ms
+//     Search timeout in milliseconds.
+func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
+	return timeouts(&c.transport, "", milliseconds)
+}
+
+// Set timeout for page loading, searching, and scripts.
+//
+// param string type
+//     Type of timeout.
+// param number ms
+//     Timeout in milliseconds.
+func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, error) {
+	if typ != "implicit" && typ != "script" {
+		typ = ""
+	}
+
+	response, err := (*transport).Send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+////////////////
+// NAVIGATION //
+////////////////
+
+// deprecated use Navigate()
+func (c *Client) Get(url string) (*Response, error) {
+	return c.Navigate(url)
+}
+
+// open url
+func (c *Client) Navigate(url string) (*Response, error) {
+	r, err := c.transport.Send("get", map[string]string{"url": url})
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+func (c *Client) PageSource() (*Response, error) {
+	response, err := c.transport.Send("getPageSource", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+// get title
+func (c *Client) Title() (string, error) {
+	r, err := c.transport.Send("getTitle", map[string]string{})
+	if err != nil {
+		return "", err
+	}
+
+	var d = map[string]string{}
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return "", err
+	}
+
+	return d["value"], nil
+}
+
+// deprecated, use Url() instead
+func (c *Client) CurrentUrl() (string, error) {
+	return c.Url()
+}
+
+// get current url
+func (c *Client) Url() (string, error) {
+	r, err := c.transport.Send("getCurrentUrl", nil)
+	if err != nil {
+		return "", err
+	}
+
+	var url map[string]string
+	err = json.Unmarshal([]byte(r.Value), &url)
+	if err != nil {
+		return "", err
+	}
+
+	return url["value"], nil
+}
+
+// refresh
+func (c *Client) Refresh() error {
+	_, err := c.transport.Send("refresh", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// back
+func (c *Client) Back() error {
+	_, err := c.transport.Send("goBack", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// forward
+func (c *Client) Forward() error {
+	_, err := c.transport.Send("goForward", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Log message.  Accepts user defined log-level.
 //
 // param string value
@@ -166,48 +304,6 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 	return response, nil
 }
 
-// Set the timeout for asynchronous script execution.
-//
-// param number ms
-//     Time in milliseconds.
-func (c *Client) SetScriptTimeout(milliseconds int) (*Response, error) {
-	return timeouts(&c.transport, "script", milliseconds)
-}
-
-// Set timeout for searching for elements.
-//
-// param number ms
-//     Search timeout in milliseconds.
-func (c *Client) SetSearchTimeout(milliseconds int) (*Response, error) {
-	return timeouts(&c.transport, "implicit", milliseconds)
-}
-
-// Set timeout for page loading.
-//
-// param number ms
-//     Search timeout in milliseconds.
-func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
-	return timeouts(&c.transport, "", milliseconds)
-}
-
-// Set timeout for page loading, searching, and scripts.
-//
-// param string type
-//     Type of timeout.
-// param number ms
-//     Timeout in milliseconds.
-func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, error) {
-	if typ != "implicit" && typ != "script" {
-		typ = ""
-	}
-
-	response, err := (*transport).Send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
-}
 
 /////////////////////
 // WINDOWS HANDLES //
@@ -313,96 +409,6 @@ func (c *Client) SwitchToFrame(by By, value string) error {
 
 func (c *Client) SwitchToParentFrame() error {
 	_, err := c.transport.Send("switchToParentFrame", nil)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-////////////////
-// NAVIGATION //
-////////////////
-
-// deprecated use Navigate()
-func (c *Client) Get(url string) (*Response, error) {
-	return c.Navigate(url)
-}
-
-// open url
-func (c *Client) Navigate(url string) (*Response, error) {
-	r, err := c.transport.Send("get", map[string]string{"url": url})
-	if err != nil {
-		return nil, err
-	}
-
-	return r, nil
-}
-
-func (c *Client) PageSource() (*Response, error) {
-	response, err := c.transport.Send("getPageSource", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
-}
-
-// get title
-func (c *Client) Title() (string, error) {
-	r, err := c.transport.Send("getTitle", map[string]string{})
-	if err != nil {
-		return "", err
-	}
-
-	var d = map[string]string{}
-	err = json.Unmarshal([]byte(r.Value), &d)
-	if err != nil {
-		return "", err
-	}
-
-	return d["value"], nil
-}
-
-// get current url
-func (c *Client) CurrentUrl() (string, error) {
-	r, err := c.transport.Send("getCurrentUrl", nil)
-	if err != nil {
-		return "", err
-	}
-
-	var url map[string]string
-	err = json.Unmarshal([]byte(r.Value), &url)
-	if err != nil {
-		return "", err
-	}
-
-	return url["value"], nil
-}
-
-// refresh
-func (c *Client) Refresh() error {
-	_, err := c.transport.Send("refresh", nil)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// back
-func (c *Client) Back() error {
-	_, err := c.transport.Send("goBack", nil)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// forward
-func (c *Client) Forward() error {
-	_, err := c.transport.Send("goForward", nil)
 	if err != nil {
 		return err
 	}
