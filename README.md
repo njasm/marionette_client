@@ -16,6 +16,7 @@ Selenium does for web content: to enable the tester to have the ability to send 
 
 ## Resources
 https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette
+https://w3c.github.io/webdriver/webdriver-spec.html
 
 ## Examples
 Incomplete list. Check the tests for more examples.
@@ -122,7 +123,7 @@ Incomplete list. Check the tests for more examples.
 	
 	timeout := time.Duration(10) * time.Second
 	condition := ElementIsPresent(By(ID), "stackH")
-	ok, webElement, _ := Wait(client).For(timeout).Until(condition)
+	ok, webElement, err := Wait(client).For(timeout).Until(condition)
 
 	if !ok {
 		log.Printf("%#v", err)
