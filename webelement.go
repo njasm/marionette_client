@@ -4,11 +4,19 @@ import (
 	"encoding/json"
 )
 
-type ElementRect struct {
+type Point struct {
 	X      float32
 	Y      float32
+}
+
+type Size struct {
 	Width  float32
 	Height float32
+}
+
+type ElementRect struct {
+	Point
+	Size
 }
 
 type WebElement struct {
