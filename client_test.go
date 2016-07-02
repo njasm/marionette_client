@@ -462,6 +462,16 @@ func TestWindowSize(t *testing.T) {
 	}
 
 	t.Logf("w: %v, h: %v", w, h)
+
+	var newW float32 = w / 2
+	var newH float32 = h / 2
+
+	w, h, err = client.SetWindowSize(newW, newH)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Logf("new w: %v, new h: %v", w, h)
 }
 
 // working - if called before other tests all hell will break loose

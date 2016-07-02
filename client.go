@@ -360,20 +360,38 @@ func (c *Client) SwitchToWindow(name string) error {
 	return nil
 }
 
-func (c *Client) WindowSize() (width float32, height float32, err error) {
+func (c *Client) WindowSize() (w float32, h float32, err error) {
 	r, err := c.transport.Send("getWindowSize", nil)
 	if err != nil {
-		return width, height, err
+		return w, h, err
 	}
 
 	rv := new(Size)
 	err = json.Unmarshal([]byte(r.Value), &rv)
 	if err != nil {
-		return width, height, err
+		return w, h, err
 	}
 
-	width = rv.Width
-	height = rv.Height
+	w = rv.Width
+	h = rv.Height
+
+	return
+}
+
+func (c *Client) SetWindowSize(width float32, height float32) (w float32, h float32, err error) {
+	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": width, "height": height})
+	if err != nil {
+		return w, h, err
+	}
+
+	rv := new(Size)
+	err = json.Unmarshal([]byte(r.Value), &rv)
+	if err != nil {
+		return w, h, err
+	}
+
+	w = rv.Width
+	h = rv.Height
 
 	return
 }
