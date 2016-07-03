@@ -396,6 +396,15 @@ func (c *Client) SetWindowSize(width float32, height float32) (w float32, h floa
 	return
 }
 
+func (c *Client) MaximizeWindow() error {
+	_, err := c.transport.Send("maximizeWindow", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *Client) CloseWindow() (*Response, error) {
 	r, err := c.transport.Send("close", nil)
 	if err != nil {

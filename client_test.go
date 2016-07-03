@@ -472,6 +472,11 @@ func TestWindowSize(t *testing.T) {
 	}
 
 	t.Logf("new w: %v, new h: %v", w, h)
+
+	err = client.MaximizeWindow()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
 }
 
 // working - if called before other tests all hell will break loose
