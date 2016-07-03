@@ -5,8 +5,8 @@ import (
 )
 
 type Point struct {
-	X      float32
-	Y      float32
+	X float32
+	Y float32
 }
 
 type Size struct {

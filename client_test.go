@@ -386,7 +386,6 @@ func TestNavigatorMethods(t *testing.T) {
 	}
 }
 
-
 func TestWait(t *testing.T) {
 	client.SetContext(Context(CONTENT))
 	client.Navigate("http://www.w3schools.com/ajax/tryit.asp?filename=tryajax_get")
@@ -424,15 +423,32 @@ func TestAlert(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
+	textFromdialog, err := client.TextFromDialog()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	if textFromdialog != text {
+		t.Fatalf("Text in dialog differ. expected: %v, textfromdialog: %v", text, textFromdialog)
+	}
+
 	err = client.AcceptDialog()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
+	script = "prompt('" + text + "');"
 	r, err = client.ExecuteScript(script, args, 1000, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
+
+	err = client.SendKeysToDialog("yeah!")
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	time.Sleep(time.Duration(5) * time.Second)
 
 	err = client.DismissDialog()
 	if err != nil {
@@ -497,7 +513,6 @@ func TestDeleteSession(t *testing.T) {
 	}
 }
 
-
 // working
 //func TestQuitApplication(t *testing.T) {
 //	r, err := client.QuitApplication()
@@ -507,4 +522,3 @@ func TestDeleteSession(t *testing.T) {
 //
 //	t.Log(r.Value)
 //}
-

@@ -91,7 +91,7 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, err
 }
 
 //  Deletes session
-func (c *Client) DeleteSession() (error) {
+func (c *Client) DeleteSession() error {
 	_, err := c.transport.Send("deleteSession", nil)
 	if err != nil {
 		return err
@@ -160,15 +160,6 @@ func (c *Client) Navigate(url string) (*Response, error) {
 	}
 
 	return r, nil
-}
-
-func (c *Client) PageSource() (*Response, error) {
-	response, err := c.transport.Send("getPageSource", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
 }
 
 // get title
@@ -287,23 +278,6 @@ func (c *Client) Context() (*Response, error) {
 
 	return response, nil
 }
-
-func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, newSandbox bool) (*Response, error) {
-	parameters := map[string]interface{}{}
-	parameters["scriptTimeout"] = timeout
-	parameters["script"] = script
-	parameters["args"] = args
-
-	parameters["newSandbox"] = newSandbox
-
-	response, err := c.transport.Send("executeScript", parameters)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
-}
-
 
 /////////////////////
 // WINDOWS HANDLES //
@@ -691,6 +665,35 @@ func findElement(c *Client, by By, value string, startNode *string) (*WebElement
 	return e, nil
 }
 
+///////////////////////
+// DOCUMENT HANDLING //
+///////////////////////
+
+func (c *Client) PageSource() (*Response, error) {
+	response, err := c.transport.Send("getPageSource", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, newSandbox bool) (*Response, error) {
+	parameters := map[string]interface{}{}
+	parameters["scriptTimeout"] = timeout
+	parameters["script"] = script
+	parameters["args"] = args
+
+	parameters["newSandbox"] = newSandbox
+
+	response, err := c.transport.Send("executeScript", parameters)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
 /////////////
 // DIALOGS //
 /////////////
@@ -706,6 +709,32 @@ func (c *Client) DismissDialog() error {
 
 func (c *Client) AcceptDialog() error {
 	_, err := c.transport.Send("acceptDialog", nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) TextFromDialog() (string, error) {
+	r, err := c.transport.Send("getTextFromDialog", nil)
+	if err != nil {
+		return "", err
+	}
+
+	var d = map[string]string{}
+	json.Unmarshal([]byte(r.Value), &d)
+
+	return d["value"], nil
+}
+
+func (c *Client) SendKeysToDialog(keys string) error {
+	slice := make([]string, 0)
+	for _, v := range keys {
+		slice = append(slice, fmt.Sprintf("%c", v))
+	}
+
+	_, err := c.transport.Send("sendKeysToDialog", map[string]interface{}{"value": slice})
 	if err != nil {
 		return err
 	}
