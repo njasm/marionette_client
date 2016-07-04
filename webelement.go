@@ -98,6 +98,11 @@ func (e *WebElement) Size() (w float32, h float32, err error) {
 	return r.Width, r.Height, nil
 }
 
+func (e *WebElement) Screenshot() (string, error) {
+	id := e.Id()
+	return takeScreenshot(e.c, &id)
+}
+
 func (e *WebElement) UnmarshalJSON(data []byte) error {
 	var d map[string]map[string]string
 	err := json.Unmarshal([]byte(data), &d)

@@ -665,6 +665,22 @@ func findElement(c *Client, by By, value string, startNode *string) (*WebElement
 	return e, nil
 }
 
+func takeScreenshot(c *Client, startNode *string) (string, error) {
+	var params map[string]string
+	if startNode == nil || *startNode == "" {
+		params = map[string]string{}
+	} else {
+		params = map[string]string{"id": *startNode}
+	}
+
+	r, err := c.transport.Send("takeScreenshot", params)
+	if err != nil {
+		return "", err
+	}
+
+	return r.Value, nil
+}
+
 ///////////////////////
 // DOCUMENT HANDLING //
 ///////////////////////
@@ -756,10 +772,5 @@ func (c *Client) QuitApplication() (*Response, error) {
 }
 
 func (c *Client) Screenshot() (string, error) {
-	r, err := c.transport.Send("takeScreenshot", map[string]string{})
-	if err != nil {
-		return "", err
-	}
-
-	return r.Value, nil
+	return takeScreenshot(c, nil)
 }

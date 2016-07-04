@@ -289,6 +289,12 @@ func TestFindElement(t *testing.T) {
 
 	t.Logf("x: %f, y: %f", x, y)
 
+	// screenshot of node element
+	_, err = element.Screenshot()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
 	collection, err := element.FindElements(By(CSS_SELECTOR), CSS_SELECTOR_LI)
 	if 18 != len(collection) {
 		t.FailNow()
