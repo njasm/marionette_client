@@ -15,7 +15,8 @@ Selenium/WebDriver, with additional commands to interact with Gecko's chrome int
 Selenium does for web content: to enable the tester to have the ability to send commands to remotely control a user agent." 
 
 ## Resources
-https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette
+https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette 
+
 https://w3c.github.io/webdriver/webdriver-spec.html
 
 ## Examples
