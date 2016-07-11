@@ -89,6 +89,7 @@ func (t *MarionetteTransport) Close() error {
 }
 
 func (t *MarionetteTransport) Send(command string, values interface{}) (*Response, error) {
+	t.messageID = t.messageID + 1 // next message ID
 	buf, err := t.de.Encode(t, command, values)
 	if err != nil {
 		return nil, err

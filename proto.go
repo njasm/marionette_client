@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"log"
 )
 
 func NewDecoderEncoder(protoVersion int32) (DecoderEncoder, error) {
@@ -38,7 +39,7 @@ type ProtoV3DecoderEncoder struct{}
 func (e ProtoV3DecoderEncoder) Encode(t Transporter, command string, values interface{}) ([]byte, error) {
 	message := make([]interface{}, 4)
 	message[0] = 0
-	message[1] = t.MessageID() + 1 // next message ID
+	message[1] = t.MessageID()
 	message[2] = command
 	message[3] = values
 
@@ -60,6 +61,16 @@ func (e ProtoV3DecoderEncoder) Decode(buf []byte, r *Response) error {
 	if err := json.Unmarshal(buf, &v); err != nil {
 		return err
 	}
+
+	//Debug only
+	if RunningInDebugMode {
+		if len(buf) >= 512 {
+			log.Println(string(buf)[0:512] + " - END - " + string(buf)[len(buf)-512:])
+		} else {
+			log.Println(string(buf))
+		}
+	}
+	//Debug only end
 
 	r.MessageID = int32(v[1].(float64))
 	r.Size = int32(len(buf))
