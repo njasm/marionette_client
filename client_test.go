@@ -424,7 +424,7 @@ func TestAlert(t *testing.T) {
 	var text string = "marionette is cool or what?"
 	var script string = "alert('" + text + "');"
 	args := []interface{}{}
-	r, err := client.ExecuteScript(script, args, 1000, false)
+	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -444,7 +444,7 @@ func TestAlert(t *testing.T) {
 	}
 
 	script = "prompt('" + text + "');"
-	r, err = client.ExecuteScript(script, args, 1000, false)
+	r, err = client.ExecuteScript(script, args, TIMEOUT, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -502,14 +502,14 @@ func TestWindowSize(t *testing.T) {
 }
 
 // working - if called before other tests all hell will break loose
-func TestCloseWindow(t *testing.T) {
-	r, err := client.CloseWindow()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	t.Log(r.Value)
-}
+//func TestCloseWindow(t *testing.T) {
+//	r, err := client.CloseWindow()
+//	if err != nil {
+//		t.Fatalf("%#v", err)
+//	}
+//
+//	t.Log(r.Value)
+//}
 
 // working - if called before other tests all hell will break loose
 func TestDeleteSession(t *testing.T) {
