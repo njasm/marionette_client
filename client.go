@@ -121,7 +121,7 @@ func (c *Client) SetSearchTimeout(milliseconds int) (*Response, error) {
 // param number ms
 //     Search timeout in milliseconds.
 func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
-	return timeouts(&c.transport, "", milliseconds)
+	return timeouts(&c.transport, "pageLoad", milliseconds)
 }
 
 // Set timeout for page loading, searching, and scripts.
@@ -131,16 +131,12 @@ func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
 // param number ms
 //     Timeout in milliseconds.
 func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, error) {
-	if typ != "implicit" && typ != "script" {
-		typ = ""
-	}
-
-	response, err := (*transport).Send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
+	r, err := (*transport).Send("timeouts", map[string]interface{}{typ: milliseconds})
 	if err != nil {
 		return nil, err
 	}
 
-	return response, nil
+	return r, nil
 }
 
 ////////////////
@@ -283,10 +279,8 @@ func (c *Client) Context() (*Response, error) {
 // WINDOWS HANDLES //
 /////////////////////
 
-//"getWindowHandle": GeckoDriver.prototype.getWindowHandle,
-//"getCurrentWindowHandle":  GeckoDriver.prototype.getWindowHandle,  // Selenium 2 compat
 func (c *Client) CurrentWindowHandle() (string, error) {
-	r, err := c.transport.Send("getCurrentWindowHandle", nil)
+	r, err := c.transport.Send("getWindowHandle", nil)
 	if err != nil {
 		return "", err
 	}
