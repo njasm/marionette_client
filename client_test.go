@@ -419,6 +419,32 @@ func TestWait(t *testing.T) {
 	e.Click()
 }
 
+func TestPrompt(t *testing.T) {
+	client.Get("http://www.abola.pt")
+	var text string = "marionette is cool or what - prompt?"
+	var script string = "prompt('" + text + "');"
+	args := []interface{}{}
+
+	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+/* FIXME: changed to parameter text in firefox 55.0a1 branch
+	err = client.SendKeysToDialog("yeah!")
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+*/
+	time.Sleep(time.Duration(5) * time.Second)
+
+	err = client.DismissDialog()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log(r.Value)
+}
+
 func TestAlert(t *testing.T) {
 	client.Get("http://www.abola.pt")
 	var text string = "marionette is cool or what?"
@@ -438,35 +464,25 @@ func TestAlert(t *testing.T) {
 		t.Fatalf("Text in dialog differ. expected: %v, textfromdialog: %v", text, textFromdialog)
 	}
 
+	time.Sleep(time.Duration(5) * time.Second)
+
 	err = client.AcceptDialog()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
-/* FIXME: firefox 50+ does not return from executeScript
-	script = "prompt('" + text + "');"
-	r, err = client.ExecuteScript(script, args, TIMEOUT, false)
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
 
-	err = client.SendKeysToDialog("yeah!")
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	time.Sleep(time.Duration(5) * time.Second)
-
-	err = client.DismissDialog()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-*/
 	t.Log(r.Value)
 }
 
 func TestNotPresent(t *testing.T) {
 	client.SwitchToParentFrame()
-	client.ActiveFrame()
+	r, err := client.ActiveFrame()
+
+	if err != nil {
+		t.Fatalf("Getting Active Frame Error: %#v", err)
+	}
+
+	t.Log(r.id)
 
 	timeout := time.Duration(10) * time.Second
 	condition := ElementIsNotPresent(By(ID), "non-existing-element")
