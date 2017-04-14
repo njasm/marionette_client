@@ -213,7 +213,7 @@ func TestPageSource(t *testing.T) {
 func TestExecuteScriptWithoutFunction(t *testing.T) {
 	script := "return (document.readyState == 'complete');"
 	args := []interface{}{}
-	r, err := client.ExecuteScript(script, args, 1000, false)
+	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -224,7 +224,7 @@ func TestExecuteScriptWithoutFunction(t *testing.T) {
 func TestExecuteScript(t *testing.T) {
 	script := "function testMyGoMarionetteClient() { return 'yes'; } return testMyGoMarionetteClient();"
 	args := []interface{}{}
-	r, err := client.ExecuteScript(script, args, 1000, false)
+	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -235,7 +235,7 @@ func TestExecuteScript(t *testing.T) {
 func TestExecuteScriptWithArgs(t *testing.T) {
 	script := "function testMyGoMarionetteClientArgs(a, b) { return a + b; }; return testMyGoMarionetteClientArgs(arguments[0], arguments[1]);"
 	args := []interface{}{1, 3}
-	r, err := client.ExecuteScript(script, args, 1000, false)
+	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
