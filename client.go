@@ -343,7 +343,7 @@ func (c *Client) WindowSize() (rv *Size, err error) {
 	return
 }
 
-func (c *Client) SetWindowSize(s Size) (rv *Size, err error) {
+func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
 	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": s.Width, "height": s.Height})
 	if err != nil {
 		return nil, err
