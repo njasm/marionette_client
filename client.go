@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 	"math"
-	"golang.org/x/mobile/event/size"
 )
 
 const (
