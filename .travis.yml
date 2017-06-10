@@ -26,4 +26,6 @@ before_script:
 
 script:
   - go test -test.v
+
+after_success:
   - $HOME/gopath/bin/goveralls -service=travis-ci

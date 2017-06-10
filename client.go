@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"math"
 )
 
 const (
@@ -347,7 +348,7 @@ func (c *Client) WindowSize() (w float32, h float32, err error) {
 }
 
 func (c *Client) SetWindowSize(width float32, height float32) (w float32, h float32, err error) {
-	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": width, "height": height})
+	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": math.Floor(width), "height": math.Floor(height)})
 	if err != nil {
 		return w, h, err
 	}
