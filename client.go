@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"math"
 )
 
 const (
@@ -329,38 +328,32 @@ func (c *Client) SwitchToWindow(name string) error {
 	return nil
 }
 
-func (c *Client) WindowSize() (w float32, h float32, err error) {
+func (c *Client) WindowSize() (rv *Size, err error) {
 	r, err := c.transport.Send("getWindowSize", nil)
 	if err != nil {
-		return w, h, err
+		return nil, err
 	}
 
-	rv := new(Size)
+	rv = new(Size)
 	err = json.Unmarshal([]byte(r.Value), &rv)
 	if err != nil {
-		return w, h, err
+		return nil, err
 	}
-
-	w = rv.Width
-	h = rv.Height
 
 	return
 }
 
-func (c *Client) SetWindowSize(width float32, height float32) (w float32, h float32, err error) {
-	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": math.Floor(width), "height": math.Floor(height)})
+func (c *Client) SetWindowSize(s Size) (rv *Size, err error) {
+	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": s.Width, "height": s.Height})
 	if err != nil {
-		return w, h, err
+		return nil, err
 	}
 
-	rv := new(Size)
+	rv = new(Size)
 	err = json.Unmarshal([]byte(r.Value), &rv)
 	if err != nil {
-		return w, h, err
+		return nil, err
 	}
-
-	w = rv.Width
-	h = rv.Height
 
 	return
 }

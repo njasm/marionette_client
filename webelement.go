@@ -10,8 +10,8 @@ type Point struct {
 }
 
 type Size struct {
-	Width  float32
-	Height float32
+	Width  float64
+	Height float64
 }
 
 type ElementRect struct {
@@ -80,22 +80,22 @@ func (e *WebElement) Clear() {
 	clearElement(e.c, e.id)
 }
 
-func (e *WebElement) Location() (x float32, y float32, err error) {
+func (e *WebElement) Location() (*Point, error) {
 	r, err := getElementRect(e.c, e.id)
 	if err != nil {
-		return x, y, err
+		return nil, err
 	}
 
-	return r.X, r.Y, nil
+	return &r.Point, nil
 }
 
-func (e *WebElement) Size() (w float32, h float32, err error) {
+func (e *WebElement) Size() (*Size, error) {
 	r, err := getElementRect(e.c, e.id)
 	if err != nil {
-		return w, h, err
+		return nil, err
 	}
 
-	return r.Width, r.Height, nil
+	return &r.Size, nil
 }
 
 func (e *WebElement) Screenshot() (string, error) {

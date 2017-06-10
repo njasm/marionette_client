@@ -273,21 +273,21 @@ func TestFindElement(t *testing.T) {
 
 	t.Log(rect)
 
-	// size
-	w, h, err := element.Location()
+	// location
+	point, err := element.Location()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Logf("width: %f, height: %f", w, h)
+	t.Logf("x: %f, y: %f", point.X, point.Y)
 
-	//location
-	x, y, err := element.Size()
+	//size
+	size, err := element.Size()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Logf("x: %f, y: %f", x, y)
+	t.Logf("w: %f, h: %f", size.Width, size.Height)
 
 	// screenshot of node element
 	_, err = element.Screenshot()
@@ -397,7 +397,7 @@ func TestWait(t *testing.T) {
 	client.Navigate("http://www.w3schools.com/xml/tryit.asp?filename=tryajax_get")
 
 	timeout := time.Duration(10) * time.Second
-	condition := ElementIsPresent(By(CSS_SELECTOR), "a.w3-button w3-bar-item topnav-icons fa fa-rotate")
+	condition := ElementIsPresent(By(CSS_SELECTOR), "a.w3-button.w3-bar-item.topnav-icons.fa.fa-rotate")
 	ok, v, err := Wait(client).For(timeout).Until(condition)
 
 	if err != nil || !ok {
@@ -501,15 +501,16 @@ func TestWindowSize(t *testing.T) {
 
 	t.Logf("w: %v, h: %v", w, h)
 
-	var newW float32 = w / 2
-	var newH float32 = h / 2
+	var newW float64 = w / 2
+	var newH float64 = h / 2
 
-	w, h, err = client.SetWindowSize(newW, newH)
+	newRv := &Size{Width: newW, Height: newH}
+	rv, err := client.SetWindowSize(newRv)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Logf("new w: %v, new h: %v", w, h)
+	t.Logf("new w: %v, new h: %v", rv.Width, rv.Height)
 
 	err = client.MaximizeWindow()
 	if err != nil {
