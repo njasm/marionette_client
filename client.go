@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"math"
+	"golang.org/x/mobile/event/size"
 )
 
 const (
@@ -344,7 +346,7 @@ func (c *Client) WindowSize() (rv *Size, err error) {
 }
 
 func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
-	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": s.Width, "height": s.Height})
+	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": math.Floor(s.Width), "height": math.Floor(s.Height)})
 	if err != nil {
 		return nil, err
 	}
