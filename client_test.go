@@ -397,7 +397,7 @@ func TestWait(t *testing.T) {
 	client.Navigate("http://www.w3schools.com/xml/tryit.asp?filename=tryajax_get")
 
 	timeout := time.Duration(10) * time.Second
-	condition := ElementIsPresent(By(ID), "stackH")
+	condition := ElementIsPresent(By(CSS_SELECTOR), "a.w3-button w3-bar-item topnav-icons fa fa-rotate")
 	ok, v, err := Wait(client).For(timeout).Until(condition)
 
 	if err != nil || !ok {
