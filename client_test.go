@@ -494,18 +494,15 @@ func TestNotPresent(t *testing.T) {
 }
 
 func TestWindowSize(t *testing.T) {
-	w, h, err := client.WindowSize()
+	size, err := client.WindowSize()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Logf("w: %v, h: %v", w, h)
-
-	var newW float64 = w / 2
-	var newH float64 = h / 2
-
-	newRv := &Size{Width: newW, Height: newH}
-	rv, err := client.SetWindowSize(newRv)
+	t.Logf("w: %v, h: %v", size.Width, size.Height)
+	
+	newSize := &Size{Width: size.Width / 2, Height: size.Height / 2}
+	rv, err := client.SetWindowSize(newSize)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
