@@ -132,7 +132,7 @@ func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
 // param number ms
 //     Timeout in milliseconds.
 func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, error) {
-	r, err := (*transport).Send("timeouts", map[string]interface{}{typ: milliseconds})
+	r, err := (*transport).Send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
 	if err != nil {
 		return nil, err
 	}

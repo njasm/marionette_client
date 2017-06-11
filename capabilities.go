@@ -5,7 +5,7 @@ type Capabilities struct {
 	BrowserVersion                string
 	PlatformName                  string
 	PlatformVersion               string
-	SpecificationLevel            uint32
+	SpecificationLevel            string
 	RaisesAccessibilityExceptions bool
 	Rotatable                     bool
 	AcceptSslCerts                bool

@@ -107,7 +107,18 @@ func (e *WebElement) UnmarshalJSON(data []byte) error {
 	var d map[string]map[string]string
 	err := json.Unmarshal([]byte(data), &d)
 	if err != nil {
-		return err
+		// firefox 53.0.3 - sometimes the value object does not bring the WEBDRIVER_ELEMENT_KEY, but the ID itself
+		// of the actual element, ie. when calling GetActiveFrame(), for that reason were giving unmashal one more
+		// chance before returning an error..
+		var d map[string]string
+		err := json.Unmarshal([]byte(data), &d)
+		if err != nil {
+			return err
+		}
+
+		e.id = d["value"]
+
+		return nil
 	}
 
 	e.id = d["value"][WEBDRIVER_ELEMENT_KEY]
