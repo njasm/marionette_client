@@ -6,7 +6,7 @@ go:
   - 1.8.1
 
 addons:
-  firefox: latest
+  firefox: 53.0.3 #latest
 
 env:
   global:
