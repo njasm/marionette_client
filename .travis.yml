@@ -3,7 +3,8 @@ language: go
 go:
   #- 1.5.2
   #- 1.6.1
-  - 1.8.1
+  - 1.8.x
+  - tip
 
 addons:
   firefox: 53.0.3 #latest
@@ -25,7 +26,9 @@ before_script:
   - ps aux | grep firefox
 
 script:
-  - go test -test.v
+  #- go test -test.v
+  - go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
 
 after_success:
+  - bash <(curl -s https://codecov.io/bash)
   - $HOME/gopath/bin/goveralls -service=travis-ci
