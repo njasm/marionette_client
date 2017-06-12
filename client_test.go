@@ -77,14 +77,15 @@ func TestInit(t *testing.T) {
 
 		t.Run("DeleteSessionTest", DeleteSessionTest)
 
-		// test expected.go
-		t.Run("ElementIsPresentFalseTest", ElementIsPresentFalseTest)
-
 		// test QuitApplication
-		//t.Run("NewSessionTest", NewSessionTest)
-		//t.Run("QuitApplicationTest", QuitApplicationTest)
+		t.Run("NewSessionTest", NewSessionTest)
+		t.Run("QuitTest", QuitTest)
 	})
 }
+
+/*********/
+/* tests */
+/*********/
 
 func NewSessionTest(t *testing.T) {
 	err := client.Connect("", 0)
@@ -549,7 +550,7 @@ func DeleteSessionTest(t *testing.T) {
 	}
 }
 
-func QuitApplicationTest(t *testing.T) {
+func QuitTest(t *testing.T) {
 	r, err := client.QuitApplication()
 	if err != nil {
 		t.Fatalf("%#v", err)

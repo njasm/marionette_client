@@ -91,14 +91,15 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, err
 	return response, nil
 }
 
-//  Deletes session
+// Marionette currently only accepts a session id, so if
+// we call delete session can also close the TCP Connection
 func (c *Client) DeleteSession() error {
 	_, err := c.transport.Send("deleteSession", nil)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	return c.transport.Close()
 }
 
 // Set the timeout for asynchronous script execution.
@@ -751,7 +752,12 @@ func (c *Client) SendKeysToDialog(keys string) error {
 // DISPOSE TEAR DOWN //
 ///////////////////////
 
+// deprecated use Quit().
 func (c *Client) QuitApplication() (*Response, error) {
+	return c.Quit()
+}
+
+func (c *Client) Quit() (*Response, error) {
 	r, err := c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
 	if err != nil {
 		return nil, err
@@ -759,6 +765,8 @@ func (c *Client) QuitApplication() (*Response, error) {
 
 	return r, nil
 }
+
+
 
 func (c *Client) Screenshot() (string, error) {
 	return takeScreenshot(c, nil)
