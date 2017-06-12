@@ -77,14 +77,33 @@ func TestInit(t *testing.T) {
 
 		t.Run("DeleteSessionTest", DeleteSessionTest)
 
-		// test expected.go
-		t.Run("ElementIsPresentFalseTest", ElementIsPresentFalseTest)
-
 		// test QuitApplication
 		//t.Run("NewSessionTest", NewSessionTest)
 		//t.Run("QuitApplicationTest", QuitApplicationTest)
 	})
 }
+
+
+/******************************************/
+/* non main nor sequential required tests */
+/******************************************/
+
+// test proto.go
+func TestProto(t *testing.T) {
+	t.Run("NewDecoderErrorTest", NewDecoderErrorTest)
+	t.Run("EncodeErrorTest", EncodeErrorTest)
+	t.Run("DecodeErrorTest", DecodeErrorTest)
+}
+
+// test expected.go
+func TestExpected(t *testing.T) {
+	t.Run("ElementIsPresentFalseTest", ElementIsPresentFalseTest)
+}
+
+
+/*********/
+/* tests */
+/*********/
 
 func NewSessionTest(t *testing.T) {
 	err := client.Connect("", 0)
