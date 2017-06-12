@@ -78,8 +78,8 @@ func TestInit(t *testing.T) {
 		t.Run("DeleteSessionTest", DeleteSessionTest)
 
 		// test QuitApplication
-		//t.Run("NewSessionTest", NewSessionTest)
-		//t.Run("QuitApplicationTest", QuitApplicationTest)
+		t.Run("NewSessionTest", NewSessionTest)
+		t.Run("QuitTest", QuitTest)
 	})
 }
 
@@ -550,7 +550,7 @@ func DeleteSessionTest(t *testing.T) {
 	}
 }
 
-func QuitApplicationTest(t *testing.T) {
+func QuitTest(t *testing.T) {
 	r, err := client.QuitApplication()
 	if err != nil {
 		t.Fatalf("%#v", err)
