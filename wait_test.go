@@ -31,22 +31,3 @@ func WaitForUntilIntegrationTest(t *testing.T) {
 
 	e.Click()
 }
-
-func NotPresentTest(t *testing.T) {
-	client.SwitchToParentFrame()
-	r, err := client.ActiveFrame()
-
-	if err != nil {
-		t.Fatalf("Getting Active Frame Error: %#v", err)
-	}
-
-	t.Log(r.id)
-
-	timeout := time.Duration(10) * time.Second
-	condition := ElementIsNotPresent(By(ID), "non-existing-element")
-	ok, _, _ := Wait(client).For(timeout).Until(condition)
-
-	if !ok {
-		t.Fatal("Element Was Found in ElementIsNotPresent test.")
-	}
-}

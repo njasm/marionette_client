@@ -70,10 +70,15 @@ func TestInit(t *testing.T) {
 		t.Run("PromptTest", PromptTest)
 		t.Run("AlertTest", AlertTest)
 
+		// test expected.go
 		t.Run("NotPresentTest", NotPresentTest)
+
 		t.Run("WindowSizeTest", WindowSizeTest)
 
 		t.Run("DeleteSessionTest", DeleteSessionTest)
+
+		// test expected.go
+		t.Run("ElementIsPresentFalseTest", ElementIsPresentFalseTest)
 
 		// test QuitApplication
 		//t.Run("NewSessionTest", NewSessionTest)
