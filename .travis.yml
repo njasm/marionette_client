@@ -28,13 +28,12 @@ before_install:
 install:
   - export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
   - wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
-  - mkdir -p $HOME/ff
-  - tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/ff/
+  - mkdir -p $HOME/firefox
+  - tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
 
 before_script:
-  - ls $HOME/ff/
-  - $HOME/ff/bin/firefox --version
-  - $HOME/ff/bin/firefox -marionette > /dev/null 2>&1 &
+  - $HOME/firefox/firefox --version
+  - $HOME/firefox/firefox -marionette > /dev/null 2>&1 &
   - sleep 5
   - ps aux | grep firefox
 
