@@ -4,7 +4,7 @@ func ElementIsPresent(by By, value string) func(f Finder) (bool, *WebElement, er
 	return func(f Finder) (bool, *WebElement, error) {
 		result := true
 		v, e := f.FindElement(by, value)
-		if e != nil {
+		if e != nil || v == nil {
 			result = false
 		}
 

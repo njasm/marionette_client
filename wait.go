@@ -16,7 +16,7 @@ type Finder interface {
 }
 
 func Wait(f Finder) *Waiter {
-	return &Waiter{f, time.Duration(1)}
+	return &Waiter{f: f, d: time.Duration(1)}
 }
 
 func (w *Waiter) For(d time.Duration) *Waiter {
