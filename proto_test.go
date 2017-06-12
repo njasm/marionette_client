@@ -2,6 +2,12 @@ package marionette_client
 
 import "testing"
 
+// test proto.go
+func TestProto(t *testing.T) {
+	t.Run("NewDecoderErrorTest", NewDecoderErrorTest)
+	t.Run("DecodeErrorTest", DecodeErrorTest)
+}
+
 func NewDecoderErrorTest(t *testing.T) {
 	var encID int32 = -1 //non existing protocol version
 	_, err := NewDecoderEncoder(encID)

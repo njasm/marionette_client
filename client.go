@@ -751,7 +751,12 @@ func (c *Client) SendKeysToDialog(keys string) error {
 // DISPOSE TEAR DOWN //
 ///////////////////////
 
+// deprecated use Quit().
 func (c *Client) QuitApplication() (*Response, error) {
+	return c.Quit()
+}
+
+func (c *Client) Quit() (*Response, error) {
 	r, err := c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
 	if err != nil {
 		return nil, err
@@ -759,6 +764,8 @@ func (c *Client) QuitApplication() (*Response, error) {
 
 	return r, nil
 }
+
+
 
 func (c *Client) Screenshot() (string, error) {
 	return takeScreenshot(c, nil)

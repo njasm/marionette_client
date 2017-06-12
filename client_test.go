@@ -83,24 +83,6 @@ func TestInit(t *testing.T) {
 	})
 }
 
-
-/******************************************/
-/* non main nor sequential required tests */
-/******************************************/
-
-// test proto.go
-func TestProto(t *testing.T) {
-	t.Run("NewDecoderErrorTest", NewDecoderErrorTest)
-	t.Run("EncodeErrorTest", EncodeErrorTest)
-	t.Run("DecodeErrorTest", DecodeErrorTest)
-}
-
-// test expected.go
-func TestExpected(t *testing.T) {
-	t.Run("ElementIsPresentFalseTest", ElementIsPresentFalseTest)
-}
-
-
 /*********/
 /* tests */
 /*********/

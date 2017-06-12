@@ -28,8 +28,13 @@ func (f fakeFinder) FindElements(by By, value string) ([]*WebElement, error) {
 	return e, nil
 }
 
-func ElementIsPresentFalseTest(t *testing.T) {
 
+func TestExpected(t *testing.T) {
+	t.Run("ElementIsPresentFalseTest", ElementIsPresentFalseTest)
+}
+
+
+func ElementIsPresentFalseTest(t *testing.T) {
 	fake := new(fakeFinder)
 	fake.ReturnError = true
 
@@ -41,6 +46,7 @@ func ElementIsPresentFalseTest(t *testing.T) {
 	}
 }
 
+// required test in sequential main client test: client_test.go
 func NotPresentTest(t *testing.T) {
 	client.SwitchToParentFrame()
 	r, err := client.ActiveFrame()
