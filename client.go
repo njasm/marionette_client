@@ -758,7 +758,7 @@ func (c *Client) QuitApplication() (*Response, error) {
 }
 
 func (c *Client) Quit() (*Response, error) {
-	r, err := c.transport.Send("quit", map[string]string{"flags": "eForceQuit"})
+	r, err := c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
 	if err != nil {
 		return nil, err
 	}
