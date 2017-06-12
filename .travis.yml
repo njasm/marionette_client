@@ -13,6 +13,11 @@ addons:
 env:
   global:
     - DISPLAY=:99.0
+  matrix:
+    - FIREFOX_VERSION=53.0.3
+    - FIREFOX_VERSION=52.0
+    - FIREFOX_VERSION=51.0
+    - FIREFOX_VERSION=50.0
 
 before_install:
   - go get github.com/axw/gocov/gocov
@@ -20,9 +25,16 @@ before_install:
   - if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
   - sh -e /etc/init.d/xvfb start
 
+install:
+  - export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=$FIREFOX_VERSION&lang=en-US&os=linux64"
+  - wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
+  - mkdir -p $HOME/ff
+  - tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/ff/
+
 before_script:
-  - firefox --version
-  - firefox -marionette > /dev/null 2>&1 &
+  - ls $HOME/ff/
+  - $HOME/ff/bin/firefox --version
+  - $HOME/ff/bin/firefox -marionette > /dev/null 2>&1 &
   - sleep 5
   - ps aux | grep firefox
 
