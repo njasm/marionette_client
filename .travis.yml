@@ -7,8 +7,8 @@ go:
   - 1.8.x
   - tip
 
-addons:
-  firefox: 53.0.3 #latest
+#addons:
+#  firefox: 53.0.3 #latest
 
 env:
   global:
@@ -18,6 +18,12 @@ env:
     - FIREFOX_VERSION=52.0
     - FIREFOX_VERSION=51.0
     - FIREFOX_VERSION=50.0
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    env: FIREFOX_VERSION=52.0 # ff is seg faulting on start with current travis env
+    env: FIREFOX_VERSION=51.0 # ff bug on getPage()
 
 before_install:
   - go get github.com/axw/gocov/gocov
