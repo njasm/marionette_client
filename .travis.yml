@@ -49,4 +49,4 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-  - $HOME/gopath/bin/goveralls -service=travis-ci
+  - $HOME/gopath/bin/goveralls -coverprofile=coverage.txt -covermode=atomic -service=travis-ci
