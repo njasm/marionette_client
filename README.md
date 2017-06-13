@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/njasm/marionette_client.svg?branch=master)](https://travis-ci.org/njasm/marionette_client)
 [![Coverage Status](https://coveralls.io/repos/github/njasm/marionette_client/badge.svg?branch=master)](https://coveralls.io/github/njasm/marionette_client?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/njasm/marionette_client)](https://goreportcard.com/report/github.com/njasm/marionette_client)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://choosealicense.com/licenses/mit/)
 
 # marionette_client
 Mozilla's Gecko Marionette client in golang
