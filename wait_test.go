@@ -1,9 +1,9 @@
 package marionette_client
 
 import (
+	"errors"
 	"testing"
 	"time"
-	"errors"
 )
 
 func TestWait(t *testing.T) {

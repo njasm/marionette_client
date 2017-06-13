@@ -381,11 +381,11 @@ func SendKeysTest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
-/* FIXME: Text is not yet set. investigate.
+	/* FIXME: Text is not yet set. investigate.
 	if e.Text() != test {
 		t.Fatalf("Elements text is not: %#v, it's: %#v", test, e.Text())
 	}
-*/
+	*/
 	e.Clear()
 	if e.Text() != "" {
 		t.Fatalf("Elements text should be empty. found: %#v", e.Text())
@@ -535,7 +535,7 @@ func WindowSizeTest(t *testing.T) {
 
 	t.Logf("w: %v, h: %v", size.Width, size.Height)
 
-/* FIXME: SetWindowSize hangs on travis ci with XVFB start on before script. tests work localy
+	/* FIXME: SetWindowSize hangs on travis ci with XVFB start on before script. tests work localy
 	newSize := &Size{Width: size.Width / 2, Height: size.Height / 2}
 	rv, err := client.SetWindowSize(newSize)
 	if err != nil {
@@ -548,7 +548,7 @@ func WindowSizeTest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
-*/
+	*/
 }
 
 // working - if called before other tests all hell will break loose

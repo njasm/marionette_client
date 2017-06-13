@@ -3,8 +3,8 @@ package marionette_client
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 	"math"
+	"strings"
 )
 
 const (
@@ -767,8 +767,6 @@ func (c *Client) Quit() (*Response, error) {
 
 	return r, nil
 }
-
-
 
 func (c *Client) Screenshot() (string, error) {
 	return takeScreenshot(c, nil)

@@ -6,8 +6,7 @@ import (
 	"time"
 )
 
-type fakeFinder struct
-{
+type fakeFinder struct {
 	ReturnError bool
 }
 
@@ -28,11 +27,9 @@ func (f fakeFinder) FindElements(by By, value string) ([]*WebElement, error) {
 	return e, nil
 }
 
-
 func TestExpected(t *testing.T) {
 	t.Run("ElementIsPresentFalseTest", ElementIsPresentFalseTest)
 }
-
 
 func ElementIsPresentFalseTest(t *testing.T) {
 	fake := new(fakeFinder)

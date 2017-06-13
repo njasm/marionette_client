@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 	"log"
+	"strconv"
 )
 
 func NewDecoderEncoder(protoVersion int32) (DecoderEncoder, error) {
