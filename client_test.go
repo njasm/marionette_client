@@ -362,6 +362,12 @@ func FindElementTest(t *testing.T) {
 	}
 
 	t.Logf("%T %#v", collection, collection)
+
+	el, err := element.FindElement(By(CSS_SELECTOR), CSS_SELECTOR_LI)
+	if el == nil || err != nil {
+		t.FailNow()
+	}
+
 }
 
 func SendKeysTest(t *testing.T) {
@@ -370,7 +376,20 @@ func SendKeysTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	e.SendKeys("teste")
+	var test string = "teste"
+	err = e.SendKeys(test)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+/* FIXME: Text is not yet set. investigate.
+	if e.Text() != test {
+		t.Fatalf("Elements text is not: %#v, it's: %#v", test, e.Text())
+	}
+*/
+	e.Clear()
+	if e.Text() != "" {
+		t.Fatalf("Elements text should be empty. found: %#v", e.Text())
+	}
 }
 
 func FindElementsTest(t *testing.T) {
@@ -463,12 +482,12 @@ func PromptTest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
-/* FIXME: changed to parameter text in firefox 55.0a1 branch
+
 	err = client.SendKeysToDialog("yeah!")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
-*/
+
 	time.Sleep(time.Duration(5) * time.Second)
 
 	err = client.DismissDialog()

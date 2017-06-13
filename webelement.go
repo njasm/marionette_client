@@ -72,8 +72,8 @@ func (e *WebElement) Click() {
 	clickElement(e.c, e.id)
 }
 
-func (e *WebElement) SendKeys(keys string) {
-	sendKeysToElement(e.c, e.id, keys)
+func (e *WebElement) SendKeys(keys string) error {
+	return sendKeysToElement(e.c, e.id, keys)
 }
 
 func (e *WebElement) Clear() {

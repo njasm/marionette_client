@@ -3,7 +3,38 @@ package marionette_client
 import (
 	"testing"
 	"time"
+	"errors"
 )
+
+func TestWait(t *testing.T) {
+	t.Run("UntilConditionNeverOccuredTest", UntilConditionNeverOccuredTest)
+	// FIXME: t.Run("UntilErrorTest", UntilErrorTest)
+}
+
+func UntilErrorTest(t *testing.T) {
+	var errorMsg string = "the Error message."
+	timeout := time.Duration(5) * time.Second
+	condition := func(c Finder) (bool, *WebElement, error) {
+		return false, nil, errors.New(errorMsg)
+	}
+	_, _, err := Wait(client).For(timeout).Until(condition)
+
+	if err.Error() != errorMsg {
+		t.Fatalf("Expected error msg %v, got %v", errorMsg, err.Error())
+	}
+}
+
+func UntilConditionNeverOccuredTest(t *testing.T) {
+	timeout := time.Duration(11) * time.Minute
+	condition := func(c Finder) (bool, *WebElement, error) {
+		return false, nil, nil
+	}
+	_, _, err := Wait(client).For(timeout).Until(condition)
+
+	if err == nil {
+		t.Fatal("Element Was Found in ElementIsNotPresent test.")
+	}
+}
 
 func WaitForUntilIntegrationTest(t *testing.T) {
 	client.SetContext(Context(CONTENT))
