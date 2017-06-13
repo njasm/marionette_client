@@ -555,21 +555,22 @@ func clickElement(c *Client, id string) {
 	//return d
 }
 
-func sendKeysToElement(c *Client, id string, keys string) {
-	slice := make([]string, 0)
-	for _, v := range keys {
-		slice = append(slice, fmt.Sprintf("%c", v))
-	}
-
-	r, err := c.transport.Send("sendKeysToElement", map[string]interface{}{"id": id, "value": slice})
+func sendKeysToElement(c *Client, id string, keys string) error {
+	//slice := make([]string, 0)
+	//for _, v := range keys {
+	//	slice = append(slice, fmt.Sprintf("%c", v))
+	//}
+	//
+	//r, err := c.transport.Send("sendKeysToElement", map[string]interface{}{"id": id, "value": slice})
+	r, err := c.transport.Send("sendKeysToElement", map[string]interface{}{"id": id, "text": keys})
 	if err != nil {
-		return
+		return err
 	}
 
 	var d = map[string]interface{}{}
 	json.Unmarshal([]byte(r.Value), &d)
 
-	//return d
+	return nil
 }
 
 func clearElement(c *Client, id string) {
@@ -735,12 +736,13 @@ func (c *Client) TextFromDialog() (string, error) {
 }
 
 func (c *Client) SendKeysToDialog(keys string) error {
-	slice := make([]string, 0)
-	for _, v := range keys {
-		slice = append(slice, fmt.Sprintf("%c", v))
-	}
-
-	_, err := c.transport.Send("sendKeysToDialog", map[string]interface{}{"value": slice})
+	//slice := make([]string, 0)
+	//for _, v := range keys {
+	//	slice = append(slice, fmt.Sprintf("%c", v))
+	//}
+	//
+	//_, err := c.transport.Send("sendKeysToDialog", map[string]interface{}{"value": slice})
+	_, err := c.transport.Send("sendKeysToDialog", map[string]interface{}{"text": keys})
 	if err != nil {
 		return err
 	}
