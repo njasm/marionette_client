@@ -373,6 +373,7 @@ func (c *Client) CloseWindow() (*Response, error) {
 // FRAMES //
 ////////////
 
+// ActiveFrame get active frame
 func (c *Client) ActiveFrame() (*WebElement, error) {
 	r, err := c.transport.Send("getActiveFrame", nil)
 	if err != nil {
@@ -388,7 +389,7 @@ func (c *Client) ActiveFrame() (*WebElement, error) {
 	return e, nil
 }
 
-// use By(ID), By(NAME) or name only.
+// SwitchToFrame switch to frame - strategies: By(ID), By(NAME) or name only.
 func (c *Client) SwitchToFrame(by By, value string) error {
 
 	//with current marionette implementation we have to find the element first and send the switchToFrame
@@ -407,6 +408,7 @@ func (c *Client) SwitchToFrame(by By, value string) error {
 	return nil
 }
 
+// SwitchToParentFrame switch to parent frame
 func (c *Client) SwitchToParentFrame() error {
 	_, err := c.transport.Send("switchToParentFrame", nil)
 	if err != nil {
@@ -420,7 +422,7 @@ func (c *Client) SwitchToParentFrame() error {
 // COOKIES //
 /////////////
 
-// Get all cookies
+// Cookies Get all cookies
 func (c *Client) Cookies() (*Response, error) {
 	r, err := c.transport.Send("getCookies", nil)
 	if err != nil {
@@ -430,7 +432,7 @@ func (c *Client) Cookies() (*Response, error) {
 	return r, nil
 }
 
-// Get all cookies
+// Cookie Get cookie by name
 func (c *Client) Cookie(name string) (*Response, error) {
 	r, err := c.transport.Send("getCookies", map[string]interface{}{"name": name})
 	if err != nil {
@@ -576,12 +578,7 @@ func clearElement(c *Client, id string) {
 	//return d
 }
 
-// Find elements using the indicated search strategy.
-//
-// param string using
-//     Indicates which search method to use.
-// param string value
-//     Value the client is looking for.
+// FindElements Find elements using the indicated search strategy.
 func (c *Client) FindElements(by By, value string) ([]*WebElement, error) {
 	return findElements(c, by, value, nil)
 }
@@ -615,12 +612,7 @@ func findElements(c *Client, by By, value string, startNode *string) ([]*WebElem
 	//return string(buf), nil
 }
 
-// Find an element using the indicated search strategy.
-//
-// @param {string} using
-//     Indicates which search method to use.
-// @param {string} value
-//     Value the client is looking for.
+// FindElement Find an element using the indicated search strategy.
 func (c *Client) FindElement(by By, value string) (*WebElement, error) {
 	return findElement(c, by, value, nil)
 }
@@ -667,6 +659,7 @@ func takeScreenshot(c *Client, startNode *string) (string, error) {
 // DOCUMENT HANDLING //
 ///////////////////////
 
+// PageSource get page source
 func (c *Client) PageSource() (*Response, error) {
 	response, err := c.transport.Send("getPageSource", nil)
 	if err != nil {
@@ -676,6 +669,7 @@ func (c *Client) PageSource() (*Response, error) {
 	return response, nil
 }
 
+// ExecuteScript Execute JS Script
 func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, newSandbox bool) (*Response, error) {
 	parameters := map[string]interface{}{}
 	parameters["scriptTimeout"] = timeout
@@ -696,6 +690,7 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 // DIALOGS //
 /////////////
 
+// DismissDialog dismisses the dialog - like clicking No/Cancel
 func (c *Client) DismissDialog() error {
 	_, err := c.transport.Send("dismissDialog", nil)
 	if err != nil {
@@ -705,6 +700,7 @@ func (c *Client) DismissDialog() error {
 	return nil
 }
 
+// AcceptDialog accepts the dialog - like clicking Ok/Yes
 func (c *Client) AcceptDialog() error {
 	_, err := c.transport.Send("acceptDialog", nil)
 	if err != nil {
@@ -714,6 +710,7 @@ func (c *Client) AcceptDialog() error {
 	return nil
 }
 
+// TextFromDialog gets text from the dialog
 func (c *Client) TextFromDialog() (string, error) {
 	r, err := c.transport.Send("getTextFromDialog", nil)
 	if err != nil {
@@ -726,6 +723,7 @@ func (c *Client) TextFromDialog() (string, error) {
 	return d["value"], nil
 }
 
+// SendKeysToDialog sends text to a dialog
 func (c *Client) SendKeysToDialog(keys string) error {
 	//slice := make([]string, 0)
 	//for _, v := range keys {
@@ -745,11 +743,12 @@ func (c *Client) SendKeysToDialog(keys string) error {
 // DISPOSE TEAR DOWN //
 ///////////////////////
 
-// deprecated use Quit().
+// QuitApplication deprecated use Quit().
 func (c *Client) QuitApplication() (*Response, error) {
 	return c.Quit()
 }
 
+// Quit quits the session and request browser process to terminate.
 func (c *Client) Quit() (*Response, error) {
 	r, err := c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
 	if err != nil {
@@ -759,6 +758,7 @@ func (c *Client) Quit() (*Response, error) {
 	return r, nil
 }
 
+// Screenshot takes a screenshot of the page.
 func (c *Client) Screenshot() (string, error) {
 	return takeScreenshot(c, nil)
 }
