@@ -44,7 +44,7 @@ func (c *Client) Connect(host string, port int) error {
 	return c.transport.Connect(host, port)
 }
 
-// Send the current session's capabilities to the client.
+// Capabilities Send the current session's capabilities to the client.
 // Capabilities informs the client of which WebDriver features are
 // supported by Firefox and Marionette.  They are immutable for the
 // length of the session.
@@ -71,7 +71,7 @@ func (c *Client) Capabilities() (*Capabilities, error) {
 // SESSION //
 /////////////
 
-// create new session
+// NewSession create new session
 func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, error) {
 	data := map[string]interface{}{
 		"sessionId":    sessionId,
@@ -91,7 +91,7 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, err
 	return response, nil
 }
 
-// Marionette currently only accepts a session id, so if
+// DeleteSession Marionette currently only accepts a session id, so if
 // we call delete session can also close the TCP Connection
 func (c *Client) DeleteSession() error {
 	_, err := c.transport.Send("deleteSession", nil)
@@ -102,26 +102,17 @@ func (c *Client) DeleteSession() error {
 	return c.transport.Close()
 }
 
-// Set the timeout for asynchronous script execution.
-//
-// param number ms
-//     Time in milliseconds.
+// SetScriptTimeout Set the timeout for asynchronous script execution.
 func (c *Client) SetScriptTimeout(milliseconds int) (*Response, error) {
 	return timeouts(&c.transport, "script", milliseconds)
 }
 
-// Set timeout for searching for elements.
-//
-// param number ms
-//     Search timeout in milliseconds.
+// SetSearchTimeout Set timeout for searching for elements.
 func (c *Client) SetSearchTimeout(milliseconds int) (*Response, error) {
 	return timeouts(&c.transport, "implicit", milliseconds)
 }
 
-// Set timeout for page loading.
-//
-// param number ms
-//     Search timeout in milliseconds.
+// SetPageTimeout Set timeout for page loading.
 func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
 	return timeouts(&c.transport, "pageLoad", milliseconds)
 }
@@ -145,12 +136,12 @@ func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, 
 // NAVIGATION //
 ////////////////
 
-// deprecated use Navigate()
+// Get deprecated use Navigate()
 func (c *Client) Get(url string) (*Response, error) {
 	return c.Navigate(url)
 }
 
-// open url
+// Navigate open url
 func (c *Client) Navigate(url string) (*Response, error) {
 	r, err := c.transport.Send("get", map[string]string{"url": url})
 	if err != nil {
@@ -160,7 +151,7 @@ func (c *Client) Navigate(url string) (*Response, error) {
 	return r, nil
 }
 
-// get title
+// Title get title
 func (c *Client) Title() (string, error) {
 	r, err := c.transport.Send("getTitle", map[string]string{})
 	if err != nil {
@@ -176,12 +167,12 @@ func (c *Client) Title() (string, error) {
 	return d["value"], nil
 }
 
-// deprecated, use Url() instead
+// CurrentUrl deprecated, use Url() instead
 func (c *Client) CurrentUrl() (string, error) {
 	return c.Url()
 }
 
-// get current url
+// Url get current url
 func (c *Client) Url() (string, error) {
 	r, err := c.transport.Send("getCurrentUrl", nil)
 	if err != nil {
@@ -197,7 +188,7 @@ func (c *Client) Url() (string, error) {
 	return url["value"], nil
 }
 
-// refresh
+// Refresh refresh
 func (c *Client) Refresh() error {
 	_, err := c.transport.Send("refresh", nil)
 	if err != nil {
@@ -207,7 +198,7 @@ func (c *Client) Refresh() error {
 	return nil
 }
 
-// back
+// Back go back in navigation history
 func (c *Client) Back() error {
 	_, err := c.transport.Send("goBack", nil)
 	if err != nil {
@@ -217,7 +208,7 @@ func (c *Client) Back() error {
 	return nil
 }
 
-// forward
+// Forward go forward in navigation history
 func (c *Client) Forward() error {
 	_, err := c.transport.Send("goForward", nil)
 	if err != nil {
@@ -227,12 +218,7 @@ func (c *Client) Forward() error {
 	return nil
 }
 
-// Log message.  Accepts user defined log-level.
-//
-// param string value
-//     Log message.
-// param string level
-//     Arbitrary log level.
+// Log Accepts user defined log-level.
 func (c *Client) Log(message string, level string) (*Response, error) {
 	response, err := c.transport.Send("log", map[string]string{"value": message, "level": level})
 	if err != nil {
@@ -242,7 +228,7 @@ func (c *Client) Log(message string, level string) (*Response, error) {
 	return response, nil
 }
 
-//  Return all logged messages.
+// Logs Return all logged messages.
 func (c *Client) Logs() (*Response, error) {
 	response, err := c.transport.Send("getLogs", nil)
 	if err != nil {
@@ -252,12 +238,8 @@ func (c *Client) Logs() (*Response, error) {
 	return response, nil
 }
 
-// Sets the context of the subsequent commands to be either "chrome" or
-// "content".
-//
-// param string value
-//     Name of the context to be switched to.  Must be one of "chrome" or
-//     "content".
+// SetContext Sets the context of the subsequent commands to be either "chrome" or "content".
+// Must be one of "chrome" or "content" only.
 func (c *Client) SetContext(value Context) (*Response, error) {
 	response, err := c.transport.Send("setContext", map[string]string{"value": fmt.Sprint(value)})
 	if err != nil {
@@ -267,7 +249,7 @@ func (c *Client) SetContext(value Context) (*Response, error) {
 	return response, nil
 }
 
-//  Gets the context of the server, either "chrome" or "content".
+// Context Gets the context of the server, either "chrome" or "content".
 func (c *Client) Context() (*Response, error) {
 	response, err := c.transport.Send("getContext", nil)
 	if err != nil {
@@ -281,6 +263,7 @@ func (c *Client) Context() (*Response, error) {
 // WINDOWS HANDLES //
 /////////////////////
 
+// CurrentWindowHandle returns the current window ID
 func (c *Client) CurrentWindowHandle() (string, error) {
 	r, err := c.transport.Send("getWindowHandle", nil)
 	if err != nil {
@@ -295,6 +278,8 @@ func (c *Client) CurrentWindowHandle() (string, error) {
 	return d["value"], nil
 }
 
+
+// CurrentChromeWindowHandle returns the current chrome window ID
 //"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 //"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 func (c *Client) CurrentChromeWindowHandle() (*Response, error) {
@@ -306,6 +291,7 @@ func (c *Client) CurrentChromeWindowHandle() (*Response, error) {
 	return r, nil
 }
 
+// WindowHandles return array of window ID currently opened
 func (c *Client) WindowHandles() ([]string, error) {
 	r, err := c.transport.Send("getWindowHandles", nil)
 	if err != nil {
@@ -321,6 +307,7 @@ func (c *Client) WindowHandles() ([]string, error) {
 	return d, nil
 }
 
+// SwitchToWindow switch to specific window.
 func (c *Client) SwitchToWindow(name string) error {
 	_, err := c.transport.Send("switchToWindow", map[string]interface{}{"name": name})
 	if err != nil {
@@ -330,6 +317,7 @@ func (c *Client) SwitchToWindow(name string) error {
 	return nil
 }
 
+// WindowSize returns the window size
 func (c *Client) WindowSize() (rv *Size, err error) {
 	r, err := c.transport.Send("getWindowSize", nil)
 	if err != nil {
@@ -345,6 +333,7 @@ func (c *Client) WindowSize() (rv *Size, err error) {
 	return
 }
 
+// SetWindowSize sets window size
 func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
 	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": math.Floor(s.Width), "height": math.Floor(s.Height)})
 	if err != nil {
@@ -360,6 +349,7 @@ func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
 	return
 }
 
+// MaximizeWindow maximizes window.
 func (c *Client) MaximizeWindow() error {
 	_, err := c.transport.Send("maximizeWindow", nil)
 	if err != nil {
@@ -369,6 +359,7 @@ func (c *Client) MaximizeWindow() error {
 	return nil
 }
 
+// CloseWindow closes current window.
 func (c *Client) CloseWindow() (*Response, error) {
 	r, err := c.transport.Send("close", nil)
 	if err != nil {
