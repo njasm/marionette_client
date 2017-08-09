@@ -750,7 +750,16 @@ func (c *Client) QuitApplication() (*Response, error) {
 
 // Quit quits the session and request browser process to terminate.
 func (c *Client) Quit() (*Response, error) {
-	r, err := c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
+	var r *Response = new(Response)
+	var err error
+
+	var version = c.browserVersion()
+	if len(version) > 2 && version[0:2] == "53" {
+		r, err = c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
+	} else {
+		r, err = c.transport.Send("quitApplication", map[string][]string{"flags": {"eForceQuit"}})
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -761,4 +770,13 @@ func (c *Client) Quit() (*Response, error) {
 // Screenshot takes a screenshot of the page.
 func (c *Client) Screenshot() (string, error) {
 	return takeScreenshot(c, nil)
+}
+
+func (c *Client) browserVersion() string {
+	r, e := c.Capabilities()
+	if e != nil {
+		return ""
+	}
+
+	return r.BrowserVersion
 }
