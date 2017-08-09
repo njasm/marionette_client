@@ -3,17 +3,33 @@ package marionette_client
 import (
 	"testing"
 	"time"
+	"os"
+	"fmt"
 )
 
 const (
+	TESTDATA_FOLDER   = "testdata"
+	WWW_FOLDER		  = "html"
 	TARGET_URL        = "http://www.abola.pt/"
 	ID_SELECTOR       = "clubes-hp"
-	CSS_SELECTOR_LI   = "li"
+	CSS_SELECTOR_LI   = "td"
 	ID_SELECTOR_INPUT = "topo_txtPesquisa"
 	TIMEOUT           = 10000 // milliseconds
 )
 
 var client *Client
+func navigateLocal(page string) (*Response, error) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Println(pwd)
+
+	var schema = "file://" + pwd + "/" + TESTDATA_FOLDER + "/" + WWW_FOLDER + "/"
+	return client.Navigate(schema + page)
+}
 
 func init() {
 	client = NewClient()
@@ -314,7 +330,8 @@ func GetTitleTest(t *testing.T) {
 
 }
 func FindElementTest(t *testing.T) {
-	element, err := client.FindElement(By(ID), ID_SELECTOR)
+	navigateLocal("table.html")
+	element, err := client.FindElement(By(ID), "the-table")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -357,7 +374,7 @@ func FindElementTest(t *testing.T) {
 	}
 
 	collection, err := element.FindElements(By(CSS_SELECTOR), CSS_SELECTOR_LI)
-	if 18 != len(collection) {
+	if 3 > len(collection) {
 		t.FailNow()
 	}
 
@@ -371,12 +388,13 @@ func FindElementTest(t *testing.T) {
 }
 
 func SendKeysTest(t *testing.T) {
-	e, err := client.FindElement(By(ID), ID_SELECTOR_INPUT)
+	navigateLocal("form.html")
+	e, err := client.FindElement(By(ID), "email")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	var test string = "teste"
+	var test string = "teste@example.com"
 	err = e.SendKeys(test)
 	if err != nil {
 		t.Fatalf("%#v", err)
@@ -393,6 +411,7 @@ func SendKeysTest(t *testing.T) {
 }
 
 func FindElementsTest(t *testing.T) {
+	navigateLocal("ul.html")
 	elements, err := client.FindElements(By(CSS_SELECTOR), CSS_SELECTOR_LI)
 	if err != nil {
 		t.Fatalf("%#v", err)
@@ -473,7 +492,7 @@ func NavigatorMethodsTest(t *testing.T) {
 }
 
 func PromptTest(t *testing.T) {
-	client.Get("http://www.abola.pt")
+	navigateLocal("ul.html")
 	var text string = "marionette is cool or what - prompt?"
 	var script string = "prompt('" + text + "');"
 	args := []interface{}{}
@@ -499,7 +518,7 @@ func PromptTest(t *testing.T) {
 }
 
 func AlertTest(t *testing.T) {
-	client.Get("http://www.abola.pt")
+	navigateLocal("ul.html")
 	var text string = "marionette is cool or what?"
 	var script string = "alert('" + text + "');"
 	args := []interface{}{}
