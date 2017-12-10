@@ -40,8 +40,8 @@ install:
   - tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
 
 before_script:
-  - $HOME/firefox/firefox --version
-  - $HOME/firefox/firefox -marionette > /dev/null 2>&1 &
+  - $HOME/firefox/firefox-bin --version
+  - $HOME/firefox/firefox-bin -marionette > /dev/null 2>&1 &
   - sleep 5
   - ps aux | grep firefox
 
