@@ -9,8 +9,8 @@ go:
   - 1.9.x
   - tip
 
-addons:
-  firefox: latest
+#addons:
+#  firefox: latest
 
 env:
   global:
