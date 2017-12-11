@@ -13,6 +13,7 @@ go:
 env:
   global:
     - DISPLAY=:99.0
+    - MOZ_HEADLESS=1
   matrix:
     - FIREFOX_VERSION=53.0.3
     - FIREFOX_VERSION=54.0.1
@@ -40,8 +41,8 @@ install:
   - tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
 
 before_script:
-  - $HOME/firefox/firefox-bin --version
-  - $HOME/firefox/firefox-bin -headless -marionette > /dev/null 2>&1 &
+  - $HOME/firefox/firefox --version
+  - $HOME/firefox/firefox -no-remote -marionette > /dev/null 2>&1 &
   - sleep 5
   - ps aux | grep firefox
 
