@@ -53,6 +53,7 @@ before_install:
   - if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
   - sh -e /etc/init.d/xvfb start
   - sleep 3
+  - netstat -ptln
 
 install:
   #- export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
@@ -67,6 +68,8 @@ before_script:
   #- ps aux | grep firefox
   - firefox --version
   - firefox -marionette -vv &
+  - sleep 10
+  - netstat -ptln
 
 script:
   #- go test -test.v
