@@ -66,7 +66,7 @@ before_script:
   #- sleep 10
   #- ps aux | grep firefox
   - firefox --version
-  - firefox -no-remote -marionette > /dev/null 2>&1 &
+  - firefox -marionette -vv &
 
 script:
   #- go test -test.v
