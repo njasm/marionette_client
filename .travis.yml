@@ -1,14 +1,16 @@
 language: go
+sudo: required
 
 go:
   #- 1.5.2
   #- 1.6.1
   - 1.7.x
   - 1.8.x
+  - 1.9.x
   - tip
 
-#addons:
-#  firefox: 53.0.3 #latest
+addons:
+  firefox: latest
 
 env:
   global:
@@ -22,6 +24,23 @@ env:
 
 matrix:
   fast_finish: true
+  include:
+    env: FIREFOX_VERSION=53.0.3
+    addons:
+      firefox: "53.0.3"
+  include:
+    env: FIREFOX_VERSION=54.0.1
+    addons:
+      firefox: "54.0.1"
+  include:
+    env: FIREFOX_VERSION=55.0
+    addons:
+      firefox: "55.0"
+  include:
+    env: FIREFOX_VERSION=57.0.1
+    addons:
+      firefox: "57.0.1"
+
   allow_failures:
   #  env: FIREFOX_VERSION=52.0 # ff is seg faulting on start with current travis env
   #  env: FIREFOX_VERSION=51.0 # ff bug on getPage()
@@ -33,18 +52,21 @@ before_install:
   - go get github.com/mattn/goveralls
   - if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
   - sh -e /etc/init.d/xvfb start
+  - sleep 3
 
 install:
-  - export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
-  - wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
-  - mkdir -p $HOME/firefox
-  - tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
+  #- export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
+  #- wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
+  #- mkdir -p $HOME/firefox
+  #- tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
 
 before_script:
-  - $HOME/firefox/firefox --version
-  - $HOME/firefox/firefox -no-remote -marionette > /dev/null 2>&1 &
-  - sleep 10
-  - ps aux | grep firefox
+  #- $HOME/firefox/firefox --version
+  #- $HOME/firefox/firefox -no-remote -marionette > /dev/null 2>&1 &
+  #- sleep 10
+  #- ps aux | grep firefox
+  - firefox --version
+  - firefox -no-remote -marionette > /dev/null 2>&1 &
 
 script:
   #- go test -test.v
