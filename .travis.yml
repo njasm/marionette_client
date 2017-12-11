@@ -43,7 +43,7 @@ install:
 before_script:
   - $HOME/firefox/firefox --version
   - $HOME/firefox/firefox -no-remote -marionette > /dev/null 2>&1 &
-  - sleep 5
+  - sleep 10
   - ps aux | grep firefox
 
 script:
