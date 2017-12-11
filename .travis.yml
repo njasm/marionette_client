@@ -41,7 +41,7 @@ install:
 
 before_script:
   - $HOME/firefox/firefox-bin --version
-  - $HOME/firefox/firefox-bin -marionette > /dev/null 2>&1 &
+  - if [[ $FIREFOX_VERSION > "54.0.1" ]]; then $HOME/firefox/firefox-bin -headless -marionette > /dev/null 2>&1 &; else $HOME/firefox/firefox-bin -marionette > /dev/null 2>&1 &; fi
   - sleep 5
   - ps aux | grep firefox
 
