@@ -108,7 +108,7 @@ func NewSessionTest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
-	t.Log("got here")
+
 	r, err := client.NewSession("", nil)
 	if err != nil {
 		t.Fatalf("%#v", err)
