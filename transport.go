@@ -10,7 +10,6 @@ import (
 	"time"
 )
 
-const connTimeOut = time.Now().Add(time.Minute * 5);
 type Transporter interface {
 	MessageID() int
 	Connect(host string, port int) error
