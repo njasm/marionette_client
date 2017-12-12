@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+const connTimeOut = time.Now().Add(time.Minute * 5);
 type Transporter interface {
 	MessageID() int
 	Connect(host string, port int) error
@@ -31,6 +32,10 @@ type Response struct {
 	Size        int32
 	Value       string
 	DriverError *DriverError
+}
+
+func connDefaultTimeout() time.Time {
+	return time.Now().Add(time.Minute * 5)
 }
 
 func (t *MarionetteTransport) MessageID() int {
@@ -57,7 +62,6 @@ func (t *MarionetteTransport) Connect(host string, port int) error {
 	}
 
 	t.conn = c
-	t.conn.SetDeadline(time.Now().Add(time.Minute * 5)) // default read and write time out
 	r, err := t.Receive()
 	if err != nil {
 		return err
@@ -125,10 +129,12 @@ func (t *MarionetteTransport) Send(command string, values interface{}) (*Respons
 }
 
 func write(c net.Conn, b []byte) (int, error) {
+	c.SetDeadline(connDefaultTimeout())
 	return c.Write(b)
 }
 
 func (t *MarionetteTransport) Receive() ([]byte, error) {
+	t.conn.SetDeadline(connDefaultTimeout())
 	return read(t.conn)
 }
 
