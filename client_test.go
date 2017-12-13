@@ -446,6 +446,15 @@ func FindElementTest(t *testing.T) {
 }
 
 func SendKeysTest(t *testing.T) {
+	var version = client.browserVersion()
+	if len(version) > 2 {
+		i, err := strconv.ParseInt(version[0:2], 10, 0)
+		if len(version) > 2 && err == nil && i == 55 {
+			t.Skip("Skipping SendKeysTest - test hangs")
+			return
+		}
+	}
+
 	navigateLocal("form.html")
 	e, err := client.FindElement(By(ID), "email")
 	if err != nil {
