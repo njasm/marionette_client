@@ -1,5 +1,6 @@
 package marionette_client
 
+// strategy type to find elements in the DOM
 type By int
 
 /*

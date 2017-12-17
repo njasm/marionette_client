@@ -2,9 +2,6 @@ language: go
 sudo: required
 
 go:
-  #- 1.5.2
-  #- 1.6.1
-  #- 1.7.x
   - 1.8.x
   - 1.9.x
   - tip
@@ -17,18 +14,13 @@ env:
     - DISPLAY=:99.0
     - MOZ_HEADLESS=1
   matrix:
-    - FIREFOX_VERSION=53.0.3
-    - FIREFOX_VERSION=54.0.1
-    - FIREFOX_VERSION=55.0
+    - FIREFOX_VERSION=56.0
     - FIREFOX_VERSION=57.0.1
 
 matrix:
   fast_finish: true
   allow_failures:
-  #  env: FIREFOX_VERSION=52.0 # ff is seg faulting on start with current travis env
-  #  env: FIREFOX_VERSION=51.0 # ff bug on getPage()
-    env: FIREFOX_VERSION=54.0.1
-    env: FIREFOX_VERSION=57.0.1
+  #  env: FIREFOX_VERSION=56.0
 
 before_install:
   - go get github.com/axw/gocov/gocov

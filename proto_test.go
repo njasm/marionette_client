@@ -22,7 +22,7 @@ func DecodeErrorTest(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 
-	var errorJson string = "12/{}ABC"
+	var errorJson = "12/{}ABC"
 	var b = []byte(errorJson)
 	if err = rv.Decode(b, nil); err == nil {
 		t.Fatalf("%v", "Decoder call should error here.")
