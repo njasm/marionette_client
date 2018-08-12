@@ -11,7 +11,7 @@ import (
 const (
 	TESTDATA_FOLDER   = "testdata"
 	WWW_FOLDER		  = "html"
-	TARGET_URL        = "http://www.abola.pt/"
+	TARGET_URL        = "https://www.abola.pt/"
 	ID_SELECTOR       = "clubes-hp"
 	CSS_SELECTOR_LI   = "td"
 	ID_SELECTOR_INPUT = "topo_txtPesquisa"
