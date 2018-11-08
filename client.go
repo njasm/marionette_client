@@ -18,6 +18,7 @@ var RunningInDebugMode bool = false
 
 type session struct {
 	SessionId string
+	Capabilities Capabilities
 }
 
 type Client struct {
@@ -52,19 +53,10 @@ func (c *Client) Connect(host string, port int) error {
 // ("capabilities") to values, which may be of types boolean,
 // numerical or string.
 func (c *Client) Capabilities() (*Capabilities, error) {
-	buf, err := c.transport.Send("getSessionCapabilities", nil)
-	if err != nil {
-		return nil, err
+	if c.session.SessionId != "" {
+		return &c.session.Capabilities, nil
 	}
-
-	response := map[string]*Capabilities{"Capabilities": &Capabilities{}}
-	err = json.Unmarshal([]byte(buf.Value), &response)
-	if err != nil {
-		return nil, err
-	}
-
-	cap, _ := response["capabilities"]
-	return cap, nil
+	return &Capabilities{}, nil
 }
 
 /////////////
@@ -78,7 +70,7 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, err
 		"capabilities": cap,
 	}
 
-	response, err := c.transport.Send("newSession", data)
+	response, err := c.transport.Send("WebDriver:NewSession", data)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +86,7 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, err
 // DeleteSession Marionette currently only accepts a session id, so if
 // we call delete session can also close the TCP Connection
 func (c *Client) DeleteSession() error {
-	_, err := c.transport.Send("deleteSession", nil)
+	_, err := c.transport.Send("WebDriver:DeleteSession", nil)
 	if err != nil {
 		return err
 	}
@@ -103,16 +95,19 @@ func (c *Client) DeleteSession() error {
 }
 
 // SetScriptTimeout Set the timeout for asynchronous script execution.
+// Deprecated
 func (c *Client) SetScriptTimeout(milliseconds int) (*Response, error) {
 	return timeouts(&c.transport, "script", milliseconds)
 }
 
 // SetSearchTimeout Set timeout for searching for elements.
+// Deprecated
 func (c *Client) SetSearchTimeout(milliseconds int) (*Response, error) {
 	return timeouts(&c.transport, "implicit", milliseconds)
 }
 
 // SetPageTimeout Set timeout for page loading.
+// Deprecated
 func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
 	return timeouts(&c.transport, "pageLoad", milliseconds)
 }
@@ -123,8 +118,9 @@ func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
 //     Type of timeout.
 // param number ms
 //     Timeout in milliseconds.
+// Deprecated
 func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, error) {
-	r, err := (*transport).Send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
+	r, err := (*transport).Send("WebDriver:Timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
 	if err != nil {
 		return nil, err
 	}
@@ -137,13 +133,14 @@ func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, 
 ////////////////
 
 // Get deprecated use Navigate()
+// Deprecated
 func (c *Client) Get(url string) (*Response, error) {
 	return c.Navigate(url)
 }
 
 // Navigate open url
 func (c *Client) Navigate(url string) (*Response, error) {
-	r, err := c.transport.Send("get", map[string]string{"url": url})
+	r, err := c.transport.Send("WebDriver:Navigate", map[string]string{"url": url})
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +150,7 @@ func (c *Client) Navigate(url string) (*Response, error) {
 
 // Title get title
 func (c *Client) Title() (string, error) {
-	r, err := c.transport.Send("getTitle", map[string]string{})
+	r, err := c.transport.Send("WebDriver:GetTitle", map[string]string{})
 	if err != nil {
 		return "", err
 	}
@@ -168,13 +165,14 @@ func (c *Client) Title() (string, error) {
 }
 
 // CurrentUrl deprecated, use Url() instead
+// Deprecated
 func (c *Client) CurrentUrl() (string, error) {
 	return c.Url()
 }
 
 // Url get current url
 func (c *Client) Url() (string, error) {
-	r, err := c.transport.Send("getCurrentUrl", nil)
+	r, err := c.transport.Send("WebDriver:GetCurrentURL", nil)
 	if err != nil {
 		return "", err
 	}
@@ -190,7 +188,7 @@ func (c *Client) Url() (string, error) {
 
 // Refresh refresh
 func (c *Client) Refresh() error {
-	_, err := c.transport.Send("refresh", nil)
+	_, err := c.transport.Send("WebDriver:Refresh", nil)
 	if err != nil {
 		return err
 	}
@@ -200,7 +198,7 @@ func (c *Client) Refresh() error {
 
 // Back go back in navigation history
 func (c *Client) Back() error {
-	_, err := c.transport.Send("goBack", nil)
+	_, err := c.transport.Send("WebDriver:Back", nil)
 	if err != nil {
 		return err
 	}
@@ -210,7 +208,7 @@ func (c *Client) Back() error {
 
 // Forward go forward in navigation history
 func (c *Client) Forward() error {
-	_, err := c.transport.Send("goForward", nil)
+	_, err := c.transport.Send("WebDriver:Forward", nil)
 	if err != nil {
 		return err
 	}
@@ -219,6 +217,7 @@ func (c *Client) Forward() error {
 }
 
 // Log Accepts user defined log-level.
+// Deprecated
 func (c *Client) Log(message string, level string) (*Response, error) {
 	response, err := c.transport.Send("log", map[string]string{"value": message, "level": level})
 	if err != nil {
@@ -229,6 +228,7 @@ func (c *Client) Log(message string, level string) (*Response, error) {
 }
 
 // Logs Return all logged messages.
+// Deprecated
 func (c *Client) Logs() (*Response, error) {
 	response, err := c.transport.Send("getLogs", nil)
 	if err != nil {
@@ -241,7 +241,7 @@ func (c *Client) Logs() (*Response, error) {
 // SetContext Sets the context of the subsequent commands to be either "chrome" or "content".
 // Must be one of "chrome" or "content" only.
 func (c *Client) SetContext(value Context) (*Response, error) {
-	response, err := c.transport.Send("setContext", map[string]string{"value": fmt.Sprint(value)})
+	response, err := c.transport.Send("Marionette:SetContext", map[string]string{"value": fmt.Sprint(value)})
 	if err != nil {
 		return nil, err
 	}
@@ -251,7 +251,7 @@ func (c *Client) SetContext(value Context) (*Response, error) {
 
 // Context Gets the context of the server, either "chrome" or "content".
 func (c *Client) Context() (*Response, error) {
-	response, err := c.transport.Send("getContext", nil)
+	response, err := c.transport.Send("Marionette:GetContext", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -265,7 +265,7 @@ func (c *Client) Context() (*Response, error) {
 
 // CurrentWindowHandle returns the current window ID
 func (c *Client) CurrentWindowHandle() (string, error) {
-	r, err := c.transport.Send("getWindowHandle", nil)
+	r, err := c.transport.Send("WebDriver:GetWindowHandle", nil)
 	if err != nil {
 		return "", err
 	}
@@ -283,7 +283,7 @@ func (c *Client) CurrentWindowHandle() (string, error) {
 //"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 //"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 func (c *Client) CurrentChromeWindowHandle() (*Response, error) {
-	r, err := c.transport.Send("getCurrentChromeWindowHandle", nil)
+	r, err := c.transport.Send("WebDriver:GetCurrentChromeWindowHandle", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -293,7 +293,7 @@ func (c *Client) CurrentChromeWindowHandle() (*Response, error) {
 
 // WindowHandles return array of window ID currently opened
 func (c *Client) WindowHandles() ([]string, error) {
-	r, err := c.transport.Send("getWindowHandles", nil)
+	r, err := c.transport.Send("WebDriver:GetWindowHandles", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -309,7 +309,7 @@ func (c *Client) WindowHandles() ([]string, error) {
 
 // SwitchToWindow switch to specific window.
 func (c *Client) SwitchToWindow(name string) error {
-	_, err := c.transport.Send("switchToWindow", map[string]interface{}{"name": name})
+	_, err := c.transport.Send("WebDriver:SwitchToWindow", map[string]interface{}{"name": name})
 	if err != nil {
 		return err
 	}
@@ -320,7 +320,7 @@ func (c *Client) SwitchToWindow(name string) error {
 // WindowSize returns the window size
 // Deprecated: Use GetWindowRect instead
 func (c *Client) WindowSize() (rv *Size, err error) {
-	r, err := c.transport.Send("getWindowSize", nil)
+	r, err := c.transport.Send("WebDriver:GetWindowSize", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -337,7 +337,7 @@ func (c *Client) WindowSize() (rv *Size, err error) {
 // SetWindowSize sets window size
 // Deprecated: Use SetWindowRect instead.
 func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
-	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": math.Floor(s.Width), "height": math.Floor(s.Height)})
+	r, err := c.transport.Send("WebDriver:SetWindowSize", map[string]interface{}{"width": math.Floor(s.Width), "height": math.Floor(s.Height)})
 	if err != nil {
 		return nil, err
 	}
@@ -353,7 +353,7 @@ func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
 
 // GetWindowRect gets window position and size
 func (c *Client) GetWindowRect() (rect *WindowRect, err error) {
-	r, err := c.transport.Send("getWindowRect", nil)
+	r, err := c.transport.Send("WebDriver:GetWindowRect", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +369,7 @@ func (c *Client) GetWindowRect() (rect *WindowRect, err error) {
 
 // SetWindowRect sets window position and size
 func (c *Client) SetWindowRect(rect WindowRect) (error) {
-	_, err := c.transport.Send("setWindowRect", map[string]interface{}{"x": rect.X, "y": rect.Y, "width": math.Floor(rect.Width), "height": math.Floor(rect.Height)})
+	_, err := c.transport.Send("WebDriver:SetWindowRect", map[string]interface{}{"x": rect.X, "y": rect.Y, "width": math.Floor(rect.Width), "height": math.Floor(rect.Height)})
 	if err != nil {
 		return err
 	}
@@ -378,7 +378,7 @@ func (c *Client) SetWindowRect(rect WindowRect) (error) {
 
 // MaximizeWindow maximizes window.
 func (c *Client) MaximizeWindow() error {
-	_, err := c.transport.Send("maximizeWindow", nil)
+	_, err := c.transport.Send("WebDriver:MaximizeWindow", nil)
 	if err != nil {
 		return err
 	}
@@ -388,7 +388,7 @@ func (c *Client) MaximizeWindow() error {
 
 // CloseWindow closes current window.
 func (c *Client) CloseWindow() (*Response, error) {
-	r, err := c.transport.Send("close", nil)
+	r, err := c.transport.Send("WebDriver:Close", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -402,7 +402,7 @@ func (c *Client) CloseWindow() (*Response, error) {
 
 // ActiveFrame get active frame
 func (c *Client) ActiveFrame() (*WebElement, error) {
-	r, err := c.transport.Send("getActiveFrame", nil)
+	r, err := c.transport.Send("WebDriver:GetActiveFrame", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -427,7 +427,7 @@ func (c *Client) SwitchToFrame(by By, value string) error {
 		return err
 	}
 
-	_, err = c.transport.Send("switchToFrame", map[string]interface{}{"element": frame.Id(), "focus": true})
+	_, err = c.transport.Send("WebDriver:SwitchToFrame", map[string]interface{}{"element": frame.Id(), "focus": true})
 	if err != nil {
 		return err
 	}
@@ -437,7 +437,7 @@ func (c *Client) SwitchToFrame(by By, value string) error {
 
 // SwitchToParentFrame switch to parent frame
 func (c *Client) SwitchToParentFrame() error {
-	_, err := c.transport.Send("switchToParentFrame", nil)
+	_, err := c.transport.Send("WebDriver:SwitchToParentFrame", nil)
 	if err != nil {
 		return err
 	}
@@ -451,7 +451,7 @@ func (c *Client) SwitchToParentFrame() error {
 
 // Cookies Get all cookies
 func (c *Client) Cookies() (*Response, error) {
-	r, err := c.transport.Send("getCookies", nil)
+	r, err := c.transport.Send("WebDriver:GetCookies", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -461,7 +461,7 @@ func (c *Client) Cookies() (*Response, error) {
 
 // Cookie Get cookie by name
 func (c *Client) Cookie(name string) (*Response, error) {
-	r, err := c.transport.Send("getCookies", map[string]interface{}{"name": name})
+	r, err := c.transport.Send("WebDriver:GetCookies", map[string]interface{}{"name": name})
 	if err != nil {
 		return nil, err
 	}
@@ -474,7 +474,7 @@ func (c *Client) Cookie(name string) (*Response, error) {
 //////////////////
 
 func isElementEnabled(c *Client, id string) bool {
-	r, err := c.transport.Send("isElementEnabled", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:IsElementEnabled", map[string]interface{}{"id": id})
 	if err != nil {
 		return false
 	}
@@ -483,7 +483,7 @@ func isElementEnabled(c *Client, id string) bool {
 }
 
 func isElementSelected(c *Client, id string) bool {
-	r, err := c.transport.Send("isElementSelected", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:IsElementSelected", map[string]interface{}{"id": id})
 	if err != nil {
 		return false
 	}
@@ -492,7 +492,7 @@ func isElementSelected(c *Client, id string) bool {
 }
 
 func isElementDisplayed(c *Client, id string) bool {
-	r, err := c.transport.Send("isElementDisplayed", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:IsElementDisplayed", map[string]interface{}{"id": id})
 	if err != nil {
 		return false
 	}
@@ -501,7 +501,7 @@ func isElementDisplayed(c *Client, id string) bool {
 }
 
 func getElementTagName(c *Client, id string) string {
-	r, err := c.transport.Send("getElementTagName", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:GetElementTagName", map[string]interface{}{"id": id})
 	if err != nil {
 		return ""
 	}
@@ -513,7 +513,7 @@ func getElementTagName(c *Client, id string) string {
 }
 
 func getElementText(c *Client, id string) string {
-	r, err := c.transport.Send("getElementText", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:GetElementText", map[string]interface{}{"id": id})
 	if err != nil {
 		return ""
 	}
@@ -525,7 +525,7 @@ func getElementText(c *Client, id string) string {
 }
 
 func getElementAttribute(c *Client, id string, name string) string {
-	r, err := c.transport.Send("getElementAttribute", map[string]interface{}{"id": id, "name": name})
+	r, err := c.transport.Send("WebDriver:GetElementAttribute", map[string]interface{}{"id": id, "name": name})
 	if err != nil {
 		return ""
 	}
@@ -537,7 +537,7 @@ func getElementAttribute(c *Client, id string, name string) string {
 }
 
 func getElementCssPropertyValue(c *Client, id string, property string) string {
-	r, err := c.transport.Send("getElementValueOfCssProperty", map[string]interface{}{"id": id, "propertyName": property})
+	r, err := c.transport.Send("WebDriver:GetElementCSSValue", map[string]interface{}{"id": id, "propertyName": property})
 	if err != nil {
 		return ""
 	}
@@ -549,7 +549,7 @@ func getElementCssPropertyValue(c *Client, id string, property string) string {
 }
 
 func getElementRect(c *Client, id string) (*ElementRect, error) {
-	r, err := c.transport.Send("getElementRect", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:GetElementRect", map[string]interface{}{"id": id})
 	if err != nil {
 		return nil, err
 	}
@@ -564,7 +564,7 @@ func getElementRect(c *Client, id string) (*ElementRect, error) {
 }
 
 func clickElement(c *Client, id string) {
-	r, err := c.transport.Send("clickElement", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:ClickElement", map[string]interface{}{"id": id})
 	if err != nil {
 		return
 	}
@@ -582,7 +582,7 @@ func sendKeysToElement(c *Client, id string, keys string) error {
 	//}
 	//
 	//r, err := c.transport.Send("sendKeysToElement", map[string]interface{}{"id": id, "value": slice})
-	r, err := c.transport.Send("sendKeysToElement", map[string]interface{}{"id": id, "text": keys})
+	r, err := c.transport.Send("WebDriver:ElementSendKeys", map[string]interface{}{"id": id, "text": keys})
 	if err != nil {
 		return err
 	}
@@ -594,7 +594,7 @@ func sendKeysToElement(c *Client, id string, keys string) error {
 }
 
 func clearElement(c *Client, id string) {
-	r, err := c.transport.Send("clearElement", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:ClearElement", map[string]interface{}{"id": id})
 	if err != nil {
 		return
 	}
@@ -618,7 +618,7 @@ func findElements(c *Client, by By, value string, startNode *string) ([]*WebElem
 		params = map[string]interface{}{"using": fmt.Sprint(by), "value": value, "element": *startNode}
 	}
 
-	response, err := c.transport.Send("findElements", params)
+	response, err := c.transport.Send("WebDriver:FindElements", params)
 	if err != nil {
 		return nil, err
 	}
@@ -652,7 +652,7 @@ func findElement(c *Client, by By, value string, startNode *string) (*WebElement
 		params = map[string]string{"using": fmt.Sprint(by), "value": value, "element": *startNode}
 	}
 
-	response, err := c.transport.Send("findElement", params)
+	response, err := c.transport.Send("WebDriver:FindElement", params)
 	if err != nil {
 		return nil, err
 	}
@@ -674,7 +674,7 @@ func takeScreenshot(c *Client, startNode *string) (string, error) {
 		params = map[string]string{"id": *startNode}
 	}
 
-	r, err := c.transport.Send("takeScreenshot", params)
+	r, err := c.transport.Send("WebDriver:TakeScreenshot", params)
 	if err != nil {
 		return "", err
 	}
@@ -688,7 +688,7 @@ func takeScreenshot(c *Client, startNode *string) (string, error) {
 
 // PageSource get page source
 func (c *Client) PageSource() (*Response, error) {
-	response, err := c.transport.Send("getPageSource", nil)
+	response, err := c.transport.Send("WebDriver:GetPageSource", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -705,7 +705,7 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 
 	parameters["newSandbox"] = newSandbox
 
-	response, err := c.transport.Send("executeScript", parameters)
+	response, err := c.transport.Send("WebDriver:ExecuteScript", parameters)
 	if err != nil {
 		return nil, err
 	}
@@ -719,7 +719,7 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 
 // DismissDialog dismisses the dialog - like clicking No/Cancel
 func (c *Client) DismissDialog() error {
-	_, err := c.transport.Send("dismissDialog", nil)
+	_, err := c.transport.Send("WebDriver:DismissAlert", nil)
 	if err != nil {
 		return err
 	}
@@ -729,7 +729,7 @@ func (c *Client) DismissDialog() error {
 
 // AcceptDialog accepts the dialog - like clicking Ok/Yes
 func (c *Client) AcceptDialog() error {
-	_, err := c.transport.Send("acceptDialog", nil)
+	_, err := c.transport.Send("WebDriver:AcceptAlert", nil)
 	if err != nil {
 		return err
 	}
@@ -739,7 +739,7 @@ func (c *Client) AcceptDialog() error {
 
 // TextFromDialog gets text from the dialog
 func (c *Client) TextFromDialog() (string, error) {
-	r, err := c.transport.Send("getTextFromDialog", nil)
+	r, err := c.transport.Send("WebDriver:GetAlertText", nil)
 	if err != nil {
 		return "", err
 	}
@@ -758,7 +758,7 @@ func (c *Client) SendKeysToDialog(keys string) error {
 	//}
 	//
 	//_, err := c.transport.Send("sendKeysToDialog", map[string]interface{}{"value": slice})
-	_, err := c.transport.Send("sendKeysToDialog", map[string]interface{}{"text": keys})
+	_, err := c.transport.Send("WebDriver:SendAlertText", map[string]interface{}{"text": keys})
 	if err != nil {
 		return err
 	}
@@ -782,9 +782,9 @@ func (c *Client) Quit() (*Response, error) {
 
 	var version = c.browserVersion()
 	if len(version) > 2 && version[0:2] == "53" {
-		r, err = c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
+		r, err = c.transport.Send("Marionette:Quit", map[string]string{"flags": "eForceQuit"})
 	} else {
-		r, err = c.transport.Send("quitApplication", map[string][]string{"flags": {"eForceQuit"}})
+		r, err = c.transport.Send("Marionette:Quit", map[string][]string{"flags": {"eForceQuit"}})
 	}
 
 	if err != nil {
