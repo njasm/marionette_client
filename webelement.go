@@ -14,6 +14,13 @@ type Size struct {
 	Height float64
 }
 
+type WindowRect struct {
+	X      float64
+	Y      float64
+	Width  float64
+	Height float64
+}
+
 type ElementRect struct {
 	Point
 	Size

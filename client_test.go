@@ -1,7 +1,6 @@
 package marionette_client
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -642,28 +641,18 @@ func WindowSizeTest(t *testing.T) {
 }
 
 func WindowRectTest(t *testing.T) {
-	err := client.SetWindowRect(0, 0, 600, 800)
+	expectedRect := WindowRect{X: 0, Y:0, Width: 600, Height: 800}
+	err := client.SetWindowRect(expectedRect)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	// get window position and size for assertion
-	response, err := client.ExecuteScript("return { x: window.screenX, y: window.screenY, width: window.outerWidth, height: window.outerHeight};", []interface{}{}, 1000, false)
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-	var value map[string]interface{}
-	json.Unmarshal([]byte(response.Value), &value)
-	rect := value["value"].(map[string]interface{})
-	x := rect["x"].(float64)
-	y := rect["y"].(float64)
-	width := rect["width"].(float64)
-	height := rect["height"].(float64)
+	actualRect, _ := client.GetWindowRect()
 
-	t.Logf("x: %v, y: %v, w: %v, h: %v", x, y, width, height)
+	t.Logf("w: %v, h: %v", actualRect.Width, actualRect.Height)
 
-	if width != 600 || height != 800 || x != 0 || y != 0 {
-		t.Fatalf("Size differs. expected: %v, actual: %v", Size{Width: 600, Height: 800}, rect)
+	if expectedRect != *actualRect {
+		t.Fatalf("Size differs. expected: %v, actual: %v", expectedRect, *actualRect)
 	}
 }
 

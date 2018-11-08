@@ -318,7 +318,7 @@ func (c *Client) SwitchToWindow(name string) error {
 }
 
 // WindowSize returns the window size
-// Deprecated
+// Deprecated: Use GetWindowRect instead
 func (c *Client) WindowSize() (rv *Size, err error) {
 	r, err := c.transport.Send("getWindowSize", nil)
 	if err != nil {
@@ -351,9 +351,25 @@ func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
 	return
 }
 
+// GetWindowRect gets window position and size
+func (c *Client) GetWindowRect() (rect *WindowRect, err error) {
+	r, err := c.transport.Send("getWindowRect", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	rect = new(WindowRect)
+	err = json.Unmarshal([]byte(r.Value), &rect)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
 // SetWindowRect sets window position and size
-func (c *Client) SetWindowRect(x, y, width, height float64) (error) {
-	_, err := c.transport.Send("setWindowRect", map[string]interface{}{"x": x, "y": y, "width": math.Floor(width), "height": math.Floor(height)})
+func (c *Client) SetWindowRect(rect WindowRect) (error) {
+	_, err := c.transport.Send("setWindowRect", map[string]interface{}{"x": rect.X, "y": rect.Y, "width": math.Floor(rect.Width), "height": math.Floor(rect.Height)})
 	if err != nil {
 		return err
 	}
