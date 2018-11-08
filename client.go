@@ -318,6 +318,7 @@ func (c *Client) SwitchToWindow(name string) error {
 }
 
 // WindowSize returns the window size
+// Deprecated
 func (c *Client) WindowSize() (rv *Size, err error) {
 	r, err := c.transport.Send("getWindowSize", nil)
 	if err != nil {
@@ -334,6 +335,7 @@ func (c *Client) WindowSize() (rv *Size, err error) {
 }
 
 // SetWindowSize sets window size
+// Deprecated: Use SetWindowRect instead.
 func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
 	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": math.Floor(s.Width), "height": math.Floor(s.Height)})
 	if err != nil {
@@ -347,6 +349,15 @@ func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
 	}
 
 	return
+}
+
+// SetWindowRect sets window position and size
+func (c *Client) SetWindowRect(x, y, width, height float64) (error) {
+	_, err := c.transport.Send("setWindowRect", map[string]interface{}{"x": x, "y": y, "width": math.Floor(width), "height": math.Floor(height)})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // MaximizeWindow maximizes window.

@@ -1,16 +1,17 @@
 package marionette_client
 
 import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"strconv"
 	"testing"
 	"time"
-	"os"
-	"fmt"
-	"strconv"
 )
 
 const (
 	TESTDATA_FOLDER   = "testdata"
-	WWW_FOLDER		  = "html"
+	WWW_FOLDER        = "html"
 	TARGET_URL        = "https://www.abola.pt/"
 	ID_SELECTOR       = "clubes-hp"
 	CSS_SELECTOR_LI   = "td"
@@ -19,6 +20,7 @@ const (
 )
 
 var client *Client
+
 func navigateLocal(page string) (*Response, error) {
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -37,7 +39,6 @@ func init() {
 	client.Transport(&MarionetteTransport{})
 	RunningInDebugMode = true
 }
-
 
 // we don't want parallel execution we need sequence.
 func TestInit(t *testing.T) {
@@ -87,6 +88,8 @@ func TestInit(t *testing.T) {
 
 		t.Run("PromptTest", PromptTest)
 		t.Run("AlertTest", AlertTest)
+
+		t.Run("WindowRectTest", WindowRectTest)
 
 		// test expected.go
 		t.Run("NotPresentTest", NotPresentTest)
@@ -614,6 +617,7 @@ func AlertTest(t *testing.T) {
 }
 
 func WindowSizeTest(t *testing.T) {
+
 	size, err := client.WindowSize()
 	if err != nil {
 		t.Fatalf("%#v", err)
@@ -635,6 +639,32 @@ func WindowSizeTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 	*/
+}
+
+func WindowRectTest(t *testing.T) {
+	err := client.SetWindowRect(0, 0, 600, 800)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	// get window position and size for assertion
+	response, err := client.ExecuteScript("return { x: window.screenX, y: window.screenY, width: window.outerWidth, height: window.outerHeight};", []interface{}{}, 1000, false)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+	var value map[string]interface{}
+	json.Unmarshal([]byte(response.Value), &value)
+	rect := value["value"].(map[string]interface{})
+	x := rect["x"].(float64)
+	y := rect["y"].(float64)
+	width := rect["width"].(float64)
+	height := rect["height"].(float64)
+
+	t.Logf("x: %v, y: %v, w: %v, h: %v", x, y, width, height)
+
+	if width != 600 || height != 800 || x != 0 || y != 0 {
+		t.Fatalf("Size differs. expected: %v, actual: %v", Size{Width: 600, Height: 800}, rect)
+	}
 }
 
 // working - if called before other tests all hell will break loose
