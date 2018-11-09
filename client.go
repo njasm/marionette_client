@@ -394,7 +394,7 @@ func (c *Client) MaximizeWindow() error {
 
 // CloseWindow closes current window.
 func (c *Client) CloseWindow() (*Response, error) {
-	r, err := c.transport.Send("WebDriver:Close", nil)
+	r, err := c.transport.Send("WebDriver:CloseWindow", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -570,7 +570,7 @@ func getElementRect(c *Client, id string) (*ElementRect, error) {
 }
 
 func clickElement(c *Client, id string) {
-	r, err := c.transport.Send("WebDriver:ClickElement", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:ElementClick", map[string]interface{}{"id": id})
 	if err != nil {
 		return
 	}
@@ -600,7 +600,7 @@ func sendKeysToElement(c *Client, id string, keys string) error {
 }
 
 func clearElement(c *Client, id string) {
-	r, err := c.transport.Send("WebDriver:ClearElement", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:ElementClear", map[string]interface{}{"id": id})
 	if err != nil {
 		return
 	}
