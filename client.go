@@ -18,7 +18,7 @@ const (
 var RunningInDebugMode bool = false
 
 type session struct {
-	SessionId string
+	SessionId    string
 	Capabilities Capabilities
 }
 
@@ -66,22 +66,20 @@ func (c *Client) Capabilities() (*Capabilities, error) {
 
 // NewSession create new session
 func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, error) {
-	var data map[string]interface{}
-
-	if sessionId == "" {
-		data = map[string]interface{}{
-			"capabilities": cap,
-		}
-	} else {
-		data = map[string]interface{}{
+	data := map[string]interface{}{
 			"sessionId":    sessionId,
 			"capabilities": cap,
-		}
 	}
+
+	var response *Response
 
 	response, err := c.transport.Send("WebDriver:NewSession", data)
 	if err != nil {
-		return nil, err
+		// fallback to old newSession command on error
+		response, err = c.transport.Send("newSession", data)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	err = json.Unmarshal([]byte(response.Value), &c)
@@ -129,7 +127,7 @@ func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
 //     Timeout in milliseconds.
 // Deprecated
 func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, error) {
-	r, err := (*transport).Send("WebDriver:Timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
+	r, err := (*transport).Send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +285,6 @@ func (c *Client) CurrentWindowHandle() (string, error) {
 	return d["value"], nil
 }
 
-
 // CurrentChromeWindowHandle returns the current chrome window ID
 //"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 //"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
@@ -329,7 +326,7 @@ func (c *Client) SwitchToWindow(name string) error {
 // WindowSize returns the window size
 // Deprecated: Use GetWindowRect instead
 func (c *Client) WindowSize() (rv *Size, err error) {
-	r, err := c.transport.Send("WebDriver:GetWindowSize", nil)
+	r, err := c.transport.Send("getWindowSize", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -346,7 +343,7 @@ func (c *Client) WindowSize() (rv *Size, err error) {
 // SetWindowSize sets window size
 // Deprecated: Use SetWindowRect instead.
 func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
-	r, err := c.transport.Send("WebDriver:SetWindowSize", map[string]interface{}{"width": math.Floor(s.Width), "height": math.Floor(s.Height)})
+	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": math.Floor(s.Width), "height": math.Floor(s.Height)})
 	if err != nil {
 		return nil, err
 	}
@@ -377,7 +374,7 @@ func (c *Client) GetWindowRect() (rect *WindowRect, err error) {
 }
 
 // SetWindowRect sets window position and size
-func (c *Client) SetWindowRect(rect WindowRect) (error) {
+func (c *Client) SetWindowRect(rect WindowRect) error {
 	_, err := c.transport.Send("WebDriver:SetWindowRect", map[string]interface{}{"x": rect.X, "y": rect.Y, "width": math.Floor(rect.Width), "height": math.Floor(rect.Height)})
 	if err != nil {
 		return err
@@ -738,18 +735,16 @@ func (c *Client) DismissDialog() error {
 
 // AcceptDialog accepts the dialog - like clicking Ok/Yes
 func (c *Client) AcceptDialog() error {
-	var version = client.browserVersion()
+	command := "WebDriver:AcceptAlert"
+	var version = c.browserVersion()
 	if len(version) > 2 {
 		i, err := strconv.ParseInt(version[0:2], 10, 0)
-		if len(version) > 2 && err == nil && i < 60 {
-			_, err := c.transport.Send("WebDriver:AcceptDialog", nil)
-			if err != nil {
-				return err
-			}
+		if err == nil && i < 60 {
+			command = "WebDriver:AcceptDialog"
 		}
 	}
 
-	_, err := c.transport.Send("WebDriver:AcceptAlert", nil)
+	_, err := c.transport.Send(command, nil)
 	if err != nil {
 		return err
 	}
