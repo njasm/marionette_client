@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"strconv"
 	"strings"
 )
 
@@ -65,9 +66,17 @@ func (c *Client) Capabilities() (*Capabilities, error) {
 
 // NewSession create new session
 func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, error) {
-	data := map[string]interface{}{
-		"sessionId":    sessionId,
-		"capabilities": cap,
+	var data map[string]interface{}
+
+	if sessionId == "" {
+		data = map[string]interface{}{
+			"capabilities": cap,
+		}
+	} else {
+		data = map[string]interface{}{
+			"sessionId":    sessionId,
+			"capabilities": cap,
+		}
 	}
 
 	response, err := c.transport.Send("WebDriver:NewSession", data)
@@ -729,6 +738,17 @@ func (c *Client) DismissDialog() error {
 
 // AcceptDialog accepts the dialog - like clicking Ok/Yes
 func (c *Client) AcceptDialog() error {
+	var version = client.browserVersion()
+	if len(version) > 2 {
+		i, err := strconv.ParseInt(version[0:2], 10, 0)
+		if len(version) > 2 && err == nil && i < 60 {
+			_, err := c.transport.Send("WebDriver:AcceptDialog", nil)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	_, err := c.transport.Send("WebDriver:AcceptAlert", nil)
 	if err != nil {
 		return err
@@ -782,7 +802,7 @@ func (c *Client) Quit() (*Response, error) {
 
 	var version = c.browserVersion()
 	if len(version) > 2 && version[0:2] == "53" {
-		r, err = c.transport.Send("Marionette:Quit", map[string]string{"flags": "eForceQuit"})
+		r, err = c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
 	} else {
 		r, err = c.transport.Send("Marionette:Quit", map[string][]string{"flags": {"eForceQuit"}})
 	}

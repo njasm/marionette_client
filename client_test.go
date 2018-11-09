@@ -85,10 +85,10 @@ func TestInit(t *testing.T) {
 
 		t.Run("WaitForUntilIntegrationTest", WaitForUntilIntegrationTest)
 
+		t.Run("WindowRectTest", WindowRectTest)
+
 		t.Run("PromptTest", PromptTest)
 		t.Run("AlertTest", AlertTest)
-
-		t.Run("WindowRectTest", WindowRectTest)
 
 		// test expected.go
 		t.Run("NotPresentTest", NotPresentTest)
@@ -621,7 +621,7 @@ func WindowSizeTest(t *testing.T) {
 	if len(version) > 2 {
 		i, err := strconv.ParseInt(version[0:2], 10, 0)
 		if len(version) > 2 && err == nil && i >= 55 {
-			t.Skip("Skipping SetPageTimoutTest for newer browsers - syntax changed")
+			t.Skip("Skipping WindowSizeTest for newer browsers - syntax changed")
 			return
 		}
 	}
@@ -650,7 +650,7 @@ func WindowSizeTest(t *testing.T) {
 }
 
 func WindowRectTest(t *testing.T) {
-	expectedRect := WindowRect{X: 0, Y:0, Width: 600, Height: 800}
+	expectedRect := WindowRect{X: 0, Y: 0, Width: 600, Height: 800}
 	err := client.SetWindowRect(expectedRect)
 	if err != nil {
 		t.Fatalf("%#v", err)
@@ -662,7 +662,7 @@ func WindowRectTest(t *testing.T) {
 
 	// FIXME: Position is not changed via SetWindowRect so cannot assert with the expected value here
 
-	if expectedRect.Width != actualRect.Width || expectedRect.Height != actualRect.Height{
+	if expectedRect.Width != actualRect.Width || expectedRect.Height != actualRect.Height {
 		t.Fatalf("Size differs. expected: %v, actual: %v", expectedRect, *actualRect)
 	}
 }
