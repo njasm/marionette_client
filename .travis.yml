@@ -19,6 +19,8 @@ env:
     - FIREFOX_VERSION=57.0.1
     - FIREFOX_VERSION=60.0
     - FIREFOX_VERSION=61.0.2
+    - FIREFOX_VERSION=62.0
+    - FIREFOX_VERSION=63.0
 
 matrix:
   fast_finish: true
