@@ -35,7 +35,7 @@ Incomplete list. Check the tests for more examples.
 
 #### Navigate to page
 ```go
-	cliente.Navigate("http://www.google.com/")
+	client.Navigate("http://www.google.com/")
 ```
 
 #### Change Contexts
