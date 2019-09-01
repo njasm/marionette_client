@@ -10,6 +10,9 @@ go:
 #addons:
 #  firefox: latest
 
+services:
+  - xvfb
+
 env:
   global:
     - DISPLAY=:99.0
@@ -21,6 +24,12 @@ env:
     - FIREFOX_VERSION=61.0.2
     - FIREFOX_VERSION=62.0
     - FIREFOX_VERSION=63.0
+    - FIREFOX_VERSION=64.0
+    - FIREFOX_VERSION=65.0
+    - FIREFOX_VERSION=66.0
+    - FIREFOX_VERSION=67.0
+    - FIREFOX_VERSION=68.0
+    - FIREFOX_VERSION=68.0.2
 
 matrix:
   fast_finish: true
@@ -30,9 +39,9 @@ matrix:
 before_install:
   - go get github.com/axw/gocov/gocov
   - go get github.com/mattn/goveralls
-  - if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
-  - sh -e /etc/init.d/xvfb start
-  - sleep 3
+  #- if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
+  #- sh -e /etc/init.d/xvfb start
+  #-sleep 3
 
 install:
   - export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
