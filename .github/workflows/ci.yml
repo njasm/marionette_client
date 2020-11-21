@@ -30,6 +30,8 @@ jobs:
     
     - name: Instal xvfb headless test
       uses: GabrielBB/xvfb-action@v1
+      with:
+        run: npm start
 
     - name: Get deps and setting up env
       run: |
