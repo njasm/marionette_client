@@ -39,7 +39,6 @@ jobs:
         wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
         mkdir -p $HOME/firefox
         tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
-        netstat -ptln
 
     - name: Startup Firefox in Headless mode
       run: |
