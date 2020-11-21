@@ -15,10 +15,12 @@ jobs:
         os: [ ubuntu-latest, macos-latest ]
         #os: [ macos-latest, ubuntu-latest, windows-latest ]
         go: [ ^1.13, ^1.14, ^1.15 ]
-        firefox: [ 62.0, 63.0 ]
+        firefox: [ "62.0", "63.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
+      MOZ_HEADLESS: 1
+      DISPLAY: ":99.0"
     steps:
     - name: Set up golang
       uses: actions/setup-go@v2
@@ -27,19 +29,13 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
-    
-    - name: Instal xvfb headless test
-      uses: GabrielBB/xvfb-action@v1
-      with:
-        run: npm -v
 
     - name: Get deps and setting up env
       run: |
         go get github.com/axw/gocov/gocov
         go get github.com/mattn/goveralls
         if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
-        #sh -e /usr/bin/xvfb-run
-        #sh -e /etc/init.d/xvfb start
+        sh -e xvfb start
         sleep 3
         # install firefox
         export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
