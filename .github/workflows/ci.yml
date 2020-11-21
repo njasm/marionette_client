@@ -16,11 +16,11 @@ jobs:
         #os: [ macos-latest, ubuntu-latest, windows-latest ]
         go: [ ^1.13, ^1.14, ^1.15 ]
         firefox: [ 62.0, 63.0 ]
-  runs-on: ${{ matrix.os }}
-  env:
-    FIREFOX_VERSION: ${{ matrix.firefox }}
-steps:
-  - name: Set up golang
+    runs-on: ${{ matrix.os }}
+    env:
+      FIREFOX_VERSION: ${{ matrix.firefox }}
+    steps:
+    - name: Set up golang
       uses: actions/setup-go@v2
       with:
         go-version: ${{ matrix.go }}
@@ -35,7 +35,6 @@ steps:
         if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
         sh -e /etc/init.d/xvfb start
         sleep 3
-
         # install firefox
         export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
         wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
