@@ -35,8 +35,6 @@ jobs:
         go get github.com/axw/gocov/gocov
         go get github.com/mattn/goveralls
         if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
-        sh -e xvfb start
-        sleep 3
         # install firefox
         export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
         wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
