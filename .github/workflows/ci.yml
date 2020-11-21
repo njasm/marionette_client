@@ -7,15 +7,15 @@ on:
   pull_request: {}
 
 jobs:
-  test-linux:
-    name: test-linux
+  test:
+    name: test-matrix
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest ]
         #os: [ macos-latest, ubuntu-latest, windows-latest ]
         go: [ ^1.13, ^1.14, ^1.15 ]
-        firefox: [ "62.0", "63.0" ]
+        firefox: [ "63.0", "83.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -30,23 +30,30 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
-    - name: Get deps and setting up env
+    - name: Download and install Firefox
       run: |
         #go get github.com/axw/gocov/gocov
         #go get github.com/mattn/goveralls
         #if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
-        # install firefox
         export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
         wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
         mkdir -p $HOME/firefox
         tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
         netstat -ptln
 
-        # before run
+    - name: Startup Firefox in Headless mode
+      run: |
         $HOME/firefox/firefox --version
         $HOME/firefox/firefox -marionette > /dev/null 2>&1 &
         sleep 10
-        netstat -ptln
 
-    - name: Test
+    - name: Confirm marionette TCP port is open (ubuntu-latest)
+      if: ${{ matrix.os == "ubuntu-lastest" }}
+      run: netstat -ptln
+
+    - name: Confirm Marionette TCP port is open (macos-latest)
+      if: ${{ matrix.os == "macos-latest" }}
+      run: netstat -p tcp -van | grep LISTEN
+
+    - name: Run Tests
       run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
