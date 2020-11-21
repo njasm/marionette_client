@@ -48,11 +48,11 @@ jobs:
         sleep 10
 
     - name: Confirm marionette TCP port is open (ubuntu-latest)
-      if: ${{ matrix.os == "ubuntu-lastest" }}
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: netstat -ptln
 
     - name: Confirm Marionette TCP port is open (macos-latest)
-      if: ${{ matrix.os == "macos-latest" }}
+      if: ${{ matrix.os == 'macos-latest' }}
       run: netstat -p tcp -van | grep LISTEN
 
     - name: Run Tests
