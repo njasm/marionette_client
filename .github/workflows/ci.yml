@@ -77,13 +77,13 @@ jobs:
 
       - name: Install Firefox
         run: |
-          choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate"
-          "C:\Program Files\Mozilla Firefox\firefox.exe" --version
+          choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:c:\ff"
+          c:\ff\firefox.exe --version
 
       - name: Startup Firefox in Headless mode
         run: |
           dir
-          "C:\Program Files\Mozilla Firefox\firefox.exe"  -Marionette
+          c:\ff\firefox.exe -Marionette
           timeout /t 10
 
       - name: Confirm Marionette TCP port is open (macos-latest)
