@@ -76,22 +76,15 @@ jobs:
       - name: Go Version
         run: go version
 
-      - name: Install Firefox
-        run: choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
-
-      - name: Startup Firefox in Headless mode
+      - name: Install Firefox and test
         run: |
+          choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
           netsh advfirewall set allprofiles state off
           dir d:\ff
           d:\ff\firefox.exe -Marionette
-
-      - name: Confirm Marionette TCP port is open
-        run: |
           tasklist
           netstat -aon -p TCP
-
-      - name: Run Tests
-        run: go test -v -covermode=atomic
+          go test -v -covermode=atomic
 
 #  osx:
 #    name: mac-os
