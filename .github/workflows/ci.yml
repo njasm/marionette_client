@@ -100,6 +100,7 @@ jobs:
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
       MOZ_HEADLESS: 1
+      MOZ_MARIONETTE: 1
       DISPLAY: ":99.0"
     steps:
       - name: Set up golang
@@ -122,7 +123,7 @@ jobs:
       - name: Startup Firefox in Headless mode
         run: |
           $HOME/firefox/Firefox.app/Contents/MacOS/firefox --version
-          $HOME/firefox/Firefox.app/Contents/MacOS/firefox/firefox -Marionette > /dev/null 2>&1 &
+          $HOME/firefox/Firefox.app/Contents/MacOS/firefox/firefox -marionette > /dev/null 2>&1 &
           sleep 5
           netstat -p tcp -van | grep LISTEN
           go test -test.v -race -covermode=atomic
