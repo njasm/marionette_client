@@ -83,13 +83,13 @@ jobs:
           export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=osx"
           wget -O /tmp/firefox.dmg $FIREFOX_SOURCE_URL
           hdiutil attach /tmp/firefox.dmg | grep Volumes
-          #mkdir -p $HOME/firefox
+          ls -sl /Volumes/Firefox/*
           #tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
 
       - name: Startup Firefox in Headless mode
         run: |
-          /Applications/Firefox.app/Contents/MacOS/firefox --version
-          /Applications/Firefox.app/Contents/MacOS/firefox/firefox -marionette > /dev/null 2>&1 &
+          /Volumes/Firefox/Firefox.app/Contents/MacOS/firefox --version
+          /Volumes/Firefox/Firefox.app/Contents/MacOS/firefox/firefox -marionette > /dev/null 2>&1 &
           sleep 10
 
       - name: Confirm Marionette TCP port is open (macos-latest)
