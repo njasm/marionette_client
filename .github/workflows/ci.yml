@@ -56,8 +56,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ windows-latest ]
-        go: [ ^1.13, ^1.14, ^1.15 ]
-        firefox: [ "82.0", "83.0" ]
+        go: [ 1.13.15, 1.14.7, 1.15.5 ]
+        firefox: [ "83.0" ] # FIXME: /InstallDir not unpacking to supplied folder on version 82
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -76,8 +76,7 @@ jobs:
         run: go version
 
       - name: Install Firefox
-        run: |
-          choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
+        run: choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
 
       - name: Startup Firefox in Headless mode
         run: |
@@ -88,7 +87,7 @@ jobs:
         run: netstat -p TCP
 
       - name: Run Tests
-        run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+        run: go test -test.v -race
 
   osx:
     name: mac-os
