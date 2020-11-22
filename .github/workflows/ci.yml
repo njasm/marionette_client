@@ -32,9 +32,6 @@ jobs:
 
     - name: Download and install Firefox
       run: |
-        #go get github.com/axw/gocov/gocov
-        #go get github.com/mattn/goveralls
-        #if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
         export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
         wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
         mkdir -p $HOME/firefox
@@ -52,6 +49,48 @@ jobs:
 
     - name: Run Tests
       run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+
+  windows:
+    name: windows
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ windows-latest ]
+        go: [ ^1.13, ^1.14, ^1.15 ]
+        firefox: [ "82.0", "83.0" ]
+    runs-on: ${{ matrix.os }}
+    env:
+      FIREFOX_VERSION: ${{ matrix.firefox }}
+      MOZ_HEADLESS: 1
+      DISPLAY: ":99.0"
+    steps:
+      - name: Set up golang
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+
+      - name: Go Version
+        run: go version
+        
+      - name: Install Firefox
+        run: |
+          choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallPath:C:\ff"
+          c:\ff\firefox --version
+
+      - name: Startup Firefox in Headless mode
+        run: |
+          dir
+          c:\ff\firefox.exe -Marionette
+          sleep 10
+
+      - name: Confirm Marionette TCP port is open (macos-latest)
+        run: netstat -p TCP
+
+      - name: Run Tests
+        run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
 
   osx:
     name: mac-os
