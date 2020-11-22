@@ -14,7 +14,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         #os: [ macos-latest, ubuntu-latest, windows-latest ]
-        go: [ ^1.13, ^1.14, ^1.15 ]
+        go: [ 1.13.15, 1.14.7, 1.15.5 ]
         firefox: [ "82.0", "83.0" ]
     runs-on: ${{ matrix.os }}
     env:
@@ -56,7 +56,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ windows-latest ]
-        go: [ 1.13.15, 1.14.7, 1.15.5 ]
+        go: [ 1.13.x, 1.14.x, 1.15.x ]
         firefox: [ "83.0" ] # FIXME: /InstallDir not unpacking to supplied folder on version 82
     runs-on: ${{ matrix.os }}
     env:
@@ -87,52 +87,52 @@ jobs:
         run: netstat -an -p TCP
 
       - name: Run Tests
-        run: go test -test.v -race .
+        run: go test -v -covermode=atomic
 
-  osx:
-    name: mac-os
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ macos-latest ]
-        go: [ ^1.13, ^1.14, ^1.15 ]
-        firefox: [ "82.0", "83.0" ]
-    runs-on: ${{ matrix.os }}
-    env:
-      FIREFOX_VERSION: ${{ matrix.firefox }}
-      MOZ_HEADLESS: 1
-      DISPLAY: ":99.0"
-    steps:
-      - name: Set up golang
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go }}
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-
-      - name: Download and install Firefox
-        run: |
-          #go get github.com/axw/gocov/gocov
-          #go get github.com/mattn/goveralls
-          #if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
-          export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=osx"
-          wget -O /tmp/firefox.dmg $FIREFOX_SOURCE_URL
-          mkdir -p $HOME/firefox
-          hdiutil attach /tmp/firefox.dmg | grep Volumes
-          ls -sl /Volumes/Firefox/*
-          cp -R /Volumes/Firefox/Firefox.app $HOME/firefox/Firefox.app
-          ls -sl $HOME/firefox/Firefox.app/Contents/MacOS/*
-          #tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
-
-      - name: Startup Firefox in Headless mode
-        run: |
-          $HOME/firefox/Firefox.app/Contents/MacOS/firefox --version
-          $HOME/firefox/Firefox.app/Contents/MacOS/firefox/firefox -Marionette > /dev/null 2>&1 &
-          sleep 10
-
-      - name: Confirm Marionette TCP port is open (macos-latest)
-        run: netstat -p tcp -van | grep LISTEN
-
-      - name: Run Tests
-        run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+#  osx:
+#    name: mac-os
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        os: [ macos-latest ]
+#        go: [ 1.13.15, 1.14.7, 1.15.5 ]
+#        firefox: [ "82.0", "83.0" ]
+#    runs-on: ${{ matrix.os }}
+#    env:
+#      FIREFOX_VERSION: ${{ matrix.firefox }}
+#      MOZ_HEADLESS: 1
+#      DISPLAY: ":99.0"
+#    steps:
+#      - name: Set up golang
+#        uses: actions/setup-go@v2
+#        with:
+#          go-version: ${{ matrix.go }}
+#
+#      - name: Check out code into the Go module directory
+#        uses: actions/checkout@v2
+#
+#      - name: Download and install Firefox
+#        run: |
+#          #go get github.com/axw/gocov/gocov
+#          #go get github.com/mattn/goveralls
+#          #if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
+#          export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=osx"
+#          wget -O /tmp/firefox.dmg $FIREFOX_SOURCE_URL
+#          mkdir -p $HOME/firefox
+#          hdiutil attach /tmp/firefox.dmg | grep Volumes
+#          ls -sl /Volumes/Firefox/*
+#          cp -R /Volumes/Firefox/Firefox.app $HOME/firefox/Firefox.app
+#          ls -sl $HOME/firefox/Firefox.app/Contents/MacOS/*
+#          #tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
+#
+#      - name: Startup Firefox in Headless mode
+#        run: |
+#          $HOME/firefox/Firefox.app/Contents/MacOS/firefox --version
+#          $HOME/firefox/Firefox.app/Contents/MacOS/firefox/firefox -Marionette > /dev/null 2>&1 &
+#          sleep 10
+#
+#      - name: Confirm Marionette TCP port is open (macos-latest)
+#        run: netstat -p tcp -van | grep LISTEN
+#
+#      - name: Run Tests
+#        run: go test -test.v -race
