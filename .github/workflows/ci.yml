@@ -124,7 +124,8 @@ jobs:
         run: |
           $HOME/firefox/Firefox.app/Contents/MacOS/firefox --version
           #$HOME/firefox/Firefox.app/Contents/MacOS/firefox/firefox -marionette > /dev/null 2>&1 &
-          $HOME/firefox/Firefox.app/Contents/MacOS/firefox/firefox -marionette
+          ls -sl $HOME/firefox/Firefox.app/Contents/MacOS/firefox/*
+          $HOME/firefox/Firefox.app/Contents/MacOS/firefox/firefox -marionette &
           sleep 5
           netstat -p tcp -van | grep LISTEN
           ps aux
