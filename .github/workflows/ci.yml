@@ -80,15 +80,16 @@ jobs:
           #go get github.com/axw/gocov/gocov
           #go get github.com/mattn/goveralls
           #if ! go get code.google.com/p/go.tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
-          export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
-          wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
-          mkdir -p $HOME/firefox
-          tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
+          export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=osx"
+          wget -O /tmp/firefox.dmg $FIREFOX_SOURCE_URL
+          hdiutil attach /tmp/firefox.dmg | grep Volumes
+          #mkdir -p $HOME/firefox
+          #tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
 
       - name: Startup Firefox in Headless mode
         run: |
-          $HOME/firefox/firefox --version
-          $HOME/firefox/firefox -marionette > /dev/null 2>&1 &
+          /Applications/Firefox.app/Contents/MacOS/firefox --version
+          /Applications/Firefox.app/Contents/MacOS/firefox/firefox -marionette > /dev/null 2>&1 &
           sleep 10
 
       - name: Confirm Marionette TCP port is open (macos-latest)
