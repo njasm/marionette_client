@@ -78,14 +78,14 @@ jobs:
       - name: Install Firefox
         run: |
           # uninstall installed version
-          choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:c:\ff"
+          choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
           #c:\ff\distribution\firefox.exe --version
 
       - name: Startup Firefox in Headless mode
         run: |
           dir
-          dir c:\ff
-          dir c:\ff\distribution
+          dir d:\ff
+          dir d:\ff\distribution
           #c:\ff\distribution\firefox.exe -Marionette
           timeout /t 10
 
