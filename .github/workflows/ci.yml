@@ -76,7 +76,9 @@ jobs:
         run: go version
 
       - name: Install Firefox
-        run: choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
+        run: |
+          choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
+          type C:\ProgramData\chocolatey\logs\chocolatey.log
 
       - name: Startup Firefox in Headless mode
         run: |
@@ -85,8 +87,8 @@ jobs:
       - name: Confirm Marionette TCP port is open
         run: netstat -p TCP
 
-      #- name: Run Tests
-      #  run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+      - name: Run Tests
+        run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
 
   osx:
     name: mac-os
