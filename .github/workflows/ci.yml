@@ -78,11 +78,11 @@ jobs:
       - name: Install Firefox
         run: |
           choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
-          type C:\ProgramData\chocolatey\logs\chocolatey.log
 
       - name: Startup Firefox in Headless mode
         run: |
-          d:\ff\firefox.exe -Marionette
+          dir c:\ff
+          "d:\ff\firefox.exe" -Marionette
 
       - name: Confirm Marionette TCP port is open
         run: netstat -p TCP
