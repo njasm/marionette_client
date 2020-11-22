@@ -126,4 +126,5 @@ jobs:
           $HOME/firefox/Firefox.app/Contents/MacOS/firefox/firefox -marionette > /dev/null 2>&1 &
           sleep 5
           netstat -p tcp -van | grep LISTEN
+          ps aux
           go test -test.v -race -covermode=atomic
