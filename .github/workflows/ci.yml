@@ -84,7 +84,7 @@ jobs:
         run: |
           netsh advfirewall set allprofiles state off
           dir d:\ff
-          d:\ff\firefox.exe -marionette
+          START /B d:\ff\firefox.exe -marionette
 
       - name: Confirm Marionette TCP port is open
         run: netstat -an -p TCP
