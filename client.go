@@ -315,7 +315,7 @@ func (c *Client) WindowHandles() ([]string, error) {
 
 // SwitchToWindow switch to specific window.
 func (c *Client) SwitchToWindow(name string) error {
-	_, err := c.transport.Send("WebDriver:SwitchToWindow", map[string]interface{}{"name": name})
+	_, err := c.transport.Send("WebDriver:SwitchToWindow", map[string]interface{}{"focus": true, "handle": name})
 	if err != nil {
 		return err
 	}

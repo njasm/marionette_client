@@ -517,7 +517,7 @@ func WindowHandlesTest(t *testing.T) {
 			t.Fatalf("%#v", err)
 		}
 
-		time.Sleep(time.Duration(time.Second))
+		time.Sleep(time.Second)
 	}
 
 	// return to original window.
