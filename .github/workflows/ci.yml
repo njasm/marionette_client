@@ -62,6 +62,7 @@ jobs:
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
       MOZ_HEADLESS: 1
+      MOZ_MARIONETTE: 1
       DISPLAY: ":99.0"
     steps:
       - name: Set up golang
