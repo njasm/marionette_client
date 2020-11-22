@@ -78,21 +78,22 @@ jobs:
       - name: Install Firefox
         run: |
           # uninstall installed version
-          choco uninstall firefox
           choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:c:\ff"
-          c:\ff\distribution\firefox.exe --version
+          #c:\ff\distribution\firefox.exe --version
 
       - name: Startup Firefox in Headless mode
         run: |
           dir
-          c:\ff\distribution\firefox.exe -Marionette
+          dir c:\ff
+          dir c:\ff\distribution
+          #c:\ff\distribution\firefox.exe -Marionette
           timeout /t 10
 
-      - name: Confirm Marionette TCP port is open (macos-latest)
+      - name: Confirm Marionette TCP port is open
         run: netstat -p TCP
 
-      - name: Run Tests
-        run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+      #- name: Run Tests
+      #  run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
 
   osx:
     name: mac-os
