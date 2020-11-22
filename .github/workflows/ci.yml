@@ -76,9 +76,11 @@ jobs:
       - name: Go Version
         run: go version
 
-      - name: Install Firefox and test
+      - name: Install Firefox
+        run: choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
+
+      - name: Test Firefox
         run: |
-          choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
           netsh advfirewall set allprofiles state off
           dir d:\ff
           d:\ff\firefox.exe -Marionette
