@@ -80,14 +80,15 @@ jobs:
         run: choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
 
       - name: Startup Firefox in Headless mode
-        shell: cmd
         run: |
           netsh advfirewall set allprofiles state off
           dir d:\ff
-          START /B d:\ff\firefox.exe -marionette
+          d:\ff\firefox.exe -Marionette
 
       - name: Confirm Marionette TCP port is open
-        run: netstat -an -p TCP
+        run: |
+          tasklist
+          netstat -aon -p TCP
 
       - name: Run Tests
         run: go test -v -covermode=atomic
