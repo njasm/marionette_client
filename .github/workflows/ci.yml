@@ -76,18 +76,11 @@ jobs:
         run: go version
 
       - name: Install Firefox
-        run: |
-          # uninstall installed version
-          choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
-          #c:\ff\distribution\firefox.exe --version
+        run: choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
 
       - name: Startup Firefox in Headless mode
         run: |
-          dir
-          dir d:\ff
-          dir d:\ff\distribution
-          #c:\ff\distribution\firefox.exe -Marionette
-          timeout /t 10
+          d:\ff\firefox.exe -Marionette
 
       - name: Confirm Marionette TCP port is open
         run: netstat -p TCP
