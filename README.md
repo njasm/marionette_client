@@ -1,5 +1,5 @@
 [![GoDoc](https://godoc.org/github.com/njasm/marionette_client?status.svg)](https://godoc.org/github.com/njasm/marionette_client)
-[![Build Status](https://travis-ci.org/njasm/marionette_client.svg?branch=master)](https://travis-ci.org/njasm/marionette_client)
+[![Build Status](https://github.com/njasm/marionette_client/workflows/CI/badge.svg)](https://github.com/njasm/marionette_client/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/njasm/marionette_client/badge.svg?branch=master)](https://coveralls.io/github/njasm/marionette_client?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/njasm/marionette_client)](https://goreportcard.com/report/github.com/njasm/marionette_client)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://choosealicense.com/licenses/mit/)
@@ -8,7 +8,7 @@
 Mozilla's Gecko Marionette client in golang
 
 ## What is Marionette
-"Marionette is an automation driver for Mozilla's Gecko engine. It can remotely control either the UI or the internal 
+"Marionette is an automation driver for Mozilla's Gecko engine. It can remotely control either the UI, or the internal 
 JavaScript of a Gecko platform, such as Firefox. It can control both the chrome (i.e. menus and functions) or the content 
 (the webpage loaded inside the browsing context), giving a high level of control and ability to replicate user actions. 
 In addition to performing actions on the browser, Marionette can also read the properties and attributes of the DOM.
