@@ -84,10 +84,10 @@ jobs:
           d:\ff\firefox.exe -Marionette
 
       - name: Confirm Marionette TCP port is open
-        run: netstat -p TCP
+        run: netstat -an -p TCP
 
       - name: Run Tests
-        run: go test -test.v -race
+        run: go test -test.v -race .
 
   osx:
     name: mac-os
