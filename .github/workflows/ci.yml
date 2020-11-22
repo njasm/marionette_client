@@ -81,7 +81,7 @@ jobs:
       - name: Startup Firefox in Headless mode
         run: |
           dir d:\ff
-          d:\ff\firefox.exe -Marionette
+          d:\ff\firefox.exe -marionette
 
       - name: Confirm Marionette TCP port is open
         run: netstat -an -p TCP
