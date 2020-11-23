@@ -47,37 +47,36 @@ jobs:
       run: netstat -ptln
 
     - name: Run Tests
-      run: go test -test.v -race -coverprofile=/home/runner/work/marionette_client/marionette_client/coverage.txt -covermode=atomic
-    
-    - name: Send coverage
-      uses: shogo82148/actions-goveralls@v1.4.2
-      with:
-        path-to-profile: /home/runner/work/marionette_client/marionette_client/coverage.txt
-        flag-name: Go-${{ matrix.go }}
-        parallel: true
-        
-  # notifies that all test jobs are finished.
-  finish:
-    needs: linux
+      run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+
+  coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: shogo82148/actions-goveralls@v1.4.2
-        with:
-          parallel-finished: true 
-
-#    - name: CodeCoverage - Convert coverage.txt to coverage.lcov
-#      if: success()
-#      uses: jandelgado/gcov2lcov-action@v1.0.8
-#      with:
-#        infile: coverage.txt
-#        outfile: coverage.lcov
-#        
-#    - name: CodeCoverage - Upload to Coveralls
-#      if: success()
-#      uses: coverallsapp/github-action@v1.1.2
-#      with:
-#          github-token: ${{ secrets.github_token }}
-#          path-to-lcov: coverage.lcov
+    - name: Install Go
+      if: success()
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15.x
+    
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Code coverage
+      run: |
+        export PATH=$PATH:$(go env GOPATH)/bin
+        go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+    
+    - name: Convert coverage to lcov
+      uses: jandelgado/gcov2lcov-action@v1.0.5
+      with:
+          infile: coverage.txt
+          outfile: coverage.lcov
+    
+    - name: Coveralls
+      uses: coverallsapp/github-action@v1.0.1
+      with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: coverage.lcov
 
   windows:
     name: windows
