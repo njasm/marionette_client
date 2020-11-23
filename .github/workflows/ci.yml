@@ -49,6 +49,20 @@ jobs:
 
     - name: Run Tests
       run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+      
+    - name: CodeCoverage - Convert coverage.txt to coverage.lcov
+      if: success()
+      uses: jandelgado/gcov2lcov-action@v1.0.8
+      with:
+        infile: coverage.txt
+        outfile: coverage.lcov
+        
+    - name: CodeCoverage - Upload to Coveralls
+      if: success()
+      uses: coverallsapp/github-action@v1.1.2
+      with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: coverage.lcov
 
   windows:
     name: windows
