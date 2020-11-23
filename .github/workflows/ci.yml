@@ -69,6 +69,8 @@ jobs:
     
     - name: Checkout code
       uses: actions/checkout@v2
+      with:
+        path: src/github.com/njasm/marionette_client
     
     - name: Code coverage
       run: |
