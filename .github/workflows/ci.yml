@@ -50,7 +50,16 @@ jobs:
       run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
 
   coverage:
+    name: coverage
+    strategy:
+      fail-fast: false
+      matrix:
+        firefox: [ "83.0" ]
     runs-on: ubuntu-latest
+    env:
+      FIREFOX_VERSION: ${{ matrix.firefox }}
+      MOZ_HEADLESS: 1
+      DISPLAY: ":99.0"
     steps:
     - name: Install Go
       if: success()
@@ -63,6 +72,13 @@ jobs:
     
     - name: Code coverage
       run: |
+        export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
+        wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
+        mkdir -p $HOME/firefox
+        tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
+        $HOME/firefox/firefox --version
+        $HOME/firefox/firefox -marionette > /dev/null 2>&1 &
+        sleep 10
         export PATH=$PATH:$(go env GOPATH)/bin
         go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
     
