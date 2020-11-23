@@ -70,7 +70,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        path: github.com/njasm/marionette_client
+        path: src/github.com/njasm/marionette_client
     
     - name: Code coverage
       run: |
@@ -81,6 +81,10 @@ jobs:
         $HOME/firefox/firefox --version
         $HOME/firefox/firefox -marionette > /dev/null 2>&1 &
         sleep 10
+        pwd
+        ls -sl
+        echo $PATH
+        echo $GOPATH
         export PATH=$PATH:$(go env GOPATH)/bin
         go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
     
