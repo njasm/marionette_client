@@ -44,11 +44,10 @@ jobs:
         sleep 10
 
     - name: Confirm Marionette TCP port is open (ubuntu-latest)
-      #if: ${{ matrix.os == 'ubuntu-latest' }}
       run: netstat -ptln
 
     - name: Run Tests
-      run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+      run: go test -test.v -race -coverprofile=/tmp/coverage.txt -covermode=atomic
       
     - name: CodeCoverage - Convert coverage.txt to coverage.lcov
       if: success()
