@@ -1,12 +1,22 @@
 name: CI
 on:
-  push: {}
-  #push:
-  #  branches:
-  #    - master
+  push:
+    branches:
+      - master
+      - staging
+      - trying
   pull_request: {}
 
 jobs:
+  # TODO: drop it when GitHub supports its by itself
+  cancel-previous:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.4.1
+        with:
+          access_token: ${{ github.token }}
+
   linux:
     name: ubuntu
     strategy:
@@ -72,53 +82,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           parallel-finished: true
-
-#  coverage:
-#    name: coverage
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        firefox: [ "83.0" ]
-#    runs-on: ubuntu-latest
-#    env:
-#      FIREFOX_VERSION: ${{ matrix.firefox }}
-#      MOZ_HEADLESS: 1
-#      DISPLAY: ":99.0"
-#    steps:
-#    - name: Install Go
-#      if: success()
-#      uses: actions/setup-go@v2
-#      with:
-#        go-version: 1.15.x
-#
-#    - name: Checkout code
-#      uses: actions/checkout@v2
-#
-#    - name: Code coverage
-#      run: |
-#        export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
-#        wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
-#        mkdir -p $HOME/firefox
-#        tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
-#        $HOME/firefox/firefox --version
-#        $HOME/firefox/firefox -marionette > /dev/null 2>&1 &
-#        sleep 10
-#        pwd
-#        ls -sl
-#        go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
-#        ls -sl
-#
-#    - name: Convert coverage to lcov
-#      uses: jandelgado/gcov2lcov-action@v1.0.5
-#      with:
-#          infile: coverage.txt
-#          outfile: coverage.lcov
-#
-#    - name: Coveralls
-#      uses: coverallsapp/github-action@v1.0.1
-#      with:
-#          github-token: ${{ secrets.github_token }}
-#          path-to-lcov: coverage.lcov
 
   windows:
     name: windows
