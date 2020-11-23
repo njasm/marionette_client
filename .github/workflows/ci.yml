@@ -69,8 +69,6 @@ jobs:
     
     - name: Checkout code
       uses: actions/checkout@v2
-      with:
-        path: src/github.com/njasm/marionette_client
     
     - name: Code coverage
       run: |
@@ -83,10 +81,8 @@ jobs:
         sleep 10
         pwd
         ls -sl
-        echo $PATH
-        echo $GOPATH
-        export PATH=$PATH:$(go env GOPATH)/bin
         go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+        ls -sl
     
     - name: Convert coverage to lcov
       uses: jandelgado/gcov2lcov-action@v1.0.5
