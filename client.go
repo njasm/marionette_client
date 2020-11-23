@@ -340,23 +340,6 @@ func (c *Client) WindowSize() (rv *Size, err error) {
 	return
 }
 
-// SetWindowSize sets window size
-// Deprecated: Use SetWindowRect instead.
-func (c *Client) SetWindowSize(s *Size) (rv *Size, err error) {
-	r, err := c.transport.Send("setWindowSize", map[string]interface{}{"width": math.Floor(s.Width), "height": math.Floor(s.Height)})
-	if err != nil {
-		return nil, err
-	}
-
-	rv = new(Size)
-	err = json.Unmarshal([]byte(r.Value), &rv)
-	if err != nil {
-		return nil, err
-	}
-
-	return
-}
-
 // GetWindowRect gets window position and size
 func (c *Client) GetWindowRect() (rect *WindowRect, err error) {
 	r, err := c.transport.Send("WebDriver:GetWindowRect", nil)
