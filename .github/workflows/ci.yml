@@ -47,12 +47,12 @@ jobs:
       run: netstat -ptln
 
     - name: Run Tests
-      run: go test -test.v -race -coverprofile=$HOME/coverage.txt -covermode=atomic
+      run: go test -test.v -race -coverprofile=/home/runner/work/marionette_client/marionette_client/coverage.txt -covermode=atomic
     
     - name: Send coverage
       uses: shogo82148/actions-goveralls@v1.4.2
       with:
-        path-to-profile: $HOME/coverage.txt
+        path-to-profile: /home/runner/work/marionette_client/marionette_client/coverage.txt
         flag-name: Go-${{ matrix.go }}
         parallel: true
         
