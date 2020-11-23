@@ -47,21 +47,37 @@ jobs:
       run: netstat -ptln
 
     - name: Run Tests
-      run: go test -test.v -race -coverprofile=coverage.txt -covermode=count
-      
-    - name: CodeCoverage - Convert coverage.txt to coverage.lcov
-      if: success()
-      uses: jandelgado/gcov2lcov-action@v1.0.8
+      run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+    
+    - name: Send coverage
+      uses: shogo82148/actions-goveralls@v1.4.2
       with:
-        infile: coverage.txt
-        outfile: coverage.lcov
+        path-to-profile: coverage.txt
+        flag-name: Go-${{ matrix.go }}
+        parallel: true
         
-    - name: CodeCoverage - Upload to Coveralls
-      if: success()
-      uses: coverallsapp/github-action@v1.1.2
-      with:
-          github-token: ${{ secrets.github_token }}
-          path-to-lcov: coverage.lcov
+  # notifies that all test jobs are finished.
+  finish:
+    needs: linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: shogo82148/actions-goveralls@v1.4.2
+        with:
+          parallel-finished: true 
+
+#    - name: CodeCoverage - Convert coverage.txt to coverage.lcov
+#      if: success()
+#      uses: jandelgado/gcov2lcov-action@v1.0.8
+#      with:
+#        infile: coverage.txt
+#        outfile: coverage.lcov
+#        
+#    - name: CodeCoverage - Upload to Coveralls
+#      if: success()
+#      uses: coverallsapp/github-action@v1.1.2
+#      with:
+#          github-token: ${{ secrets.github_token }}
+#          path-to-lcov: coverage.lcov
 
   windows:
     name: windows
