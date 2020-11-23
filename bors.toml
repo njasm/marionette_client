@@ -1,0 +1,5 @@
+status = [
+  "CI",
+]
+delete_merged_branches = false
+timeout_sec = 3600
