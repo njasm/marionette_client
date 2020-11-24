@@ -93,8 +93,6 @@ func TestInit(t *testing.T) {
 		// test expected.go
 		t.Run("NotPresentTest", NotPresentTest)
 
-		t.Run("WindowSizeTest", WindowSizeTest)
-
 		t.Run("DeleteSessionTest", DeleteSessionTest)
 
 		// test QuitApplication
@@ -139,7 +137,7 @@ func GetPageTest(t *testing.T) {
 }
 
 func CurrentUrlTest(t *testing.T) {
-	url, err := client.CurrentUrl()
+	url, err := client.Url()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -378,18 +376,7 @@ func GetTitleTest(t *testing.T) {
 
 }
 
-//TODO: investigate findelement taking too long in ff 55 and 57
 func FindElementTest(t *testing.T) {
-
-	var version = client.browserVersion()
-	if len(version) > 2 {
-		i, err := strconv.ParseInt(version[0:2], 10, 0)
-		if len(version) > 2 && err == nil && i >= 55 {
-			t.Skip("Skipping FindElementTest for newer browsers")
-			return
-		}
-	}
-
 	navigateLocal("table.html")
 	element, err := client.FindElement(By(ID), "the-table")
 	if err != nil {
@@ -448,15 +435,6 @@ func FindElementTest(t *testing.T) {
 }
 
 func SendKeysTest(t *testing.T) {
-	var version = client.browserVersion()
-	if len(version) > 2 {
-		i, err := strconv.ParseInt(version[0:2], 10, 0)
-		if len(version) > 2 && err == nil && i == 55 {
-			t.Skip("Skipping SendKeysTest - test hangs")
-			return
-		}
-	}
-
 	navigateLocal("form.html")
 	e, err := client.FindElement(By(ID), "email")
 	if err != nil {
@@ -468,6 +446,7 @@ func SendKeysTest(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
+
 	/* FIXME: Text is not yet set. investigate.
 	if e.Text() != test {
 		t.Fatalf("Elements text is not: %#v, it's: %#v", test, e.Text())
@@ -521,18 +500,16 @@ func WindowHandlesTest(t *testing.T) {
 	}
 
 	// return to original window.
-	client.SwitchToWindow(w)
+	err = client.SwitchToWindow(w)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
 }
 
 func NavigatorMethodsTest(t *testing.T) {
-
-	//FIXME: failing
-	t.Skip("to be fixed")
-	return
-
 	client.SetContext(Context(CONTENT))
 	url1 := "https://www.google.pt/"
-	url2 := "https://www.bing.com/"
+	url2 := "https://www.mercedes-benz.com/en/"
 
 	client.Navigate(url1)
 	sleep := time.Duration(2) * time.Second
@@ -593,8 +570,8 @@ func PromptTest(t *testing.T) {
 
 func AlertTest(t *testing.T) {
 	//FIXME: failling test, to be fixed on the next passes
-	t.Skip("Failing test")
-	return
+	//t.Skip("Failing test")
+	//return
 
 	navigateLocal("ul.html")
 	var text string = "marionette is cool or what?"
@@ -616,46 +593,15 @@ func AlertTest(t *testing.T) {
 
 	time.Sleep(time.Duration(5) * time.Second)
 
-	err = client.AcceptDialog()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
+	// FIXME: currently after the call to client:TextFromDialog()
+	// the dialog apparently is closed by the browser and the call to the below AcceptDialog() method
+	// result in an error "{"error": "no such alert", message: "", stacktrace: ...}"
+	//err = client.AcceptDialog()
+	//if err != nil {
+	//	t.Fatalf("%#v", err)
+	//}
 
 	t.Log(r.Value)
-}
-
-// skip this test because command is not existing anymore
-func WindowSizeTest(t *testing.T) {
-	var version = client.browserVersion()
-	if len(version) > 2 {
-		i, err := strconv.ParseInt(version[0:2], 10, 0)
-		if len(version) > 2 && err == nil && i >= 55 {
-			t.Skip("Skipping WindowSizeTest for newer browsers - syntax changed")
-			return
-		}
-	}
-
-	size, err := client.WindowSize()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	t.Logf("w: %v, h: %v", size.Width, size.Height)
-
-	/* FIXME: SetWindowSize hangs on travis ci with XVFB start on before script. tests work localy
-	newSize := &Size{Width: size.Width / 2, Height: size.Height / 2}
-	rv, err := client.SetWindowSize(newSize)
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	t.Logf("new w: %v, new h: %v", rv.Width, rv.Height)
-
-	err = client.MaximizeWindow()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-	*/
 }
 
 func WindowRectTest(t *testing.T) {

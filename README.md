@@ -27,115 +27,116 @@ Incomplete list. Check the tests for more examples.
 
 #### Instantiate the client
 ```go
-	client := NewClient()
-	client.Connect("", 0) // this are the default marionette values for hostname, and port 
-	client.NewSession("", nil) // let marionette generate the Session ID with it's default Capabilities
+client := NewClient()
+// this are the default marionette values for hostname, and port 
+client.Connect("", 0)
+// let marionette generate the Session ID with it's default Capabilities
+client.NewSession("", nil) 
 	
 ```
 
 #### Navigate to page
 ```go
-	client.Navigate("http://www.google.com/")
+client.Navigate("http://www.google.com/")
 ```
 
 #### Change Contexts
 ```go
-    client.SetContext(Context(CHROME))
-    //or
-	client.SetContext(Context(CONTENT))
+client.SetContext(Context(CHROME))
+// or
+client.SetContext(Context(CONTENT))
 	
 ```
 
 #### Find Element
 ```go
-	element, err := client.FindElement(By(ID), "html-element-id-attribute")
-	if err != nil {
-		// handle your errors
-	}
+element, err := client.FindElement(By(ID), "html-element-id-attribute")
+if err != nil {
+	// handle your errors
+}
 
-    // else
-	println(element.Id())
-	println(element.Enabled())
-	println(element.Selected())
-	println(element.Displayed())
-	println(element.TagName())
-	println(element.Text())
-	println(element.Attribute("id"))
-	println(element.CssValue("text-decoration"))
+// else
+println(element.Id())
+println(element.Enabled())
+println(element.Selected())
+println(element.Displayed())
+println(element.TagName())
+println(element.Text())
+println(element.Attribute("id"))
+println(element.CssValue("text-decoration"))
 	
-	// width, height, x and y
-	rect, err := element.Rect()
-	if err != nil {
-        // handle your errors
-	}
+// width, height, x and y
+rect, err := element.Rect()
+if err != nil {
+    // handle your errors
+}
 
-	fmt.Printf("%#v", rect)
+fmt.Printf("%#v", rect)
 	
-	// size
-	w, h, err := element.Size()
-	if err != nil {
-		// handle your errors
-	}
-	
-    fmt.Printf("width: %f, height: %f", w, h)
-    
-	//location
-	x, y, err := element.Location()
-	if err != nil {
-	    // handle your errors
-	}
-	
-	fmt.Printf("x: %v, y: %v", x, y)
+// size
+w, h, err := element.Size()
+if err != nil {
+	// handle your errors
+}
+
+fmt.Printf("width: %f, height: %f", w, h)
+
+//location
+x, y, err := element.Location()
+if err != nil {
+    // handle your errors
+}
+
+fmt.Printf("x: %v, y: %v", x, y)
 ```
 
 #### Find Elements
 ```go
-	collection, err := element.FindElements(By(TAG_NAME), "li")
-	if err != nil {
-		// handle your errors
-	}
+collection, err := element.FindElements(By(TAG_NAME), "li")
+if err != nil {
+	// handle your errors
+}
 
-    // else
-    for var e := range collection {
-    	println(e.Id())
-    	println(e.Enabled())
-    	println(e.Selected())
-    	println(e.Displayed())
-    	println(e.TagName())
-    	println(e.Text())
-    	println(e.Attribute("id"))
-    	println(e.CssValue("text-decoration"))
-    	e.Click()
-    }
+// else
+for var e := range collection {
+	println(e.Id())
+   	println(e.Enabled())
+   	println(e.Selected())
+   	println(e.Displayed())
+   	println(e.TagName())
+   	println(e.Text())
+   	println(e.Attribute("id"))
+   	println(e.CssValue("text-decoration"))
+   	e.Click()
+}
 ```
 
 #### Execute JS Script
 ```go
-	script := "function mySum(a, b) { return a + b; }; return mySum(arguments[0], arguments[1]);"
-	args := []int{1, 3} // arguments to be passed to the function
-	timeout := 1000     // milliseconds
-	sandbox := false    // new Sandbox
-	r, err := client.ExecuteScript(script, args, timeout, sandbox)
-	if err == nil {
-	    println(r.Value)    // 4 
-	}
+script := "function mySum(a, b) { return a + b; }; return mySum(arguments[0], arguments[1]);"
+args := []int{1, 3} // arguments to be passed to the function
+timeout := 1000     // milliseconds
+sandbox := false    // new Sandbox
+r, err := client.ExecuteScript(script, args, timeout, sandbox)
+if err == nil {
+    println(r.Value) // 4 
+}
 ```
 
 #### Wait(), Until() Expected condition is true.
 ```go
-	client.Navigate("http://www.w3schools.com/ajax/tryit.asp?filename=tryajax_get")
-	
-	timeout := time.Duration(10) * time.Second
-	condition := ElementIsPresent(By(ID), "stackH")
-	ok, webElement, err := Wait(client).For(timeout).Until(condition)
+client.Navigate("http://www.w3schools.com/ajax/tryit.asp?filename=tryajax_get")
 
-	if !ok {
-		log.Printf("%#v", err)
-		// do your error stuff
-		return
-	}
+timeout := time.Duration(10) * time.Second
+condition := ElementIsPresent(By(ID), "stackH")
+ok, webElement, err := Wait(client).For(timeout).Until(condition)
 
-    // cool, we've the element, let's click on it!
-	webElement.Click()
-	
+if !ok {
+	log.Printf("%#v", err)
+	// do your error stuff
+	return
+}
+
+// cool, we've the element, let's click on it!
+webElement.Click()
 ```

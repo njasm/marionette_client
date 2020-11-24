@@ -1,5 +1,5 @@
 status = [
-  "CI",
+  "ci-pass",
 ]
 delete_merged_branches = false
 timeout_sec = 1800
