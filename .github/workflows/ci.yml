@@ -161,3 +161,11 @@ jobs:
           sleep 5
           netstat -p tcp -van | grep LISTEN
           go test -test.v -race -covermode=atomic
+
+  ci-pass:
+    name: 'ci-pass'
+    runs-on: "ubuntu-latest"
+    needs: [linux, windows, osx]
+    steps:
+      - name: "Merge into master"
+        run: exit 0
