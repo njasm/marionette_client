@@ -2,6 +2,7 @@ package marionette_client
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 type Point struct {
@@ -112,23 +113,19 @@ func (e *WebElement) Screenshot() (string, error) {
 
 func (e *WebElement) UnmarshalJSON(data []byte) error {
 	var d map[string]map[string]string
-	err := json.Unmarshal([]byte(data), &d)
+	err := json.Unmarshal(data, &d)
 	if err != nil {
-		// firefox 53.0.3 - sometimes the value object does not bring the WEBDRIVER_ELEMENT_KEY, but the ID itself
-		// of the actual element, ie. when calling GetActiveFrame(), for that reason were giving unmashal one more
-		// chance before returning an error..
-		var d map[string]string
-		err := json.Unmarshal([]byte(data), &d)
-		if err != nil {
-			return err
-		}
+		return err
+	}
 
-		e.id = d["value"]
-
+	if newId, ok := d["value"][WEBDRIVER_ELEMENT_KEY]; ok {
+		e.id = newId
 		return nil
 	}
 
-	e.id = d["value"][WEBDRIVER_ELEMENT_KEY]
-
-	return nil
+	return DriverError{
+		ErrorType: "WebDriverElementKey",
+		Message: fmt.Sprintf("key %v expected in response but not found", WEBDRIVER_ELEMENT_KEY),
+		Stacktrace: nil,
+	}
 }
