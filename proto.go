@@ -9,9 +9,6 @@ import (
 )
 
 func NewDecoderEncoder(protoVersion int32) (DecoderEncoder, error) {
-	//if protoVersion == MARIONETTE_PROTOCOL_V2 {
-	//	return makeProto2Response(buf)
-	//}
 	if protoVersion == MARIONETTE_PROTOCOL_V3 {
 		return ProtoV3DecoderEncoder{}, nil
 	}
@@ -65,7 +62,7 @@ func (e ProtoV3DecoderEncoder) Decode(buf []byte, r *Response) error {
 	//Debug only
 	if RunningInDebugMode {
 		if len(buf) >= 512 {
-			log.Println(string(buf)[0:512] + " - END - " + string(buf)[len(buf)-512:])
+			log.Println(string(buf)[0:256] + " - END - " + string(buf)[len(buf)-256:])
 		} else {
 			log.Println(string(buf))
 		}
