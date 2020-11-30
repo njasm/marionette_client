@@ -415,7 +415,7 @@ func SendKeysTest(t *testing.T) {
 	}
 	time.Sleep(time.Second * 10)
 	*/
-	
+
 	e.Clear()
 	if e.Text() != "" {
 		t.Fatalf("Elements text should be empty. found: %#v", e.Text())
