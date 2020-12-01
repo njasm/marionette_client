@@ -45,7 +45,7 @@ func TestInit(t *testing.T) {
 		t.Run("NewSessionTest", NewSessionTest)
 		t.Run("GetSessionIDTest", GetSessionIDTest)
 		t.Run("GetPageTest", GetPageTest)
-		t.Run("CurrentUrlTest", CurrentUrlTest)
+		t.Run("UrlTest", UrlTest)
 
 		t.Run("GetCookiesTest", GetCookiesTest)
 		t.Run("GetCookieTest", GetCookieTest)
@@ -133,7 +133,7 @@ func GetPageTest(t *testing.T) {
 	t.Log(r.Value)
 }
 
-func CurrentUrlTest(t *testing.T) {
+func UrlTest(t *testing.T) {
 	url, err := client.Url()
 	if err != nil {
 		t.Fatalf("%#v", err)
@@ -234,15 +234,6 @@ func GetPageSourceTest(t *testing.T) {
 }
 
 func SetScriptTimoutTest(t *testing.T) {
-	var version = client.browserVersion()
-	if len(version) > 2 {
-		i, err := strconv.ParseInt(version[0:2], 10, 0)
-		if len(version) > 2 && err == nil && i >= 55 {
-			t.Skip("Skipping SetScriptTimoutTest for newer browsers - syntax changed")
-			return
-		}
-	}
-
 	r, err := client.SetScriptTimeout(TIMEOUT)
 	if err != nil {
 		t.Fatalf("%#v", err)
@@ -252,16 +243,7 @@ func SetScriptTimoutTest(t *testing.T) {
 }
 
 func SetPageTimoutTest(t *testing.T) {
-	var version = client.browserVersion()
-	if len(version) > 2 {
-		i, err := strconv.ParseInt(version[0:2], 10, 0)
-		if len(version) > 2 && err == nil && i >= 55 {
-			t.Skip("Skipping SetPageTimoutTest for newer browsers - syntax changed")
-			return
-		}
-	}
-
-	r, err := client.SetPageTimeout(TIMEOUT)
+	r, err := client.SetPageLoadTimeout(TIMEOUT)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -270,16 +252,7 @@ func SetPageTimoutTest(t *testing.T) {
 }
 
 func SetSearchTimoutTest(t *testing.T) {
-	var version = client.browserVersion()
-	if len(version) > 2 {
-		i, err := strconv.ParseInt(version[0:2], 10, 0)
-		if len(version) > 2 && err == nil && i >= 55 {
-			t.Skip("Skipping SetPageTimoutTest for newer browsers - syntax changed")
-			return
-		}
-	}
-
-	r, err := client.SetSearchTimeout(TIMEOUT)
+	r, err := client.SetImplicitTimout(TIMEOUT)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
