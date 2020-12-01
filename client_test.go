@@ -486,7 +486,7 @@ func NavigatorMethodsTest(t *testing.T) {
 	client.Refresh()
 	time.Sleep(sleep)
 
-	firstUrl, err := client.CurrentUrl()
+	firstUrl, err := client.Url()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -496,7 +496,7 @@ func NavigatorMethodsTest(t *testing.T) {
 	}
 
 	client.Forward()
-	secondUrl, err := client.CurrentUrl()
+	secondUrl, err := client.Url()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
