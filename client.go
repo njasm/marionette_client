@@ -97,32 +97,38 @@ func (c *Client) DeleteSession() error {
 }
 
 // SetScriptTimeout Set the timeout for asynchronous script execution.
-// Deprecated
 func (c *Client) SetScriptTimeout(milliseconds int) (*Response, error) {
-	return timeouts(&c.transport, "script", milliseconds)
+	data := map[string]int{ "script": milliseconds}
+	return c.SetTimeouts(data)
 }
 
-// SetSearchTimeout Set timeout for searching for elements.
-// Deprecated
-func (c *Client) SetSearchTimeout(milliseconds int) (*Response, error) {
-	return timeouts(&c.transport, "implicit", milliseconds)
+// SetImplicitTimout Set timeout for searching for elements.
+func (c *Client) SetImplicitTimout(milliseconds int) (*Response, error) {
+	data := map[string]int{ "implicit": milliseconds}
+	return c.SetTimeouts(data)
 }
 
-// SetPageTimeout Set timeout for page loading.
-// Deprecated
-func (c *Client) SetPageTimeout(milliseconds int) (*Response, error) {
-	return timeouts(&c.transport, "pageLoad", milliseconds)
+// SetPageLoadTimeout Set timeout for page loading.
+func (c *Client) SetPageLoadTimeout(milliseconds int) (*Response, error) {
+	data := map[string]int{ "pageLoad": milliseconds}
+	return c.SetTimeouts(data)
 }
 
-// Set timeout for page loading, searching, and scripts.
+// <h4>Timeouts object</h4>
 //
-// param string type
-//     Type of timeout.
-// param number ms
-//     Timeout in milliseconds.
-// Deprecated
-func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, error) {
-	r, err := (*transport).Send("timeouts", map[string]interface{}{"type": typ, "ms": milliseconds})
+// <dl>
+// <dt><code>script</code> (number)
+// <dd>Determines when to interrupt a script that is being evaluates.
+//
+// <dt><code>pageLoad</code> (number)
+// <dd>Provides the timeout limit used to interrupt navigation of the
+//  browsing context.
+//
+// <dt><code>implicit</code> (number)
+// <dd>Gives the timeout of when to abort when locating an element.
+// </dl>
+func (c *Client) SetTimeouts(data map[string]int) (*Response, error) {
+	r, err := c.transport.Send("WebDriver:SetTimeouts", data)
 	if err != nil {
 		return nil, err
 	}
