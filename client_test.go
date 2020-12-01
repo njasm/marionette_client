@@ -53,9 +53,6 @@ func TestInit(t *testing.T) {
 		t.Run("GetSessionCapabilitiesTest", GetSessionCapabilitiesTest)
 		t.Run("ScreenshotTest", ScreenshotTest)
 
-		t.Run("LogTest", LogTest)
-		t.Run("GetLogsTest", GetLogsTest)
-
 		t.Run("SetContextTest", SetContextTest)
 		t.Run("GetContextTest", GetContextTest)
 
@@ -93,11 +90,11 @@ func TestInit(t *testing.T) {
 		// test expected.go
 		t.Run("NotPresentTest", NotPresentTest)
 
-		t.Run("DeleteSessionTest", DeleteSessionTest)
+		//t.Run("DeleteSessionTest", DeleteSessionTest)
 
 		// test QuitApplication
-		t.Run("NewSessionTest", NewSessionTest)
-		t.Run("QuitTest", QuitTest)
+		//t.Run("NewSessionTest", NewSessionTest)
+		//t.Run("QuitTest", QuitTest)
 	})
 }
 
@@ -193,42 +190,6 @@ func ScreenshotTest(t *testing.T) {
 	//this print ise a problem for travis builds, since it can surpass the 4 MB of log size.
 	// don't print the base64 encoded image.
 	//println(base64encoded)
-}
-
-// working
-func LogTest(t *testing.T) {
-	var version = client.browserVersion()
-	if len(version) > 2 {
-		i, err := strconv.ParseInt(version[0:2], 10, 0)
-		if len(version) > 2 && err == nil && i >= 55 {
-			t.Skip("Skipping LogTest for newer browsers - command removed")
-			return
-		}
-	}
-
-	r, err := client.Log("message testing", "warning")
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	t.Log(r.Value)
-}
-
-func GetLogsTest(t *testing.T) {
-	var version = client.browserVersion()
-	if len(version) > 2 {
-		i, err := strconv.ParseInt(version[0:2], 10, 0)
-		if len(version) > 2 && err == nil && i >= 55 {
-			t.Skip("Skipping GetLogsTest for newer browsers - command removed")
-			return
-		}
-	}
-	r, err := client.Logs()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	t.Log(r.Value)
 }
 
 func SetContextTest(t *testing.T) {
@@ -448,10 +409,13 @@ func SendKeysTest(t *testing.T) {
 	}
 
 	/* FIXME: Text is not yet set. investigate.
+	time.Sleep(time.Second * 5)
 	if e.Text() != test {
 		t.Fatalf("Elements text is not: %#v, it's: %#v", test, e.Text())
 	}
+	time.Sleep(time.Second * 10)
 	*/
+
 	e.Clear()
 	if e.Text() != "" {
 		t.Fatalf("Elements text should be empty. found: %#v", e.Text())
@@ -522,7 +486,7 @@ func NavigatorMethodsTest(t *testing.T) {
 	client.Refresh()
 	time.Sleep(sleep)
 
-	firstUrl, err := client.CurrentUrl()
+	firstUrl, err := client.Url()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -532,7 +496,7 @@ func NavigatorMethodsTest(t *testing.T) {
 	}
 
 	client.Forward()
-	secondUrl, err := client.CurrentUrl()
+	secondUrl, err := client.Url()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -560,7 +524,7 @@ func PromptTest(t *testing.T) {
 
 	time.Sleep(time.Duration(5) * time.Second)
 
-	err = client.DismissDialog()
+	err = client.AcceptDialog()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -569,10 +533,6 @@ func PromptTest(t *testing.T) {
 }
 
 func AlertTest(t *testing.T) {
-	//FIXME: failling test, to be fixed on the next passes
-	//t.Skip("Failing test")
-	//return
-
 	navigateLocal("ul.html")
 	var text string = "marionette is cool or what?"
 	var script string = "alert('" + text + "');"
@@ -582,7 +542,7 @@ func AlertTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	textFromdialog, err := client.TextFromDialog()
+	textFromdialog, err := client.TextFromAlert()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -593,13 +553,18 @@ func AlertTest(t *testing.T) {
 
 	time.Sleep(time.Duration(5) * time.Second)
 
-	// FIXME: currently after the call to client:TextFromDialog()
-	// the dialog apparently is closed by the browser and the call to the below AcceptDialog() method
-	// result in an error "{"error": "no such alert", message: "", stacktrace: ...}"
-	//err = client.AcceptDialog()
-	//if err != nil {
-	//	t.Fatalf("%#v", err)
-	//}
+	err = client.AcceptDialog()
+	if err != nil {
+		var version = client.browserVersion()
+		if len(version) > 2 {
+			major, err := strconv.ParseInt(version[0:2], 10, 0)
+			if err == nil && major <= 83 {
+				t.Skip("Skipping AcceptDialog for spurious failures")
+				return
+			}
+		}
+		t.Fatalf("%#v", err)
+	}
 
 	t.Log(r.Value)
 }

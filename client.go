@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
-	"strconv"
 	"strings"
 )
 
@@ -223,28 +222,6 @@ func (c *Client) Forward() error {
 	return nil
 }
 
-// Log Accepts user defined log-level.
-// Deprecated
-func (c *Client) Log(message string, level string) (*Response, error) {
-	response, err := c.transport.Send("log", map[string]string{"value": message, "level": level})
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
-}
-
-// Logs Return all logged messages.
-// Deprecated
-func (c *Client) Logs() (*Response, error) {
-	response, err := c.transport.Send("getLogs", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return response, nil
-}
-
 // SetContext Sets the context of the subsequent commands to be either "chrome" or "content".
 // Must be one of "chrome" or "content" only.
 func (c *Client) SetContext(value Context) (*Response, error) {
@@ -321,23 +298,6 @@ func (c *Client) SwitchToWindow(name string) error {
 	}
 
 	return nil
-}
-
-// WindowSize returns the window size
-// Deprecated: Use GetWindowRect instead
-func (c *Client) WindowSize() (rv *Size, err error) {
-	r, err := c.transport.Send("getWindowSize", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	rv = new(Size)
-	err = json.Unmarshal([]byte(r.Value), &rv)
-	if err != nil {
-		return nil, err
-	}
-
-	return
 }
 
 // GetWindowRect gets window position and size
@@ -718,16 +678,7 @@ func (c *Client) DismissDialog() error {
 
 // AcceptDialog accepts the dialog - like clicking Ok/Yes
 func (c *Client) AcceptDialog() error {
-	command := "WebDriver:AcceptAlert"
-	var version = c.browserVersion()
-	if len(version) > 2 {
-		i, err := strconv.ParseInt(version[0:2], 10, 0)
-		if err == nil && i < 60 {
-			command = "WebDriver:AcceptDialog"
-		}
-	}
-
-	_, err := c.transport.Send(command, nil)
+	_, err := c.transport.Send("WebDriver:AcceptAlert", nil)
 	if err != nil {
 		return err
 	}
@@ -735,9 +686,9 @@ func (c *Client) AcceptDialog() error {
 	return nil
 }
 
-// TextFromDialog gets text from the dialog
-func (c *Client) TextFromDialog() (string, error) {
-	r, err := c.transport.Send("WebDriver:GetAlertText", nil)
+// TextFromAlert gets text from the dialog
+func (c *Client) TextFromAlert() (string, error) {
+	r, err := c.transport.Send("WebDriver:GetAlertText", map[string]interface{}{"key": "value"})
 	if err != nil {
 		return "", err
 	}
