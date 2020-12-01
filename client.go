@@ -74,11 +74,7 @@ func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, err
 
 	response, err := c.transport.Send("WebDriver:NewSession", data)
 	if err != nil {
-		// fallback to old newSession command on error
-		response, err = c.transport.Send("newSession", data)
-		if err != nil {
-			return nil, err
-		}
+		return nil, err
 	}
 
 	err = json.Unmarshal([]byte(response.Value), &c)
@@ -138,12 +134,6 @@ func timeouts(transport *Transporter, typ string, milliseconds int) (*Response, 
 // NAVIGATION //
 ////////////////
 
-// Get deprecated use Navigate()
-// Deprecated
-func (c *Client) Get(url string) (*Response, error) {
-	return c.Navigate(url)
-}
-
 // Navigate open url
 func (c *Client) Navigate(url string) (*Response, error) {
 	r, err := c.transport.Send("WebDriver:Navigate", map[string]string{"url": url})
@@ -168,12 +158,6 @@ func (c *Client) Title() (string, error) {
 	}
 
 	return d["value"], nil
-}
-
-// CurrentUrl deprecated, use Url() instead
-// Deprecated
-func (c *Client) CurrentUrl() (string, error) {
-	return c.Url()
 }
 
 // Url get current url
@@ -348,22 +332,6 @@ func (c *Client) CloseWindow() (*Response, error) {
 ////////////
 // FRAMES //
 ////////////
-
-// ActiveFrame get active frame
-func (c *Client) ActiveFrame() (*WebElement, error) {
-	r, err := c.transport.Send("WebDriver:GetActiveFrame", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	e := &WebElement{c: c}
-	err = json.Unmarshal([]byte(r.Value), e)
-	if err != nil {
-		return nil, err
-	}
-
-	return e, nil
-}
 
 // SwitchToFrame switch to frame - strategies: By(ID), By(NAME) or name only.
 func (c *Client) SwitchToFrame(by By, value string) error {
@@ -666,8 +634,8 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 // DIALOGS //
 /////////////
 
-// DismissDialog dismisses the dialog - like clicking No/Cancel
-func (c *Client) DismissDialog() error {
+// DismissAlert dismisses the dialog - like clicking No/Cancel
+func (c *Client) DismissAlert() error {
 	_, err := c.transport.Send("WebDriver:DismissAlert", nil)
 	if err != nil {
 		return err
@@ -676,8 +644,8 @@ func (c *Client) DismissDialog() error {
 	return nil
 }
 
-// AcceptDialog accepts the dialog - like clicking Ok/Yes
-func (c *Client) AcceptDialog() error {
+// AcceptAlert accepts the dialog - like clicking Ok/Yes
+func (c *Client) AcceptAlert() error {
 	_, err := c.transport.Send("WebDriver:AcceptAlert", nil)
 	if err != nil {
 		return err
@@ -699,14 +667,8 @@ func (c *Client) TextFromAlert() (string, error) {
 	return d["value"], nil
 }
 
-// SendKeysToDialog sends text to a dialog
-func (c *Client) SendKeysToDialog(keys string) error {
-	//slice := make([]string, 0)
-	//for _, v := range keys {
-	//	slice = append(slice, fmt.Sprintf("%c", v))
-	//}
-	//
-	//_, err := c.transport.Send("sendKeysToDialog", map[string]interface{}{"value": slice})
+// SendAlertText sends text to a dialog
+func (c *Client) SendAlertText(keys string) error {
 	_, err := c.transport.Send("WebDriver:SendAlertText", map[string]interface{}{"text": keys})
 	if err != nil {
 		return err
@@ -719,23 +681,9 @@ func (c *Client) SendKeysToDialog(keys string) error {
 // DISPOSE TEAR DOWN //
 ///////////////////////
 
-// QuitApplication deprecated use Quit().
-func (c *Client) QuitApplication() (*Response, error) {
-	return c.Quit()
-}
-
 // Quit quits the session and request browser process to terminate.
 func (c *Client) Quit() (*Response, error) {
-	var r *Response = new(Response)
-	var err error
-
-	var version = c.browserVersion()
-	if len(version) > 2 && version[0:2] == "53" {
-		r, err = c.transport.Send("quitApplication", map[string]string{"flags": "eForceQuit"})
-	} else {
-		r, err = c.transport.Send("Marionette:Quit", map[string][]string{"flags": {"eForceQuit"}})
-	}
-
+	r, err := c.transport.Send("Marionette:Quit", map[string][]string{"flags": {"eForceQuit"}})
 	if err != nil {
 		return nil, err
 	}

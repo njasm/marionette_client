@@ -90,11 +90,11 @@ func TestInit(t *testing.T) {
 		// test expected.go
 		t.Run("NotPresentTest", NotPresentTest)
 
-		//t.Run("DeleteSessionTest", DeleteSessionTest)
+		t.Run("DeleteSessionTest", DeleteSessionTest)
 
 		// test QuitApplication
-		//t.Run("NewSessionTest", NewSessionTest)
-		//t.Run("QuitTest", QuitTest)
+		t.Run("NewSessionTest", NewSessionTest)
+		t.Run("QuitTest", QuitTest)
 	})
 }
 
@@ -517,14 +517,14 @@ func PromptTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	err = client.SendKeysToDialog("yeah!")
+	err = client.SendAlertText("yeah!")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
 	time.Sleep(time.Duration(5) * time.Second)
 
-	err = client.AcceptDialog()
+	err = client.AcceptAlert()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -553,13 +553,13 @@ func AlertTest(t *testing.T) {
 
 	time.Sleep(time.Duration(5) * time.Second)
 
-	err = client.AcceptDialog()
+	err = client.AcceptAlert()
 	if err != nil {
 		var version = client.browserVersion()
 		if len(version) > 2 {
 			major, err := strconv.ParseInt(version[0:2], 10, 0)
 			if err == nil && major <= 83 {
-				t.Skip("Skipping AcceptDialog for spurious failures")
+				t.Skip("Skipping AcceptAlert for spurious failures")
 				return
 			}
 		}
@@ -585,6 +585,11 @@ func WindowRectTest(t *testing.T) {
 	if expectedRect.Width != actualRect.Width || expectedRect.Height != actualRect.Height {
 		t.Fatalf("Size differs. expected: %v, actual: %v", expectedRect, *actualRect)
 	}
+
+	err = client.MaximizeWindow()
+	if err != nil {
+		t.Fatal("Unable to Maximize window")
+	}
 }
 
 // working - if called before other tests all hell will break loose
@@ -606,7 +611,7 @@ func DeleteSessionTest(t *testing.T) {
 }
 
 func QuitTest(t *testing.T) {
-	r, err := client.QuitApplication()
+	r, err := client.Quit()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
