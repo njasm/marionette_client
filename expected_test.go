@@ -45,19 +45,6 @@ func ElementIsPresentFalseTest(t *testing.T) {
 
 // required test in sequential main client test: client_test.go
 func NotPresentTest(t *testing.T) {
-	//FIXME: failing test
-	t.Skip("Failing test")
-	return
-
-	client.SwitchToParentFrame()
-	r, err := client.ActiveFrame()
-
-	if err != nil {
-		t.Fatalf("Getting Active Frame Error: %#v", err)
-	}
-
-	t.Log(r.id)
-
 	timeout := time.Duration(10) * time.Second
 	condition := ElementIsNotPresent(By(ID), "non-existing-element")
 	ok, _, _ := Wait(client).For(timeout).Until(condition)
