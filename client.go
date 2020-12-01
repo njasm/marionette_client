@@ -686,9 +686,9 @@ func (c *Client) AcceptDialog() error {
 	return nil
 }
 
-// TextFromDialog gets text from the dialog
-func (c *Client) TextFromDialog() (string, error) {
-	r, err := c.transport.Send("WebDriver:GetAlertText", nil)
+// TextFromAlert gets text from the dialog
+func (c *Client) TextFromAlert() (string, error) {
+	r, err := c.transport.Send("WebDriver:GetAlertText", map[string]interface{}{"key": "value"})
 	if err != nil {
 		return "", err
 	}
