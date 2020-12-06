@@ -110,7 +110,7 @@ jobs:
         run: go version
 
       - name: Install Firefox
-        run: choco install Firefox --version=${{ matrix.firefox }} --params "/NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
+        run: choco install Firefox --version=${{ matrix.firefox }} --params "/NoMaintenanceService /RemoveDistributionDir /NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
 
       - name: Test Firefox
         run: |
