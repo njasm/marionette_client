@@ -47,6 +47,7 @@ func TestInit(t *testing.T) {
 		t.Run("GetPageTest", GetPageTest)
 		t.Run("UrlTest", UrlTest)
 
+		t.Run("AddCookiesTest", AddCookieTest)
 		t.Run("GetCookiesTest", GetCookiesTest)
 		t.Run("GetCookieTest", GetCookieTest)
 
@@ -144,9 +145,13 @@ func UrlTest(t *testing.T) {
 	}
 
 }
+func AddCookieTest(t *testing.T) {
+	c := Cookie{
+		Name: "test-cookie",
+		Value: "test-value",
+	}
 
-func GetCookiesTest(t *testing.T) {
-	r, err := client.Cookies()
+	r, err := client.AddCookie(c)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -154,8 +159,18 @@ func GetCookiesTest(t *testing.T) {
 	t.Log(r.Value)
 }
 
+func GetCookiesTest(t *testing.T) {
+	r, err := client.Cookies()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log(r)
+}
+
 func GetCookieTest(t *testing.T) {
-	r, err := client.Cookie("abolaCookie")
+	//r, err := client.Cookie("abolaCookie")
+	r, err := client.Cookie("test-cookie")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
