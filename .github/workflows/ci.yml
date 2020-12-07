@@ -109,9 +109,6 @@ jobs:
       - name: Go Version
         run: go version
 
-      - name: Uninstall Previous Firefox
-        run: where firefox.exe
-
       - name: Install Firefox
         run: choco install Firefox --force --version=${{ matrix.firefox }} --params "/NoMaintenanceService /RemoveDistributionDir /NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
 
