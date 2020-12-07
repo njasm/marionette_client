@@ -372,9 +372,9 @@ func (c *Client) SwitchToParentFrame() error {
 // COOKIES //
 /////////////
 
-// Cookies Get all cookies
-func (c *Client) Cookies() (*Response, error) {
-	r, err := c.transport.Send("WebDriver:GetCookies", nil)
+// Add Cookies
+func (c *Client) AddCookie(cookie Cookie) (*Response, error) {
+	r, err := c.transport.Send("WebDriver:AddCookie", map[string]interface{}{"cookie": cookie})
 	if err != nil {
 		return nil, err
 	}
@@ -382,14 +382,30 @@ func (c *Client) Cookies() (*Response, error) {
 	return r, nil
 }
 
+// Cookies Get all cookies
+func (c *Client) Cookies() ([]Cookie, error) {
+	r, err := c.transport.Send("WebDriver:GetCookies", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var cookies []Cookie
+	_ = json.Unmarshal([]byte(r.Value), &cookies)
+
+	return cookies, nil
+}
+
 // Cookie Get cookie by name
-func (c *Client) Cookie(name string) (*Response, error) {
+func (c *Client) Cookie(name string) (*Cookie, error) {
 	r, err := c.transport.Send("WebDriver:GetCookies", map[string]interface{}{"name": name})
 	if err != nil {
 		return nil, err
 	}
 
-	return r, nil
+	var cookie Cookie
+	_ = json.Unmarshal([]byte(r.Value), &cookie)
+
+	return &cookie, nil
 }
 
 //////////////////
