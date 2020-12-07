@@ -110,7 +110,7 @@ jobs:
         run: go version
 
       - name: Uninstall Previous Firefox
-        run: C:\Program Files\Mozilla Firefox\uninstall\helper.exe
+        run: where firefox.exe
 
       - name: Install Firefox
         run: choco install Firefox --version=${{ matrix.firefox }} --params "/NoMaintenanceService /RemoveDistributionDir /NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
