@@ -372,7 +372,7 @@ func (c *Client) SwitchToParentFrame() error {
 // COOKIES //
 /////////////
 
-// Add Cookies
+// AddCookie Adds a cookie
 func (c *Client) AddCookie(cookie Cookie) (*Response, error) {
 	r, err := c.transport.Send("WebDriver:AddCookie", map[string]interface{}{"cookie": cookie})
 	if err != nil {
@@ -382,8 +382,8 @@ func (c *Client) AddCookie(cookie Cookie) (*Response, error) {
 	return r, nil
 }
 
-// Cookies Get all cookies
-func (c *Client) Cookies() ([]Cookie, error) {
+// GetCookies Get all cookies
+func (c *Client) GetCookies() ([]Cookie, error) {
 	r, err := c.transport.Send("WebDriver:GetCookies", nil)
 	if err != nil {
 		return nil, err
@@ -395,17 +395,16 @@ func (c *Client) Cookies() ([]Cookie, error) {
 	return cookies, nil
 }
 
-// Cookie Get cookie by name
-func (c *Client) Cookie(name string) (*Cookie, error) {
-	r, err := c.transport.Send("WebDriver:GetCookies", map[string]interface{}{"name": name})
-	if err != nil {
-		return nil, err
-	}
+// DeleteCookie Deletes cookie by name
+func (c *Client) DeleteCookie(name string) (error, error) {
+	_, err := c.transport.Send("WebDriver:DeleteCookie", map[string]interface{}{"name": name})
+	return err, nil
+}
 
-	var cookie Cookie
-	_ = json.Unmarshal([]byte(r.Value), &cookie)
-
-	return &cookie, nil
+// DeleteAllCookies Delete all cookies
+func (c *Client) DeleteAllCookies() error {
+	_, err := c.transport.Send("WebDriver:DeleteAllCookies", nil)
+	return err
 }
 
 //////////////////
