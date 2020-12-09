@@ -49,7 +49,8 @@ func TestInit(t *testing.T) {
 
 		t.Run("AddCookiesTest", AddCookieTest)
 		t.Run("GetCookiesTest", GetCookiesTest)
-		t.Run("GetCookieTest", GetCookieTest)
+		t.Run("DeleteCookieTest", DeleteCookieTest)
+		t.Run("DeleteAllCookiesTest", DeleteAllCookiesTest)
 
 		t.Run("GetSessionCapabilitiesTest", GetSessionCapabilitiesTest)
 		t.Run("ScreenshotTest", ScreenshotTest)
@@ -160,7 +161,7 @@ func AddCookieTest(t *testing.T) {
 }
 
 func GetCookiesTest(t *testing.T) {
-	r, err := client.Cookies()
+	r, err := client.GetCookies()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -168,14 +169,56 @@ func GetCookiesTest(t *testing.T) {
 	t.Log(r)
 }
 
-func GetCookieTest(t *testing.T) {
-	//r, err := client.Cookie("abolaCookie")
-	r, err := client.Cookie("test-cookie")
+func DeleteCookieTest(t *testing.T) {
+	//confirm cookie: test-cookie exists
+	r, err := client.GetCookies()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Log(r.Value)
+	found := false
+	for _, cookie := range r {
+		if cookie.Name == "test-cookie" {
+			found = true
+			break
+		}
+	}
+
+	// if not found error
+	if !found {
+		t.Fatal("Cookie 'test-cookie' not found in browser")
+	}
+
+	// delete it
+	_, err = client.DeleteCookie("test-cookie")
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	// assert
+	r, err = client.GetCookies()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	for _, cookie := range r {
+		if cookie.Name == "test-cookie" {
+			t.Fatal("Cookie 'test-cookie' was not deleted in browser")
+		}
+	}
+}
+
+func DeleteAllCookiesTest(t* testing.T) {
+	err := client.DeleteAllCookies()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	cookies, err := client.GetCookies()
+	if len(cookies) != 0 {
+		t.Logf("%#v", cookies)
+		t.Fatalf("Cookie jar should be empty but it's not")
+	}
 }
 
 //func TestConnectWithActiveConnection(t *testing.T) {
