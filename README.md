@@ -1,4 +1,4 @@
-[![Go Reference](https://pkg.go.dev/badge/marionette_client.svg)](https://pkg.go.dev/marionette_client)
+[![Go Reference](https://pkg.go.dev/badge/marionette_client.svg)](https://pkg.go.dev/github.com/njasm/marionette_client)
 [![Build Status](https://github.com/njasm/marionette_client/workflows/CI/badge.svg)](https://github.com/njasm/marionette_client/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/njasm/marionette_client/badge.svg?branch=master)](https://coveralls.io/github/njasm/marionette_client?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/njasm/marionette_client)](https://goreportcard.com/report/github.com/njasm/marionette_client)
