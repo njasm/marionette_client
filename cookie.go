@@ -8,5 +8,4 @@ type Cookie struct {
 	Name     string `json:"name"`
 	Path     string	`json:"path,omitempty"`
 	Value    string	`json:"value"`
-
 }

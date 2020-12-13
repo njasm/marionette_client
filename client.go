@@ -8,9 +8,7 @@ import (
 )
 
 const (
-	MARIONETTE_PROTOCOL_V2 = 2
 	MARIONETTE_PROTOCOL_V3 = 3
-
 	WEBDRIVER_ELEMENT_KEY = "element-6066-11e4-a52e-4f735466cecf"
 )
 
@@ -43,20 +41,6 @@ func (c *Client) SessionID() string {
 
 func (c *Client) Connect(host string, port int) error {
 	return c.transport.Connect(host, port)
-}
-
-// Capabilities Send the current session's capabilities to the client.
-// Capabilities informs the client of which WebDriver features are
-// supported by Firefox and Marionette.  They are immutable for the
-// length of the session.
-// The return value is an immutable map of string keys
-// ("capabilities") to values, which may be of types boolean,
-// numerical or string.
-func (c *Client) Capabilities() (*Capabilities, error) {
-	if c.session.SessionId != "" {
-		return &c.session.Capabilities, nil
-	}
-	return &Capabilities{}, nil
 }
 
 /////////////
@@ -94,6 +78,24 @@ func (c *Client) DeleteSession() error {
 	}
 
 	return c.transport.Close()
+}
+
+// Capabilities informs the client of which WebDriver features are
+// supported by Firefox and Marionette. They are immutable for the
+// length of the session.
+func (c *Client) GetCapabilities() (*Capabilities, error) {
+	r, err := c.transport.Send("WebDriver:GetCapabilities", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+
+	var d = map[string]*Capabilities{}
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return nil, err
+	}
+
+	return d["capabilities"], nil
 }
 
 // SetScriptTimeout Set the timeout for asynchronous script execution.
@@ -134,6 +136,22 @@ func (c *Client) SetTimeouts(data map[string]int) (*Response, error) {
 	}
 
 	return r, nil
+}
+
+// Get Timeouts Get current set timeouts
+func (c *Client) GetTimeouts() (map[string]uint, error) {
+	r, err := c.transport.Send("WebDriver:GetTimeouts", map[string]string{})
+	if err != nil {
+		return nil, err
+	}
+
+	var d = map[string]uint{}
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return nil, err
+	}
+
+	return d, nil
 }
 
 ////////////////
@@ -718,7 +736,7 @@ func (c *Client) Screenshot() (string, error) {
 }
 
 func (c *Client) browserVersion() string {
-	r, e := c.Capabilities()
+	r, e := c.GetCapabilities()
 	if e != nil {
 		return ""
 	}
