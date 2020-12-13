@@ -15,7 +15,7 @@ const (
 	ID_SELECTOR       = "clubes-hp"
 	CSS_SELECTOR_LI   = "td"
 	ID_SELECTOR_INPUT = "topo_txtPesquisa"
-	TIMEOUT           = 10000 // milliseconds
+	TIMEOUT           = 5000 // milliseconds
 )
 
 var client *Client
@@ -63,6 +63,7 @@ func TestInit(t *testing.T) {
 		t.Run("SetScriptTimoutTest", SetScriptTimoutTest)
 		t.Run("SetPageTimoutTest", SetPageTimoutTest)
 		t.Run("SetSearchTimoutTest", SetSearchTimoutTest)
+		t.Run("GetTimeoutsTest", GetTimeoutsTest)
 
 		t.Run("PageSourceTest", PageSourceTest)
 
@@ -231,12 +232,16 @@ func DeleteAllCookiesTest(t* testing.T) {
 //}
 
 func GetSessionCapabilitiesTest(t *testing.T) {
-	r, err := client.Capabilities()
+	r, err := client.GetCapabilities()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Log(r.BrowserName)
+	if r.BrowserName != "firefox" {
+		t.Fatal("Capabilities: Browser Name doesn't have the expected 'firefox' name")
+	}
+
+	t.Log(r)
 }
 
 func ScreenshotTest(t *testing.T) {
@@ -316,6 +321,19 @@ func SetSearchTimoutTest(t *testing.T) {
 	}
 
 	t.Log(r.Value)
+}
+
+func GetTimeoutsTest(t *testing.T) {
+	r, err := client.GetTimeouts()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	if r["pageLoad"] != TIMEOUT {
+		t.Fatalf("pageLoad TIMEOUT value, was expected to be: %#v", TIMEOUT)
+	}
+
+	t.Log(r)
 }
 
 func PageSourceTest(t *testing.T) {
