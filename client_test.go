@@ -3,7 +3,6 @@ package marionette_client
 import (
 	"fmt"
 	"os"
-	"strconv"
 	"testing"
 	"time"
 )
@@ -79,7 +78,9 @@ func TestInit(t *testing.T) {
 		t.Run("FindElementsTest", FindElementsTest)
 
 		t.Run("CurrentChromeWindowHandleTest", CurrentChromeWindowHandleTest)
+		t.Run("NewWindowTest", NewWindowTest)
 		t.Run("WindowHandlesTest", WindowHandlesTest)
+		t.Run("CloseWindowTest", CloseWindowTest)
 
 		t.Run("NavigatorMethodsTest", NavigatorMethodsTest)
 
@@ -490,6 +491,62 @@ func CurrentChromeWindowHandleTest(t *testing.T) {
 	t.Log(r.Value)
 }
 
+func NewWindowTest(t *testing.T) {
+	r, err := client.WindowHandles()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	var count = len(r)
+	var expectedCount = count + 1
+	_, err = client.NewWindow(true, "tab", false)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	r, err = client.WindowHandles()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	var current = len(r)
+	if len(r) != expectedCount {
+		t.Fatalf("Number of Tab windows does not match, expected: %#v, got: %#v", expectedCount, current)
+	}
+}
+
+func CloseWindowTest(t *testing.T) {
+	r, err := client.WindowHandles()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	var current = len(r)
+	if current <= 1 {
+		t.Fatalf("Expected more then one window availiable, got: %#v", current)
+	}
+
+	_, err = client.CloseWindow()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	// return to browsing context
+	r, err = client.WindowHandles()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	for _, w := range r {
+		err = client.SwitchToWindow(w)
+		if err != nil {
+			t.Fatalf("%#v", err)
+		}
+
+		break
+	}
+}
+
 func WindowHandlesTest(t *testing.T) {
 	w, err := client.CurrentWindowHandle()
 	if err != nil {
@@ -582,7 +639,7 @@ func PromptTest(t *testing.T) {
 }
 
 func AlertTest(t *testing.T) {
-	navigateLocal("ul.html")
+	navigateLocal("table.html")
 	var text string = "marionette is cool or what?"
 	var script string = "alert('" + text + "');"
 	args := []interface{}{}
@@ -602,16 +659,8 @@ func AlertTest(t *testing.T) {
 
 	time.Sleep(time.Duration(5) * time.Second)
 
-	err = client.AcceptAlert()
+	err = client.DismissAlert()
 	if err != nil {
-		var version = client.browserVersion()
-		if len(version) > 2 {
-			major, err := strconv.ParseInt(version[0:2], 10, 0)
-			if err == nil && major <= 83 {
-				t.Skip("Skipping AcceptAlert for spurious failures")
-				return
-			}
-		}
 		t.Fatalf("%#v", err)
 	}
 
@@ -640,16 +689,6 @@ func WindowRectTest(t *testing.T) {
 		t.Fatal("Unable to Maximize window")
 	}
 }
-
-// working - if called before other tests all hell will break loose
-//func TestCloseWindow(t *testing.T) {
-//	r, err := client.CloseWindow()
-//	if err != nil {
-//		t.Fatalf("%#v", err)
-//	}
-//
-//	t.Log(r.Value)
-//}
 
 // working - if called before other tests all hell will break loose
 func DeleteSessionTest(t *testing.T) {
