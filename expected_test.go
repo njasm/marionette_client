@@ -45,7 +45,7 @@ func ElementIsPresentFalseTest(t *testing.T) {
 
 // required test in sequential main client test: client_test.go
 func NotPresentTest(t *testing.T) {
-	timeout := time.Duration(10) * time.Second
+	timeout := time.Duration(5) * time.Second
 	condition := ElementIsNotPresent(By(ID), "non-existing-element")
 	ok, _, _ := Wait(client).For(timeout).Until(condition)
 

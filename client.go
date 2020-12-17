@@ -9,7 +9,7 @@ import (
 
 const (
 	MARIONETTE_PROTOCOL_V3 = 3
-	WEBDRIVER_ELEMENT_KEY = "element-6066-11e4-a52e-4f735466cecf"
+	WEBDRIVER_ELEMENT_KEY  = "element-6066-11e4-a52e-4f735466cecf"
 )
 
 var RunningInDebugMode bool = false
@@ -50,8 +50,8 @@ func (c *Client) Connect(host string, port int) error {
 // NewSession create new session
 func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, error) {
 	data := map[string]interface{}{
-			"sessionId":    sessionId,
-			"capabilities": cap,
+		"sessionId":    sessionId,
+		"capabilities": cap,
 	}
 
 	var response *Response
@@ -100,19 +100,19 @@ func (c *Client) GetCapabilities() (*Capabilities, error) {
 
 // SetScriptTimeout Set the timeout for asynchronous script execution.
 func (c *Client) SetScriptTimeout(milliseconds int) (*Response, error) {
-	data := map[string]int{ "script": milliseconds}
+	data := map[string]int{"script": milliseconds}
 	return c.SetTimeouts(data)
 }
 
 // SetImplicitTimout Set timeout for searching for elements.
 func (c *Client) SetImplicitTimout(milliseconds int) (*Response, error) {
-	data := map[string]int{ "implicit": milliseconds}
+	data := map[string]int{"implicit": milliseconds}
 	return c.SetTimeouts(data)
 }
 
 // SetPageLoadTimeout Set timeout for page loading.
 func (c *Client) SetPageLoadTimeout(milliseconds int) (*Response, error) {
-	data := map[string]int{ "pageLoad": milliseconds}
+	data := map[string]int{"pageLoad": milliseconds}
 	return c.SetTimeouts(data)
 }
 
@@ -341,6 +341,33 @@ func (c *Client) MaximizeWindow() error {
 	}
 
 	return nil
+}
+
+// NewWindow opens a new top-level browsing context window.
+//
+// param: type string
+// Optional type of the new top-level browsing context. Can be one of
+// `tab` or `window`. Defaults to `tab`.
+//
+// param: focus bool
+// Optional flag if the new top-level browsing context should be opened
+// in foreground (focused) or background (not focused). Defaults to false.
+//
+// param: private bool
+// Optional flag, which gets only evaluated for type `window`. True if the
+// new top-level browsing context should be a private window.
+// Defaults to false.
+//
+// return {"handle": string, "type": string}
+// Handle and type of the new browsing context.
+func (c *Client) NewWindow(focus bool, typ string, private bool) (*Response, error) {
+	r, err := c.transport.Send("WebDriver:NewWindow", map[string]interface{}{"focus": focus, "type": typ, "private": private})
+	if err != nil {
+		return nil, err
+	}
+
+	//TODO: would be nice if we could create a Window struct and return that struct instead of the Response object
+	return r, nil
 }
 
 // CloseWindow closes current window.
