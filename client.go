@@ -255,8 +255,8 @@ func (c *Client) Context() (*Response, error) {
 // WINDOWS HANDLES //
 /////////////////////
 
-// CurrentWindowHandle returns the current window ID
-func (c *Client) CurrentWindowHandle() (string, error) {
+// GetWindowHandle returns the current window ID
+func (c *Client) GetWindowHandle() (string, error) {
 	r, err := c.transport.Send("WebDriver:GetWindowHandle", nil)
 	if err != nil {
 		return "", err
@@ -270,21 +270,44 @@ func (c *Client) CurrentWindowHandle() (string, error) {
 	return d["value"], nil
 }
 
-// CurrentChromeWindowHandle returns the current chrome window ID
-//"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-//"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-func (c *Client) CurrentChromeWindowHandle() (*Response, error) {
+// GetWindowHandles return array of window ID currently opened
+func (c *Client) GetWindowHandles() ([]string, error) {
+	r, err := c.transport.Send("WebDriver:GetWindowHandles", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var d []string
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return nil, err
+	}
+
+	return d, nil
+}
+
+// GetChromeWindowHandle returns the current chrome window ID
+func (c *Client) GetChromeWindowHandle() (*string, error) {
+	//"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
+	//"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 	r, err := c.transport.Send("WebDriver:GetCurrentChromeWindowHandle", nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return r, nil
+	var d map[string]string
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return nil, err
+	}
+
+	t := d["value"]
+	return &t, nil
 }
 
-// WindowHandles return array of window ID currently opened
-func (c *Client) WindowHandles() ([]string, error) {
-	r, err := c.transport.Send("WebDriver:GetWindowHandles", nil)
+// GetChromeWindowHandles return array of chrome window ID
+func (c *Client) GetChromeWindowHandles() ([]string, error) {
+	r, err := c.transport.Send("WebDriver:GetChromeWindowHandles", nil)
 	if err != nil {
 		return nil, err
 	}
