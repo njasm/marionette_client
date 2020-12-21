@@ -255,8 +255,8 @@ func (c *Client) Context() (*Response, error) {
 // WINDOWS HANDLES //
 /////////////////////
 
-// CurrentWindowHandle returns the current window ID
-func (c *Client) CurrentWindowHandle() (string, error) {
+// GetWindowHandle returns the current window ID
+func (c *Client) GetWindowHandle() (string, error) {
 	r, err := c.transport.Send("WebDriver:GetWindowHandle", nil)
 	if err != nil {
 		return "", err
@@ -270,21 +270,44 @@ func (c *Client) CurrentWindowHandle() (string, error) {
 	return d["value"], nil
 }
 
-// CurrentChromeWindowHandle returns the current chrome window ID
-//"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-//"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-func (c *Client) CurrentChromeWindowHandle() (*Response, error) {
+// GetWindowHandles return array of window ID currently opened
+func (c *Client) GetWindowHandles() ([]string, error) {
+	r, err := c.transport.Send("WebDriver:GetWindowHandles", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var d []string
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return nil, err
+	}
+
+	return d, nil
+}
+
+// GetChromeWindowHandle returns the current chrome window ID
+func (c *Client) GetChromeWindowHandle() (*string, error) {
+	//"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
+	//"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
 	r, err := c.transport.Send("WebDriver:GetCurrentChromeWindowHandle", nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return r, nil
+	var d map[string]string
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return nil, err
+	}
+
+	t := d["value"]
+	return &t, nil
 }
 
-// WindowHandles return array of window ID currently opened
-func (c *Client) WindowHandles() ([]string, error) {
-	r, err := c.transport.Send("WebDriver:GetWindowHandles", nil)
+// GetChromeWindowHandles return array of chrome window ID
+func (c *Client) GetChromeWindowHandles() ([]string, error) {
+	r, err := c.transport.Send("WebDriver:GetChromeWindowHandles", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -334,13 +357,53 @@ func (c *Client) SetWindowRect(rect WindowRect) error {
 }
 
 // MaximizeWindow maximizes window.
-func (c *Client) MaximizeWindow() error {
-	_, err := c.transport.Send("WebDriver:MaximizeWindow", nil)
+func (c *Client) MaximizeWindow() (rect *WindowRect, err error) {
+	r, err := c.transport.Send("WebDriver:MaximizeWindow", nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	rect = new(WindowRect)
+	err = json.Unmarshal([]byte(r.Value), &rect)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
+// MinimizeWindow Synchronously minimizes the user agent window as if the user pressed
+// the minimize button.
+func (c *Client) MinimizeWindow() (rect *WindowRect, err error) {
+	r, err := c.transport.Send("WebDriver:MinimizeWindow", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	rect = new(WindowRect)
+	err = json.Unmarshal([]byte(r.Value), &rect)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
+// FullscreenWindow Synchronously sets the user agent window to full screen as if the user
+// had done "View > Enter Full Screen"
+func (c *Client) FullscreenWindow() (rect *WindowRect, err error) {
+	r, err := c.transport.Send("WebDriver:FullscreenWindow", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	rect = new(WindowRect)
+	err = json.Unmarshal([]byte(r.Value), &rect)
+	if err != nil {
+		return nil, err
+	}
+
+	return
 }
 
 // NewWindow opens a new top-level browsing context window.
@@ -760,13 +823,4 @@ func (c *Client) Quit() (*Response, error) {
 // Screenshot takes a screenshot of the page.
 func (c *Client) Screenshot() (string, error) {
 	return takeScreenshot(c, nil)
-}
-
-func (c *Client) browserVersion() string {
-	r, e := c.GetCapabilities()
-	if e != nil {
-		return ""
-	}
-
-	return r.BrowserVersion
 }
