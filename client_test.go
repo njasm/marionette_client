@@ -81,6 +81,7 @@ func TestInit(t *testing.T) {
 		t.Run("NewWindowTest", NewWindowTest)
 		t.Run("WindowHandlesTest", WindowHandlesTest)
 		t.Run("CloseWindowTest", CloseWindowTest)
+		t.Run("SwitchToParentFrameTest", SwitchToParentFrameTest)
 
 		t.Run("NavigatorMethodsTest", NavigatorMethodsTest)
 
@@ -576,6 +577,13 @@ func WindowHandlesTest(t *testing.T) {
 	}
 }
 
+func SwitchToParentFrameTest(t *testing.T) {
+	err := client.SwitchToParentFrame()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+}
+
 func NavigatorMethodsTest(t *testing.T) {
 	client.SetContext(Context(CONTENT))
 	url1 := "https://www.google.pt/"
@@ -678,15 +686,33 @@ func WindowRectTest(t *testing.T) {
 
 	t.Logf("w: %v, h: %v", actualRect.Width, actualRect.Height)
 
-	// FIXME: Position is not changed via SetWindowRect so cannot assert with the expected value here
-
 	if expectedRect.Width != actualRect.Width || expectedRect.Height != actualRect.Height {
 		t.Fatalf("Size differs. expected: %v, actual: %v", expectedRect, *actualRect)
 	}
 
-	err = client.MaximizeWindow()
+	mr, err := client.MinimizeWindow()
+	if err != nil {
+		t.Fatal("Unable to Minimize window")
+	}
+
+	// sizes are expected to differ
+	if mr.Width == actualRect.Width || mr.Height == actualRect.Height {
+		t.Fatalf("Size DOES NOT differs. actual: %v, mr: %v", actualRect, mr)
+	}
+
+	wr, err := client.MaximizeWindow()
 	if err != nil {
 		t.Fatal("Unable to Maximize window")
+	}
+
+	// sizes are expected to differ once again
+	if wr.Width == mr.Width || wr.Height == mr.Height {
+		t.Fatalf("Size DOES NOT differs. wr: %v, mr: %v", wr, mr)
+	}
+
+	_, err = client.FullscreenWindow()
+	if err != nil {
+		t.Fatal("Unable to Fullscreen window")
 	}
 }
 

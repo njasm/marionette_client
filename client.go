@@ -334,13 +334,53 @@ func (c *Client) SetWindowRect(rect WindowRect) error {
 }
 
 // MaximizeWindow maximizes window.
-func (c *Client) MaximizeWindow() error {
-	_, err := c.transport.Send("WebDriver:MaximizeWindow", nil)
+func (c *Client) MaximizeWindow() (rect *WindowRect, err error) {
+	r, err := c.transport.Send("WebDriver:MaximizeWindow", nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	rect = new(WindowRect)
+	err = json.Unmarshal([]byte(r.Value), &rect)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
+// MinimizeWindow Synchronously minimizes the user agent window as if the user pressed
+// the minimize button.
+func (c *Client) MinimizeWindow() (rect *WindowRect, err error) {
+	r, err := c.transport.Send("WebDriver:MinimizeWindow", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	rect = new(WindowRect)
+	err = json.Unmarshal([]byte(r.Value), &rect)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
+// FullscreenWindow Synchronously sets the user agent window to full screen as if the user
+// had done "View > Enter Full Screen"
+func (c *Client) FullscreenWindow() (rect *WindowRect, err error) {
+	r, err := c.transport.Send("WebDriver:FullscreenWindow", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	rect = new(WindowRect)
+	err = json.Unmarshal([]byte(r.Value), &rect)
+	if err != nil {
+		return nil, err
+	}
+
+	return
 }
 
 // NewWindow opens a new top-level browsing context window.
@@ -760,13 +800,4 @@ func (c *Client) Quit() (*Response, error) {
 // Screenshot takes a screenshot of the page.
 func (c *Client) Screenshot() (string, error) {
 	return takeScreenshot(c, nil)
-}
-
-func (c *Client) browserVersion() string {
-	r, e := c.GetCapabilities()
-	if e != nil {
-		return ""
-	}
-
-	return r.BrowserVersion
 }
