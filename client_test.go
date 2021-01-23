@@ -70,6 +70,8 @@ func TestInit(t *testing.T) {
 		t.Run("ExecuteScriptTest", ExecuteScriptTest)
 		t.Run("ExecuteScriptWithArgsTest", ExecuteScriptWithArgsTest)
 
+		t.Run("ExecuteAsyncScriptWithArgsTest", ExecuteAsyncScriptWithArgsTest)
+
 		t.Run("GetTitleTest", GetTitleTest)
 
 		t.Run("FindElementTest", FindElementTest)
@@ -211,7 +213,7 @@ func DeleteCookieTest(t *testing.T) {
 	}
 }
 
-func DeleteAllCookiesTest(t* testing.T) {
+func DeleteAllCookiesTest(t *testing.T) {
 	err := client.DeleteAllCookies()
 	if err != nil {
 		t.Fatalf("%#v", err)
@@ -371,6 +373,21 @@ func ExecuteScriptWithArgsTest(t *testing.T) {
 	script := "function testMyGoMarionetteClientArgs(a, b) { return a + b; }; return testMyGoMarionetteClientArgs(arguments[0], arguments[1]);"
 	args := []interface{}{1, 3}
 	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Log(r.Value)
+}
+
+func ExecuteAsyncScriptWithArgsTest(t *testing.T) {
+	script := "function testMyGoMarionetteClientArgs(a, b) { return a + b; }; " +
+		"let resolve = arguments[arguments.length - 1]; " +
+		"let result = testMyGoMarionetteClientArgs(arguments[0], arguments[1]);" +
+		"resolve(result);"
+
+	args := []interface{}{3, 3}
+	r, err := client.ExecuteAsyncScript(script, args, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
