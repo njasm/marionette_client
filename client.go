@@ -759,6 +759,23 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 	return response, nil
 }
 
+// ExecuteAsyncScript Execute JS Script Async
+//TODO: Add missing arguments/options
+func (c *Client) ExecuteAsyncScript(script string, args []interface{}, newSandbox bool) (*Response, error) {
+	parameters := map[string]interface{}{}
+	parameters["script"] = script
+	parameters["args"] = args
+
+	parameters["newSandbox"] = newSandbox
+
+	response, err := c.transport.Send("WebDriver:ExecuteAsyncScript", parameters)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
 /////////////
 // DIALOGS //
 /////////////
