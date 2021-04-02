@@ -221,7 +221,7 @@ func DeleteAllCookiesTest(t *testing.T) {
 	}
 
 	// add some dummy cookies
-	cookies = append(cookies,
+	cookies = append([]Cookie{},
 		Cookie{Name: "test-cookie1", Value: "test-value1"},
 		Cookie{Name: "test-cookie2", Value: "test-value2"},
 	)
