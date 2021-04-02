@@ -219,6 +219,7 @@ func DeleteAllCookiesTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
+	time.Sleep(time.Second)
 	cookies, err := client.GetCookies()
 	if len(cookies) != 0 {
 		t.Logf("%#v", cookies)
