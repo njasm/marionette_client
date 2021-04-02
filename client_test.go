@@ -57,6 +57,8 @@ func TestInit(t *testing.T) {
 		t.Run("SetContextTest", SetContextTest)
 		t.Run("GetContextTest", GetContextTest)
 
+		t.Run("GetActiveElementTest", GetActiveElementTest)
+
 		t.Run("GetPageSourceTest", GetPageSourceTest)
 
 		t.Run("SetScriptTimoutTest", SetScriptTimoutTest)
@@ -350,6 +352,8 @@ func GetActiveElementTest(t *testing.T) {
 	if r.Attribute("id") != "email" || r.TagName() != "input" {
 		t.Fatalf("%#v", err)
 	}
+
+	_, _ = client.Navigate(TARGET_URL)
 }
 
 func GetPageSourceTest(t *testing.T) {
