@@ -214,6 +214,9 @@ func DeleteCookieTest(t *testing.T) {
 }
 
 func DeleteAllCookiesTest(t *testing.T) {
+	// set browser in a controlled webpage
+	_, _ = navigateLocal("table.html")
+
 	// clear all visible cookies now
 	cookies, err := client.GetCookies()
 	for _, c := range cookies {
@@ -256,6 +259,9 @@ func DeleteAllCookiesTest(t *testing.T) {
 		t.Logf("%#v", cookies)
 		t.Fatalf("Cookie jar should be empty but it's not")
 	}
+
+	// reset url for next tests
+	_, _ = client.Navigate(TARGET_URL)
 }
 
 //func TestConnectWithActiveConnection(t *testing.T) {
