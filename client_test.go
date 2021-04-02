@@ -153,7 +153,7 @@ func UrlTest(t *testing.T) {
 }
 func AddCookieTest(t *testing.T) {
 	c := Cookie{
-		Name: "test-cookie",
+		Name:  "test-cookie",
 		Value: "test-value",
 	}
 
@@ -214,16 +214,54 @@ func DeleteCookieTest(t *testing.T) {
 }
 
 func DeleteAllCookiesTest(t *testing.T) {
-	err := client.DeleteAllCookies()
+	// set browser in a controlled webpage
+	_, _ = client.Navigate("http://example.com")
+
+	// clear all visible cookies now
+	cookies, err := client.GetCookies()
+	for _, c := range cookies {
+		_, _ = client.DeleteCookie(c.Name)
+	}
+
+	// add some dummy cookies
+	cookies = append([]Cookie{},
+		Cookie{Name: "test-cookie1", Value: "test-value1"},
+		Cookie{Name: "test-cookie2", Value: "test-value2"},
+	)
+	for _, c := range cookies {
+		_, _ = client.AddCookie(c)
+	}
+
+	// test those
+	time.Sleep(time.Second)
+	newCookies, err := client.GetCookies()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	cookies, err := client.GetCookies()
+	if len(newCookies) != 2 {
+		t.Fatalf("total number of cookies still dont match: %#v", newCookies)
+	}
+
+	err = client.DeleteAllCookies()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	time.Sleep(time.Second)
+	cookies, err = client.GetCookies()
+	t.Logf("Current cookies: %#v", cookies)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
 	if len(cookies) != 0 {
 		t.Logf("%#v", cookies)
 		t.Fatalf("Cookie jar should be empty but it's not")
 	}
+
+	// reset url for next tests
+	_, _ = client.Navigate(TARGET_URL)
 }
 
 //func TestConnectWithActiveConnection(t *testing.T) {
