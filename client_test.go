@@ -322,6 +322,36 @@ func GetContextTest(t *testing.T) {
 	t.Log(r.Value)
 }
 
+func GetActiveElementTest(t *testing.T) {
+	_, _ = navigateLocal("form.html")
+	r, err := client.GetActiveElement()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	// theres always an active element?
+	t.Logf("%#v", r)
+
+	form, err := client.FindElement(By(NAME), "optional")
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	// click on a *other* form element to activate
+	e, _ := client.FindElement(By(ID), "email")
+	e.Click()
+
+	// assert now
+	r, err = form.GetActiveElement()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	if r.Attribute("id") != "email" || r.TagName() != "input" {
+		t.Fatalf("%#v", err)
+	}
+}
+
 func GetPageSourceTest(t *testing.T) {
 	r, err := client.SetContext(Context(CHROME))
 	if err != nil {

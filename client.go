@@ -712,6 +712,26 @@ func findElement(c *Client, by By, value string, startNode *string) (*WebElement
 	return e, nil
 }
 
+// GetActiveElement Returns the page's active element.
+func (c *Client) GetActiveElement() (*WebElement, error) {
+	return getActiveElement(c)
+}
+
+func getActiveElement(c *Client) (*WebElement, error) {
+	response, err := c.transport.Send("WebDriver:GetActiveElement", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var e = &WebElement{c: c}
+	err = json.Unmarshal([]byte(response.Value), e)
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
 func takeScreenshot(c *Client, startNode *string) (string, error) {
 	var params map[string]string
 	if startNode == nil || *startNode == "" {
