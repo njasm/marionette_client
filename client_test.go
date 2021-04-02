@@ -215,7 +215,7 @@ func DeleteCookieTest(t *testing.T) {
 
 func DeleteAllCookiesTest(t *testing.T) {
 	// set browser in a controlled webpage
-	_, _ = navigateLocal("table.html")
+	_, _ = client.Navigate("http://example.com")
 
 	// clear all visible cookies now
 	cookies, err := client.GetCookies()
