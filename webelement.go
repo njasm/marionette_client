@@ -36,6 +36,10 @@ func (e *WebElement) Id() string {
 	return e.id
 }
 
+func (e *WebElement) GetActiveElement() (*WebElement, error) {
+	return getActiveElement(e.c)
+}
+
 func (e *WebElement) FindElement(by By, value string) (*WebElement, error) {
 	return findElement(e.c, by, value, &e.id)
 }
