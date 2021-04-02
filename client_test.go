@@ -214,13 +214,26 @@ func DeleteCookieTest(t *testing.T) {
 }
 
 func DeleteAllCookiesTest(t *testing.T) {
-	err := client.DeleteAllCookies()
+	// get cookies and print them out
+	cookies, err := client.GetCookies()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	t.Logf("Before delete all cookies: %#v", cookies)
+
+	err = client.DeleteAllCookies()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
 	time.Sleep(time.Second)
-	cookies, err := client.GetCookies()
+	cookies, err = client.GetCookies()
+	t.Logf("Current cookies: %#v", cookies)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
 	if len(cookies) != 0 {
 		t.Logf("%#v", cookies)
 		t.Fatalf("Cookie jar should be empty but it's not")
