@@ -153,7 +153,7 @@ func UrlTest(t *testing.T) {
 }
 func AddCookieTest(t *testing.T) {
 	c := Cookie{
-		Name: "test-cookie",
+		Name:  "test-cookie",
 		Value: "test-value",
 	}
 
@@ -214,13 +214,31 @@ func DeleteCookieTest(t *testing.T) {
 }
 
 func DeleteAllCookiesTest(t *testing.T) {
-	// get cookies and print them out
+	// clear all visible cookies now
 	cookies, err := client.GetCookies()
+	for _, c := range cookies {
+		_, _ = client.DeleteCookie(c.Name)
+	}
+
+	// add some dummy cookies
+	cookies = append(cookies,
+		Cookie{Name: "test-cookie1", Value: "test-value1"},
+		Cookie{Name: "test-cookie2", Value: "test-value2"},
+	)
+	for _, c := range cookies {
+		_, _ = client.AddCookie(c)
+	}
+
+	// test those
+	time.Sleep(time.Second)
+	newCookies, err := client.GetCookies()
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Logf("Before delete all cookies: %#v", cookies)
+	if len(newCookies) != 2 {
+		t.Fatalf("total number of cookies still dont match: %#v", newCookies)
+	}
 
 	err = client.DeleteAllCookies()
 	if err != nil {
