@@ -491,10 +491,18 @@ func FindElementTest(t *testing.T) {
 	t.Log(element.TagName())
 	t.Log(element.Text())
 	t.Log(element.Attribute("id"))
+	t.Log(element.Property("id"))
 	t.Log(element.CssValue("text-decoration"))
 	rect, err := element.Rect()
 	if err != nil {
 		t.Fatalf("%#v", err)
+	}
+
+	// id attribute and property must be equal
+	att_id := element.Attribute("id")
+	pro_id := element.Property("id")
+	if att_id != pro_id {
+		t.Fatalf("Missmatch values from Attribute and Property 'id': first is %#v, former is %#v", att_id, pro_id)
 	}
 
 	t.Log(rect)
