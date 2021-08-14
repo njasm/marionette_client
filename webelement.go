@@ -72,6 +72,10 @@ func (e *WebElement) Attribute(name string) string {
 	return getElementAttribute(e.c, e.id, name)
 }
 
+func (e *WebElement) Property(name string) string {
+	return getElementProperty(e.c, e.id, name)
+}
+
 func (e *WebElement) CssValue(property string) string {
 	return getElementCssPropertyValue(e.c, e.id, property)
 }
