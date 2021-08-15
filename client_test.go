@@ -499,10 +499,10 @@ func FindElementTest(t *testing.T) {
 	}
 
 	// id attribute and property must be equal
-	att_id := element.Attribute("id")
-	pro_id := element.Property("id")
-	if att_id != pro_id {
-		t.Fatalf("Missmatch values from Attribute and Property 'id': first is %#v, former is %#v", att_id, pro_id)
+	attId := element.Attribute("id")
+	propId := element.Property("id")
+	if attId != propId {
+		t.Fatalf("Missmatch values from Attribute and Property 'id': first is %#v, former is %#v", attId, propId)
 	}
 
 	t.Log(rect)
