@@ -63,6 +63,7 @@ println(element.Displayed())
 println(element.TagName())
 println(element.Text())
 println(element.Attribute("id"))
+println(element.Property("id"))
 println(element.CssValue("text-decoration"))
 	
 // width, height, x and y

@@ -25,7 +25,7 @@ jobs:
         os: [ ubuntu-latest ]
         #os: [ macos-latest, ubuntu-latest, windows-latest ]
         go: [ 1.15.x, 1.16.x ]
-        firefox: [ "82.0", "83.0", "84.0.2", "85.0", "86.0", "87.0", "88.0.1" ]
+        firefox: [ "82.0", "83.0", "84.0.2", "85.0", "86.0", "87.0", "88.0.1", "90.0.2", "91.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -90,7 +90,7 @@ jobs:
       matrix:
         os: [ windows-latest ]
         go: [ 1.15.x, 1.16.x ]
-        firefox: [ "83.0", "84.0.2", "85.0", "86.0", "87.0", "88.0.1" ] # FIXME: /InstallDir not unpacking to supplied folder on version 82
+        firefox: [ "83.0", "84.0.2", "85.0", "86.0", "87.0", "88.0.1", "90.0.2", "91.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -128,7 +128,7 @@ jobs:
       matrix:
         os: [ macos-latest ]
         go: [ 1.15.x, 1.16.x ]
-        firefox: [ "82.0", "83.0", "84.0.2", "85.0", "86.0", "87.0", "88.0.1" ]
+        firefox: [ "82.0", "83.0", "84.0.2", "85.0", "86.0", "87.0", "88.0.1", "90.0.2", "91.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}

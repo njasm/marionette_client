@@ -582,6 +582,18 @@ func getElementAttribute(c *Client, id string, name string) string {
 	return d["value"]
 }
 
+func getElementProperty(c *Client, id string, name string) string {
+	r, err := c.transport.Send("WebDriver:GetElementProperty", map[string]interface{}{"id": id, "name": name})
+	if err != nil {
+		return ""
+	}
+
+	var d = map[string]string{}
+	json.Unmarshal([]byte(r.Value), &d)
+
+	return d["value"]
+}
+
 func getElementCssPropertyValue(c *Client, id string, property string) string {
 	r, err := c.transport.Send("WebDriver:GetElementCSSValue", map[string]interface{}{"id": id, "propertyName": property})
 	if err != nil {
