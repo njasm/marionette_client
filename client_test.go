@@ -81,7 +81,6 @@ func TestInit(t *testing.T) {
 		t.Run("SendKeysTest", SendKeysTest)
 		t.Run("FindElementsTest", FindElementsTest)
 
-		t.Run("CurrentChromeWindowHandleTest", CurrentChromeWindowHandleTest)
 		t.Run("NewWindowTest", NewWindowTest)
 		t.Run("WindowHandlesTest", WindowHandlesTest)
 		t.Run("CloseWindowTest", CloseWindowTest)
@@ -578,26 +577,6 @@ func FindElementsTest(t *testing.T) {
 	}
 
 	t.Log(len(elements))
-}
-
-func CurrentChromeWindowHandleTest(t *testing.T) {
-	r, err := client.GetChromeWindowHandle()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	t.Log(r)
-
-	list, err := client.GetChromeWindowHandles()
-	for _, w := range list {
-		if err != nil {
-			t.Logf("%#v", w)
-		}
-
-		time.Sleep(time.Second)
-	}
-
-	t.Log(list)
 }
 
 func NewWindowTest(t *testing.T) {
