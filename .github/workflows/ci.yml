@@ -24,8 +24,8 @@ jobs:
       matrix:
         os: [ ubuntu-latest ]
         #os: [ macos-latest, ubuntu-latest, windows-latest ]
-        go: [ 1.15.x, 1.16.x, 1.17.x, 1.18.x ]
-        firefox: [ "82.0", "83.0", "84.0.2", "85.0", "86.0", "87.0", "88.0.1", "90.0.2", "91.0" ]
+        go: [ 1.17.x, 1.18.x ]
+        firefox: [ "91.0", "96.0.3", "97.0.2", "98.0.2", "99.0.1", "100.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -89,8 +89,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ windows-latest ]
-        go: [ 1.15.x, 1.16.x, 1.17.x, 1.18.x ]
-        firefox: [ "83.0", "84.0.2", "85.0", "86.0", "87.0", "88.0.1", "90.0.2", "91.0" ]
+        go: [ 1.17.x, 1.18.x ]
+        firefox: [ "98.0.2", "99.0.1", "100.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -127,8 +127,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ macos-latest ]
-        go: [ 1.15.x, 1.16.x, 1.17.x, 1.18.x ]
-        firefox: [ "82.0", "83.0", "84.0.2", "85.0", "86.0", "87.0", "88.0.1", "90.0.2", "91.0" ]
+        go: [ 1.17.x, 1.18.x ]
+        firefox: [ "98.0.2", "99.0.1", "100.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
