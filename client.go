@@ -286,41 +286,6 @@ func (c *Client) GetWindowHandles() ([]string, error) {
 	return d, nil
 }
 
-// GetChromeWindowHandle returns the current chrome window ID
-func (c *Client) GetChromeWindowHandle() (*string, error) {
-	//"getChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-	//"getCurrentChromeWindowHandle": GeckoDriver.prototype.getChromeWindowHandle,
-	r, err := c.transport.Send("WebDriver:GetCurrentChromeWindowHandle", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var d map[string]string
-	err = json.Unmarshal([]byte(r.Value), &d)
-	if err != nil {
-		return nil, err
-	}
-
-	t := d["value"]
-	return &t, nil
-}
-
-// GetChromeWindowHandles return array of chrome window ID
-func (c *Client) GetChromeWindowHandles() ([]string, error) {
-	r, err := c.transport.Send("WebDriver:GetChromeWindowHandles", nil)
-	if err != nil {
-		return nil, err
-	}
-
-	var d []string
-	err = json.Unmarshal([]byte(r.Value), &d)
-	if err != nil {
-		return nil, err
-	}
-
-	return d, nil
-}
-
 // SwitchToWindow switch to specific window.
 func (c *Client) SwitchToWindow(name string) error {
 	_, err := c.transport.Send("WebDriver:SwitchToWindow", map[string]interface{}{"focus": true, "handle": name})
