@@ -43,7 +43,7 @@ func (t *MarionetteTransport) MessageID() int {
 
 func (t *MarionetteTransport) Connect(host string, port int) error {
 	if t.conn != nil {
-		return errors.New("A Connection is already established. please disconnect before connecting.")
+		return errors.New("a connection is already established. please disconnect before connecting")
 	}
 
 	if host == "" {

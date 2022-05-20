@@ -220,6 +220,10 @@ func DeleteAllCookiesTest(t *testing.T) {
 
 	// clear all visible cookies now
 	cookies, err := client.GetCookies()
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
 	for _, c := range cookies {
 		_, _ = client.DeleteCookie(c.Name)
 	}
@@ -529,6 +533,10 @@ func FindElementTest(t *testing.T) {
 	}
 
 	collection, err := element.FindElements(By(CSS_SELECTOR), CSS_SELECTOR_LI)
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
 	if 3 > len(collection) {
 		t.FailNow()
 	}
@@ -625,13 +633,11 @@ func CloseWindowTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	for _, w := range r {
-		err = client.SwitchToWindow(w)
+	if len(r) >= 1 {
+		err = client.SwitchToWindow(r[0])
 		if err != nil {
 			t.Fatalf("%#v", err)
 		}
-
-		break
 	}
 }
 
