@@ -50,5 +50,5 @@ func (w *Waiter) Until(f func(c Finder) (bool, *WebElement, error)) (bool, *WebE
 		time.Sleep(time.Second)
 	}
 
-	return false, nil, errors.New("Condition never occurred.")
+	return false, nil, errors.New("condition never occurred")
 }
