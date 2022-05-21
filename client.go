@@ -408,6 +408,26 @@ func (c *Client) CloseWindow() (*Response, error) {
 	return r, nil
 }
 
+// Close the currently selected chrome window.
+//
+// If it is the last window currently open, the chrome window will not be
+// closed to prevent a shutdown of Firefox. Instead the returned
+// list of chrome window handles is empty.
+//
+// return []string
+// Unique chrome window handles of remaining chrome windows.
+//
+// error NoSuchWindowError
+// Top-level browsing context has been discarded.
+func (c *Client) CloseChromeWindow() (*Response, error) {
+	r, err := c.transport.Send("WebDriver:CloseChromeWindow", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
 ////////////
 // FRAMES //
 ////////////
