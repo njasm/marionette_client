@@ -1,3 +1,3 @@
 module github.com/njasm/marionette_client
 
-go 1.15
+go 1.22
