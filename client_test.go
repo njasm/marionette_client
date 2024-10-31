@@ -337,13 +337,13 @@ func GetActiveElementTest(t *testing.T) {
 	// theres always an active element?
 	t.Logf("%#v", r)
 
-	form, err := client.FindElement(By(NAME), "optional")
+	form, err := client.FindElement(By(Name), "optional")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
 	// click on a *other* form element to activate
-	e, _ := client.FindElement(By(ID), "email")
+	e, _ := client.FindElement(By(Id), "email")
 	e.Click()
 
 	// assert now
@@ -482,7 +482,7 @@ func GetTitleTest(t *testing.T) {
 
 func FindElementTest(t *testing.T) {
 	navigateLocal("table.html")
-	element, err := client.FindElement(By(ID), "the-table")
+	element, err := client.FindElement(By(Id), "the-table")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -532,7 +532,7 @@ func FindElementTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	collection, err := element.FindElements(By(CSS_SELECTOR), CSS_SELECTOR_LI)
+	collection, err := element.FindElements(By(CssSelector), CSS_SELECTOR_LI)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -543,7 +543,7 @@ func FindElementTest(t *testing.T) {
 
 	t.Logf("%T %#v", collection, collection)
 
-	el, err := element.FindElement(By(CSS_SELECTOR), CSS_SELECTOR_LI)
+	el, err := element.FindElement(By(CssSelector), CSS_SELECTOR_LI)
 	if el == nil || err != nil {
 		t.FailNow()
 	}
@@ -552,7 +552,7 @@ func FindElementTest(t *testing.T) {
 
 func SendKeysTest(t *testing.T) {
 	navigateLocal("form.html")
-	e, err := client.FindElement(By(ID), "email")
+	e, err := client.FindElement(By(Id), "email")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -579,7 +579,7 @@ func SendKeysTest(t *testing.T) {
 
 func FindElementsTest(t *testing.T) {
 	navigateLocal("ul.html")
-	elements, err := client.FindElements(By(CSS_SELECTOR), CSS_SELECTOR_LI)
+	elements, err := client.FindElements(By(CssSelector), CSS_SELECTOR_LI)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
