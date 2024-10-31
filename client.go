@@ -284,7 +284,7 @@ func (c *Client) Context() (*Response, error) {
 // WINDOWS HANDLES //
 /////////////////////
 
-// GetWindowHandle returns the current window ID
+// GetWindowHandle returns the current window Id
 func (c *Client) GetWindowHandle() (string, error) {
 	r, err := c.transport.Send("WebDriver:GetWindowHandle", nil)
 	if err != nil {
@@ -299,7 +299,7 @@ func (c *Client) GetWindowHandle() (string, error) {
 	return d["value"], nil
 }
 
-// GetWindowHandles return array of window ID currently opened
+// GetWindowHandles return array of window Id currently opened
 func (c *Client) GetWindowHandles() ([]string, error) {
 	r, err := c.transport.Send("WebDriver:GetWindowHandles", nil)
 	if err != nil {
@@ -461,7 +461,7 @@ func (c *Client) CloseChromeWindow() (*Response, error) {
 // FRAMES //
 ////////////
 
-// SwitchToFrame switch to frame - strategies: By(ID), By(NAME) or name only.
+// SwitchToFrame switch to frame - strategies: By(Id), By(Name) or name only.
 func (c *Client) SwitchToFrame(by By, value string) error {
 
 	//with current marionette implementation we have to find the element first and send the switchToFrame
