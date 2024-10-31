@@ -98,19 +98,21 @@ func (c *Client) GetCapabilities() (*Capabilities, error) {
 
 	// older browser versions
 	if capabilities, exist := d["capabilities"]; exist {
-		if value, ok := capabilities.(*Capabilities); ok {
-			return value, nil
+		var finalCap = Capabilities{}
+		bytes, _ := json.Marshal(capabilities)
+		if err := json.Unmarshal(bytes, &finalCap); err != nil {
+			return nil, err
 		}
 
-		return nil, errors.New("type assertion failed for *Capabilities")
+		return &finalCap, nil
 	}
 
 	// newer versions
 	if capabilities, exist := d["value"]; exist {
 		if value, ok := capabilities.(map[string]interface{}); ok {
 			var finalCap = Capabilities{}
-			damn, _ := json.Marshal(value["capabilities"])
-			err = json.Unmarshal(damn, &finalCap)
+			bytes, _ := json.Marshal(value["capabilities"])
+			err = json.Unmarshal(bytes, &finalCap)
 			if err != nil {
 				return nil, err
 			}
