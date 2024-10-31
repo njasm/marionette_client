@@ -128,12 +128,20 @@ func (t *MarionetteTransport) Send(command string, values interface{}) (*Respons
 }
 
 func write(c net.Conn, b []byte) (int, error) {
-	c.SetDeadline(connDefaultTimeout())
+	err := c.SetDeadline(connDefaultTimeout())
+	if err != nil {
+		return 0, err
+	}
+
 	return c.Write(b)
 }
 
 func (t *MarionetteTransport) Receive() ([]byte, error) {
-	t.conn.SetDeadline(connDefaultTimeout())
+	err := t.conn.SetDeadline(connDefaultTimeout())
+	if err != nil {
+		return nil, err
+	}
+
 	return read(t.conn)
 }
 
