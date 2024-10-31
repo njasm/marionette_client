@@ -83,7 +83,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           debug: true
-          carryforward: "run-ubuntu-latest-FF-130.0.1,run-ubuntu-latest-FF-131.0.3,run-ubuntu-latest-FF-132.0"
           parallel-finished: true
 
   windows:
