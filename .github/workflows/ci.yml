@@ -23,9 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest ]
-        #os: [ macos-latest, ubuntu-latest, windows-latest ]
-        go: [ 1.17.x, 1.18.x ]
-        firefox: [ "98.0.2", "99.0.1", "100.0", "110.0.1" ]
+        go: [ 1.22.x ]
+        firefox: [ "130.0.1", "131.0.3", "132.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
