@@ -24,7 +24,8 @@ type Capabilities struct {
 {"capabilities":
   {
 	"browserName":"firefox",
-	"browserVersion":"53.0.3","platformName":"linux",
+	"browserVersion":"53.0.3",
+	"platformName":"linux",
 	"platformVersion":"4.8.12-040812-generic",
 	"pageLoadStrategy":"normal",
 	"acceptInsecureCerts":false,

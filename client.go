@@ -2,6 +2,7 @@ package marionette_client
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"strings"
@@ -89,13 +90,38 @@ func (c *Client) GetCapabilities() (*Capabilities, error) {
 		return nil, err
 	}
 
-	var d = map[string]*Capabilities{}
+	var d = map[string]any{}
 	err = json.Unmarshal([]byte(r.Value), &d)
 	if err != nil {
 		return nil, err
 	}
 
-	return d["capabilities"], nil
+	// older browser versions
+	if capabilities, exist := d["capabilities"]; exist {
+		if value, ok := capabilities.(*Capabilities); ok {
+			return value, nil
+		}
+
+		return nil, errors.New("type assertion failed for *Capabilities")
+	}
+
+	// newer versions
+	if capabilities, exist := d["value"]; exist {
+		if value, ok := capabilities.(map[string]interface{}); ok {
+			var finalCap = Capabilities{}
+			damn, _ := json.Marshal(value["capabilities"])
+			err = json.Unmarshal(damn, &finalCap)
+			if err != nil {
+				return nil, err
+			}
+
+			return &finalCap, nil
+		}
+
+		return nil, errors.New("type assertion failed for *Capabilities")
+	}
+
+	return nil, errors.New("no capabilities")
 }
 
 // SetScriptTimeout Set the timeout for asynchronous script execution.
@@ -124,7 +150,8 @@ func (c *Client) SetPageLoadTimeout(milliseconds int) (*Response, error) {
 //
 // <dt><code>pageLoad</code> (number)
 // <dd>Provides the timeout limit used to interrupt navigation of the
-//  browsing context.
+//
+//	browsing context.
 //
 // <dt><code>implicit</code> (number)
 // <dd>Gives the timeout of when to abort when locating an element.
@@ -777,7 +804,7 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 }
 
 // ExecuteAsyncScript Execute JS Script Async
-//TODO: Add missing arguments/options
+// TODO: Add missing arguments/options
 func (c *Client) ExecuteAsyncScript(script string, args []interface{}, newSandbox bool) (*Response, error) {
 	parameters := map[string]interface{}{}
 	parameters["script"] = script
