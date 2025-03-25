@@ -179,6 +179,8 @@ jobs:
 
   tag-release:
     if: github.ref == 'refs/heads/master'
+    permissions:
+      contents: write
     runs-on: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v4
