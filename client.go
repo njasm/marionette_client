@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	MARIONETTE_PROTOCOL_V3 = 3
-	WEBDRIVER_ELEMENT_KEY  = "element-6066-11e4-a52e-4f735466cecf"
+	MarionetteProtocolV3 = 3
+	WebdriverElementKey  = "element-6066-11e4-a52e-4f735466cecf"
 )
 
-var RunningInDebugMode bool = false
+var RunningInDebugMode = false
 
 type session struct {
 	SessionId    string
@@ -80,7 +80,7 @@ func (c *Client) DeleteSession() error {
 	return c.transport.Close()
 }
 
-// Capabilities informs the client of which WebDriver features are
+// GetCapabilities informs the client of which WebDriver features are
 // supported by Firefox and Marionette. They are immutable for the
 // length of the session.
 func (c *Client) GetCapabilities() (*Capabilities, error) {
@@ -116,7 +116,7 @@ func (c *Client) SetPageLoadTimeout(milliseconds int) (*Response, error) {
 	return c.SetTimeouts(data)
 }
 
-// <h4>Timeouts object</h4>
+// SetTimeouts <h4>Timeouts object</h4>
 //
 // <dl>
 // <dt><code>script</code> (number)
@@ -124,7 +124,8 @@ func (c *Client) SetPageLoadTimeout(milliseconds int) (*Response, error) {
 //
 // <dt><code>pageLoad</code> (number)
 // <dd>Provides the timeout limit used to interrupt navigation of the
-//  browsing context.
+//
+//	browsing context.
 //
 // <dt><code>implicit</code> (number)
 // <dd>Gives the timeout of when to abort when locating an element.
@@ -138,7 +139,7 @@ func (c *Client) SetTimeouts(data map[string]int) (*Response, error) {
 	return r, nil
 }
 
-// Get Timeouts Get current set timeouts
+// GetTimeouts Get current set timeouts
 func (c *Client) GetTimeouts() (map[string]uint, error) {
 	r, err := c.transport.Send("WebDriver:GetTimeouts", map[string]string{})
 	if err != nil {
@@ -200,7 +201,7 @@ func (c *Client) Url() (string, error) {
 	return url["value"], nil
 }
 
-// Refresh refresh
+// Refresh refresh the page
 func (c *Client) Refresh() error {
 	_, err := c.transport.Send("WebDriver:Refresh", nil)
 	if err != nil {
@@ -408,10 +409,10 @@ func (c *Client) CloseWindow() (*Response, error) {
 	return r, nil
 }
 
-// Close the currently selected chrome window.
+// CloseChromeWindow Close the currently selected chrome window.
 //
 // If it is the last window currently open, the chrome window will not be
-// closed to prevent a shutdown of Firefox. Instead the returned
+// closed to prevent a shutdown of Firefox. Instead, the returned
 // list of chrome window handles is empty.
 //
 // return []string
@@ -436,7 +437,7 @@ func (c *Client) CloseChromeWindow() (*Response, error) {
 func (c *Client) SwitchToFrame(by By, value string) error {
 
 	//with current marionette implementation we have to find the element first and send the switchToFrame
-	//command with the UUID, else it wont work.
+	//command with the UUID, else it won't work.
 	//https://bugzilla.mozilla.org/show_bug.cgi?id=1143908
 	frame, err := c.FindElement(by, value)
 	if err != nil {
@@ -538,7 +539,7 @@ func getElementTagName(c *Client, id string) string {
 	}
 
 	var d = map[string]string{}
-	json.Unmarshal([]byte(r.Value), &d)
+	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	return d["value"]
 }
@@ -550,7 +551,7 @@ func getElementText(c *Client, id string) string {
 	}
 
 	var d = map[string]string{}
-	json.Unmarshal([]byte(r.Value), &d)
+	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	return d["value"]
 }
@@ -562,7 +563,7 @@ func getElementAttribute(c *Client, id string, name string) string {
 	}
 
 	var d = map[string]string{}
-	json.Unmarshal([]byte(r.Value), &d)
+	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	return d["value"]
 }
@@ -574,7 +575,7 @@ func getElementProperty(c *Client, id string, name string) string {
 	}
 
 	var d = map[string]string{}
-	json.Unmarshal([]byte(r.Value), &d)
+	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	return d["value"]
 }
@@ -586,7 +587,7 @@ func getElementCssPropertyValue(c *Client, id string, property string) string {
 	}
 
 	var d = map[string]string{}
-	json.Unmarshal([]byte(r.Value), &d)
+	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	return d["value"]
 }
@@ -613,7 +614,7 @@ func clickElement(c *Client, id string) {
 	}
 
 	var d = map[string]interface{}{}
-	json.Unmarshal([]byte(r.Value), &d)
+	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	//return d
 }
@@ -631,7 +632,7 @@ func sendKeysToElement(c *Client, id string, keys string) error {
 	}
 
 	var d = map[string]interface{}{}
-	json.Unmarshal([]byte(r.Value), &d)
+	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	return nil
 }
@@ -643,7 +644,7 @@ func clearElement(c *Client, id string) {
 	}
 
 	var d = map[string]interface{}{}
-	json.Unmarshal([]byte(r.Value), &d)
+	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	//return d
 }
@@ -674,7 +675,7 @@ func findElements(c *Client, by By, value string, startNode *string) ([]*WebElem
 
 	var e []*WebElement
 	for _, v := range d {
-		e = append(e, &WebElement{c: c, id: v[WEBDRIVER_ELEMENT_KEY]})
+		e = append(e, &WebElement{c: c, id: v[WebdriverElementKey]})
 	}
 
 	return e, nil
@@ -777,7 +778,7 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 }
 
 // ExecuteAsyncScript Execute JS Script Async
-//TODO: Add missing arguments/options
+// TODO: Add missing arguments/options
 func (c *Client) ExecuteAsyncScript(script string, args []interface{}, newSandbox bool) (*Response, error) {
 	parameters := map[string]interface{}{}
 	parameters["script"] = script
@@ -825,7 +826,7 @@ func (c *Client) TextFromAlert() (string, error) {
 	}
 
 	var d = map[string]string{}
-	json.Unmarshal([]byte(r.Value), &d)
+	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	return d["value"], nil
 }
