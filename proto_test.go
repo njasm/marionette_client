@@ -17,7 +17,7 @@ func NewDecoderErrorTest(t *testing.T) {
 }
 
 func DecodeErrorTest(t *testing.T) {
-	rv, err := NewDecoderEncoder(MARIONETTE_PROTOCOL_V3)
+	rv, err := NewDecoderEncoder(MarionetteProtocolV3)
 	if err != nil {
 		t.Fatalf("%v", err)
 	}

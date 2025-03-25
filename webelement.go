@@ -126,14 +126,14 @@ func (e *WebElement) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if newId, ok := d["value"][WEBDRIVER_ELEMENT_KEY]; ok {
+	if newId, ok := d["value"][WebdriverElementKey]; ok {
 		e.id = newId
 		return nil
 	}
 
 	return DriverError{
-		ErrorType: "WebDriverElementKey",
-		Message: fmt.Sprintf("key %v expected in response but not found", WEBDRIVER_ELEMENT_KEY),
+		ErrorType:  "WebDriverElementKey",
+		Message:    fmt.Sprintf("key %v expected in response but not found", WebdriverElementKey),
 		Stacktrace: nil,
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func NewDecoderEncoder(protoVersion int32) (DecoderEncoder, error) {
-	if protoVersion == MARIONETTE_PROTOCOL_V3 {
+	if protoVersion == MarionetteProtocolV3 {
 		return ProtoV3DecoderEncoder{}, nil
 	}
 
