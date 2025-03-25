@@ -2,6 +2,7 @@ package marionette_client
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"strings"
@@ -89,13 +90,40 @@ func (c *Client) GetCapabilities() (*Capabilities, error) {
 		return nil, err
 	}
 
-	var d = map[string]*Capabilities{}
+	var d = map[string]any{}
 	err = json.Unmarshal([]byte(r.Value), &d)
 	if err != nil {
 		return nil, err
 	}
 
-	return d["capabilities"], nil
+	// older browser versions
+	if capabilities, exist := d["capabilities"]; exist {
+		var finalCap = Capabilities{}
+		bytes, _ := json.Marshal(capabilities)
+		if err := json.Unmarshal(bytes, &finalCap); err != nil {
+			return nil, err
+		}
+
+		return &finalCap, nil
+	}
+
+	// newer versions
+	if capabilities, exist := d["value"]; exist {
+		if value, ok := capabilities.(map[string]interface{}); ok {
+			var finalCap = Capabilities{}
+			bytes, _ := json.Marshal(value["capabilities"])
+			err = json.Unmarshal(bytes, &finalCap)
+			if err != nil {
+				return nil, err
+			}
+
+			return &finalCap, nil
+		}
+
+		return nil, errors.New("type assertion failed for *Capabilities")
+	}
+
+	return nil, errors.New("no capabilities")
 }
 
 // SetScriptTimeout Set the timeout for asynchronous script execution.
@@ -256,7 +284,7 @@ func (c *Client) Context() (*Response, error) {
 // WINDOWS HANDLES //
 /////////////////////
 
-// GetWindowHandle returns the current window ID
+// GetWindowHandle returns the current window Id
 func (c *Client) GetWindowHandle() (string, error) {
 	r, err := c.transport.Send("WebDriver:GetWindowHandle", nil)
 	if err != nil {
@@ -271,7 +299,7 @@ func (c *Client) GetWindowHandle() (string, error) {
 	return d["value"], nil
 }
 
-// GetWindowHandles return array of window ID currently opened
+// GetWindowHandles return array of window Id currently opened
 func (c *Client) GetWindowHandles() ([]string, error) {
 	r, err := c.transport.Send("WebDriver:GetWindowHandles", nil)
 	if err != nil {
@@ -433,7 +461,7 @@ func (c *Client) CloseChromeWindow() (*Response, error) {
 // FRAMES //
 ////////////
 
-// SwitchToFrame switch to frame - strategies: By(ID), By(NAME) or name only.
+// SwitchToFrame switch to frame - strategies: By(Id), By(Name) or name only.
 func (c *Client) SwitchToFrame(by By, value string) error {
 
 	//with current marionette implementation we have to find the element first and send the switchToFrame

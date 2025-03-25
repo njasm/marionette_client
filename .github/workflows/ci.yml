@@ -22,10 +22,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # If you change the Matrix values, make sure to update the 'carryforward'
+        # field of the coveralls app job below.
         os: [ ubuntu-latest ]
-        #os: [ macos-latest, ubuntu-latest, windows-latest ]
-        go: [ 1.17.x, 1.18.x ]
-        firefox: [ "98.0.2", "99.0.1", "100.0", "110.0.1" ]
+        go: [ 1.22.x ]
+        firefox: [ "130.0.1", "131.0.3", "132.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -66,7 +67,7 @@ jobs:
         outfile: coverage.lcov
 
     - name: Coveralls
-      uses: coverallsapp/github-action@v1.1.2
+      uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.github_token }}
         path-to-lcov: coverage.lcov
@@ -78,9 +79,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Coveralls Finished
-        uses: coverallsapp/github-action@v1.2.4
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          debug: true
           flag-name: run ${{ join(matrix.*, ' - ') }}
           parallel: true
           parallel-finished: true
@@ -91,8 +93,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ windows-latest ]
-        go: [ 1.17.x, 1.18.x ]
-        firefox: [ "98.0.2", "99.0.1", "100.0", "110.0.1" ]
+        go: [ 1.22.x ]
+        firefox: [ "130.0.1", "131.0.3", "132.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -129,8 +131,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ macos-latest ]
-        go: [ 1.17.x, 1.18.x ]
-        firefox: [ "98.0.2", "99.0.1", "100.0", "110.0.1" ]
+        go: [ 1.22.x ]
+        firefox: [ "130.0.1", "131.0.3", "132.0" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -159,7 +161,7 @@ jobs:
         run: |
           $HOME/firefox/Firefox.app/Contents/MacOS/firefox --version
           ls -sl $HOME/firefox/Firefox.app/Contents/MacOS/*
-          $HOME/firefox/Firefox.app/Contents/MacOS/firefox-bin -marionette > /dev/null 2>&1 &
+          $HOME/firefox/Firefox.app/Contents/MacOS/firefox -marionette > /dev/null 2>&1 &
           sleep 5
           netstat -p tcp -van | grep LISTEN
           go test -test.v -race -covermode=atomic

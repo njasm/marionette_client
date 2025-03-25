@@ -41,7 +41,7 @@ func WaitForUntilIntegrationTest(t *testing.T) {
 	client.Navigate("http://www.w3schools.com/xml/tryit.asp?filename=tryajax_get")
 
 	timeout := time.Duration(10) * time.Second
-	condition := ElementIsPresent(By(CSS_SELECTOR), "a.w3-button.w3-bar-item.topnav-icons.fa.fa-rotate")
+	condition := ElementIsPresent(By(CssSelector), "a.w3-button.w3-bar-item.topnav-icons.fa.fa-rotate")
 	ok, v, err := Wait(client).For(timeout).Until(condition)
 
 	if err != nil || !ok {
@@ -50,12 +50,12 @@ func WaitForUntilIntegrationTest(t *testing.T) {
 
 	v.Click()
 
-	err = client.SwitchToFrame(By(ID), "iframeResult")
+	err = client.SwitchToFrame(By(Id), "iframeResult")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	e, err := client.FindElement(By(TAG_NAME), "button")
+	e, err := client.FindElement(By(TagName), "button")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
