@@ -7,6 +7,9 @@ on:
       - trying
   pull_request: {}
 
+permissions:
+  contents: read
+
 jobs:
   # TODO: drop it when GitHub supports its by itself
   cancel-previous:
@@ -173,3 +176,21 @@ jobs:
     steps:
       - name: "Merge into master"
         run: exit 0
+
+  tag-release:
+    if: github.ref == 'refs/heads/master'
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
