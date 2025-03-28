@@ -18,6 +18,9 @@ func UntilErrorTest(t *testing.T) {
 		return false, nil, errors.New(errorMsg)
 	}
 	_, _, err := Wait(client).For(timeout).Until(condition)
+	if err == nil {
+		t.Fatal("Expected error, got nil")
+	}
 
 	if err.Error() != errorMsg {
 		t.Fatalf("Expected error msg %v, got %v", errorMsg, err.Error())

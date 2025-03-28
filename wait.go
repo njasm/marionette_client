@@ -37,7 +37,8 @@ func (w *Waiter) Until(f func(c Finder) (bool, *WebElement, error)) (bool, *WebE
 
 		ok, value, err := f(w.f)
 		if err != nil {
-			_, de := err.(DriverError)
+			var driverError *DriverError
+			de := errors.As(err, &driverError)
 			if de {
 				return false, nil, err
 			}
