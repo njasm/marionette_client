@@ -53,9 +53,9 @@ jobs:
         wget -O firefox.tar.z $FIREFOX_SOURCE_URL
 
         if [ "$FIREFOX_VERSION" = "136.0.3" ]; then
-          export $TAR_FLAGS = "-Jvxf"
+          export TAR_FLAGS = "-Jvxf"
         else
-          export $TAR_FLAGS = "-jvxf"
+          export TAR_FLAGS = "-jvxf"
         fi
         
         echo "TAR_FLAGS: " $TAR_FLAGS
