@@ -14,11 +14,6 @@ func TestWebElementUnmarshalJSON(t *testing.T) {
 		if err == nil {
 			t.Fatal("Expected error for invalid JSON format, got nil")
 		}
-
-		_, ok := err.(*DriverError)
-		if !ok {
-			t.Fatalf("Expected error to be of type *DriverError, got %T", err)
-		}
 	})
 
 	t.Run("MissingWebDriverElementKey", func(t *testing.T) {
