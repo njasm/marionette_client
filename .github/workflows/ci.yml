@@ -27,7 +27,7 @@ jobs:
         # field of the coveralls app job below.
         os: [ ubuntu-latest ]
         go: [ 1.22.x ]
-        firefox: [ "130.0.1", "131.0.3", "132.0" ]
+        firefox: [ "131.0.3", "132.0", "136.0.3" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
