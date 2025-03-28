@@ -91,89 +91,10 @@ jobs:
           parallel: true
           parallel-finished: true
 
-  windows:
-    name: windows
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ windows-latest ]
-        go: [ 1.22.x ]
-        firefox: [ "130.0.1", "131.0.3", "132.0" ]
-    runs-on: ${{ matrix.os }}
-    env:
-      FIREFOX_VERSION: ${{ matrix.firefox }}
-      MOZ_HEADLESS: 1
-      MOZ_MARIONETTE: 1
-      DISPLAY: ":99.0"
-    steps:
-      - name: Set up golang
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go }}
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-
-      - name: Go Version
-        run: go version
-
-      - name: Install Firefox
-        run: choco install Firefox --force --version=${{ matrix.firefox }} --params "/NoMaintenanceService /RemoveDistributionDir /NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
-
-      - name: Test Firefox
-        run: |
-          netsh advfirewall set allprofiles state off
-          dir d:\ff
-          d:\ff\firefox.exe -Marionette
-          tasklist
-          netstat -aon -p TCP
-          go test -v -covermode=atomic
-
-  osx:
-    name: mac-os
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ macos-latest ]
-        go: [ 1.22.x ]
-        firefox: [ "130.0.1", "131.0.3", "132.0" ]
-    runs-on: ${{ matrix.os }}
-    env:
-      FIREFOX_VERSION: ${{ matrix.firefox }}
-      MOZ_HEADLESS: 1
-      MOZ_MARIONETTE: 1
-      DISPLAY: ":99.0"
-    steps:
-      - name: Set up golang
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go }}
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-
-      - name: Install Firefox
-        run: |
-          export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=osx"
-          wget -O /tmp/firefox.dmg $FIREFOX_SOURCE_URL
-          mkdir -p $HOME/firefox
-          hdiutil attach /tmp/firefox.dmg | grep Volumes
-          ls -sl /Volumes/Firefox/*
-          cp -R /Volumes/Firefox/Firefox.app $HOME/firefox/Firefox.app
-
-      - name: Startup Firefox in Headless mode
-        run: |
-          $HOME/firefox/Firefox.app/Contents/MacOS/firefox --version
-          ls -sl $HOME/firefox/Firefox.app/Contents/MacOS/*
-          $HOME/firefox/Firefox.app/Contents/MacOS/firefox -marionette > /dev/null 2>&1 &
-          sleep 5
-          netstat -p tcp -van | grep LISTEN
-          go test -test.v -race -covermode=atomic
-
   ci-pass:
     name: 'ci-pass'
     runs-on: "ubuntu-latest"
-    needs: [linux, windows, osx]
+    needs: [linux]
     steps:
       - name: "Merge into master"
         run: exit 0

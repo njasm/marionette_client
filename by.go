@@ -39,10 +39,6 @@ const (
 	AnonAttribute
 )
 
-func ID() By {
-	return Id
-}
-
 var bys = [...]string{
 	"id",
 	"name",
