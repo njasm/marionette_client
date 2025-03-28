@@ -59,12 +59,12 @@ func WaitForUntilIntegrationTest(t *testing.T) {
 
 	v.Click()
 
-	err = client.SwitchToFrame(By(Id), "iframeResult")
+	err = client.SwitchToFrame(Id, "iframeResult")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	e, err := client.FindElement(By(TagName), "button")
+	e, err := client.FindElement(TagName, "button")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}

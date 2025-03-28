@@ -40,7 +40,7 @@ const (
 )
 
 func ID() By {
-	return By(Id)
+	return Id
 }
 
 var bys = [...]string{

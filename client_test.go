@@ -332,16 +332,16 @@ func GetActiveElementTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	// theres always an active element?
+	// there's always an active element?
 	t.Logf("%#v", r)
 
-	form, err := client.FindElement(By(Name), "optional")
+	form, err := client.FindElement(Name, "optional")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
 	// click on a *other* form element to activate
-	e, _ := client.FindElement(By(Id), "email")
+	e, _ := client.FindElement(Id, "email")
 	e.Click()
 
 	// assert now
@@ -484,7 +484,7 @@ func FindElementTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	element, err := client.FindElement(By(Id), "the-table")
+	element, err := client.FindElement(Id, "the-table")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -545,7 +545,7 @@ func FindElementTest(t *testing.T) {
 
 	t.Logf("%T %#v", collection, collection)
 
-	el, err := element.FindElement(By(CssSelector), CssSelectorTagTd)
+	el, err := element.FindElement(CssSelector, CssSelectorTagTd)
 	if el == nil || err != nil {
 		t.FailNow()
 	}
@@ -558,7 +558,7 @@ func SendKeysTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	e, err := client.FindElement(By(Id), "email")
+	e, err := client.FindElement(Id, "email")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
