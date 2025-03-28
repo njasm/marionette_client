@@ -55,7 +55,7 @@ jobs:
         if [ "$FIREFOX_VERSION" = "136.0.3" ]; then
           export TAR_FLAGS="-Jvxf"
         else
-          export TAR_FLAGS="-xvf""-jvxf"
+          export TAR_FLAGS="-jvxf"
         fi
         
         echo "TAR_FLAGS: " $TAR_FLAGS
