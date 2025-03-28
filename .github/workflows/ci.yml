@@ -49,9 +49,19 @@ jobs:
       run: |
 
         export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
-        wget -O /tmp/firefox.tar.z $FIREFOX_SOURCE_URL
+        cd /tmp
+        wget $FIREFOX_SOURCE_URL
+        
+        export FF_FILENAME=$(ls firefox*)
+        extension="${FF_FILENAME##*.}"
+        if [ "$extension" = "xz" ]; then
+          export $TAR_FLAGS = "-Jvxf"
+        else
+          export $TAR_FLAGS = "-jvxf"
+        fi
+        
         mkdir -p $HOME/firefox
-        tar -jvxf /tmp/firefox.tar.z -C $HOME/
+        tar $TAR_FLAGS /tmp/$FF_FILENAME -C $HOME/
 
     - name: Startup Firefox in Headless mode
       run: |
