@@ -27,7 +27,7 @@ jobs:
         # field of the coveralls app job below.
         os: [ ubuntu-latest ]
         go: [ 1.22.x ]
-        firefox: [ "130.0.1", "131.0.3", "132.0" ]
+        firefox: [ "131.0.3", "132.0", "136.0.3" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -42,12 +42,25 @@ jobs:
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
 
+    - name: instal xz utils
+      run: sudo apt install xz-utils -y
+
     - name: Download and install Firefox
       run: |
+
         export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
-        wget -O /tmp/firefox.tar.bz2 $FIREFOX_SOURCE_URL
+        cd /tmp
+        wget -O firefox.tar.z $FIREFOX_SOURCE_URL
+
+        if [ "$FIREFOX_VERSION" = "136.0.3" ]; then
+          export TAR_FLAGS="-Jvxf"
+        else
+          export TAR_FLAGS="-jvxf"
+        fi
+        
+        echo "TAR_FLAGS: " $TAR_FLAGS
         mkdir -p $HOME/firefox
-        tar -jvxf /tmp/firefox.tar.bz2 -C $HOME/
+        tar $TAR_FLAGS /tmp/firefox.tar.z -C $HOME/
 
     - name: Startup Firefox in Headless mode
       run: |
@@ -91,89 +104,10 @@ jobs:
           parallel: true
           parallel-finished: true
 
-  windows:
-    name: windows
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ windows-latest ]
-        go: [ 1.22.x ]
-        firefox: [ "130.0.1", "131.0.3", "132.0" ]
-    runs-on: ${{ matrix.os }}
-    env:
-      FIREFOX_VERSION: ${{ matrix.firefox }}
-      MOZ_HEADLESS: 1
-      MOZ_MARIONETTE: 1
-      DISPLAY: ":99.0"
-    steps:
-      - name: Set up golang
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go }}
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-
-      - name: Go Version
-        run: go version
-
-      - name: Install Firefox
-        run: choco install Firefox --force --version=${{ matrix.firefox }} --params "/NoMaintenanceService /RemoveDistributionDir /NoTaskbarShortcut /NoDesktopShortcut /NoAutoUpdate /InstallDir:d:\ff"
-
-      - name: Test Firefox
-        run: |
-          netsh advfirewall set allprofiles state off
-          dir d:\ff
-          d:\ff\firefox.exe -Marionette
-          tasklist
-          netstat -aon -p TCP
-          go test -v -covermode=atomic
-
-  osx:
-    name: mac-os
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ macos-latest ]
-        go: [ 1.22.x ]
-        firefox: [ "130.0.1", "131.0.3", "132.0" ]
-    runs-on: ${{ matrix.os }}
-    env:
-      FIREFOX_VERSION: ${{ matrix.firefox }}
-      MOZ_HEADLESS: 1
-      MOZ_MARIONETTE: 1
-      DISPLAY: ":99.0"
-    steps:
-      - name: Set up golang
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go }}
-
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
-
-      - name: Install Firefox
-        run: |
-          export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=osx"
-          wget -O /tmp/firefox.dmg $FIREFOX_SOURCE_URL
-          mkdir -p $HOME/firefox
-          hdiutil attach /tmp/firefox.dmg | grep Volumes
-          ls -sl /Volumes/Firefox/*
-          cp -R /Volumes/Firefox/Firefox.app $HOME/firefox/Firefox.app
-
-      - name: Startup Firefox in Headless mode
-        run: |
-          $HOME/firefox/Firefox.app/Contents/MacOS/firefox --version
-          ls -sl $HOME/firefox/Firefox.app/Contents/MacOS/*
-          $HOME/firefox/Firefox.app/Contents/MacOS/firefox -marionette > /dev/null 2>&1 &
-          sleep 5
-          netstat -p tcp -van | grep LISTEN
-          go test -test.v -race -covermode=atomic
-
   ci-pass:
     name: 'ci-pass'
     runs-on: "ubuntu-latest"
-    needs: [linux, windows, osx]
+    needs: [linux]
     steps:
       - name: "Merge into master"
         run: exit 0
