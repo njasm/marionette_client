@@ -8,13 +8,11 @@ import (
 )
 
 const (
-	TESTDATA_FOLDER   = "testdata"
-	WWW_FOLDER        = "html"
-	TARGET_URL        = "https://www.abola.pt/"
-	ID_SELECTOR       = "clubes-hp"
-	CSS_SELECTOR_LI   = "td"
-	ID_SELECTOR_INPUT = "topo_txtPesquisa"
-	TIMEOUT           = 5000 // milliseconds
+	TestdataFolder   = "testdata"
+	WwwFolder        = "html"
+	TargetUrl        = "https://www.abola.pt/"
+	CssSelectorTagTd = "td"
+	Timeout          = 5000 // milliseconds
 )
 
 var client *Client
@@ -28,7 +26,7 @@ func navigateLocal(page string) (*Response, error) {
 
 	fmt.Println(pwd)
 
-	var schema = "file://" + pwd + "/" + TESTDATA_FOLDER + "/" + WWW_FOLDER + "/"
+	var schema = "file://" + pwd + "/" + TestdataFolder + "/" + WwwFolder + "/"
 	return client.Navigate(schema + page)
 }
 
@@ -133,7 +131,7 @@ func GetSessionIDTest(t *testing.T) {
 }
 
 func GetPageTest(t *testing.T) {
-	r, err := client.Navigate(TARGET_URL)
+	r, err := client.Navigate(TargetUrl)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -147,8 +145,8 @@ func UrlTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	if url != TARGET_URL {
-		t.Fatalf("Current Url %v not equal to target url %v", url, TARGET_URL)
+	if url != TargetUrl {
+		t.Fatalf("Current Url %v not equal to target url %v", url, TargetUrl)
 	}
 
 }
@@ -266,7 +264,7 @@ func DeleteAllCookiesTest(t *testing.T) {
 	}
 
 	// reset url for next tests
-	_, _ = client.Navigate(TARGET_URL)
+	_, _ = client.Navigate(TargetUrl)
 }
 
 //func TestConnectWithActiveConnection(t *testing.T) {
@@ -303,14 +301,14 @@ func ScreenshotTest(t *testing.T) {
 }
 
 func SetContextTest(t *testing.T) {
-	r, err := client.SetContext(Context(CHROME))
+	r, err := client.SetContext(Context(Chrome))
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
 	t.Log(r.Value)
 
-	r, err = client.SetContext(Context(CONTENT))
+	r, err = client.SetContext(Context(Content))
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -334,16 +332,16 @@ func GetActiveElementTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	// theres always an active element?
+	// there's always an active element?
 	t.Logf("%#v", r)
 
-	form, err := client.FindElement(By(Name), "optional")
+	form, err := client.FindElement(Name, "optional")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
 	// click on a *other* form element to activate
-	e, _ := client.FindElement(By(Id), "email")
+	e, _ := client.FindElement(Id, "email")
 	e.Click()
 
 	// assert now
@@ -356,18 +354,18 @@ func GetActiveElementTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	_, _ = client.Navigate(TARGET_URL)
+	_, _ = client.Navigate(TargetUrl)
 }
 
 func GetPageSourceTest(t *testing.T) {
-	r, err := client.SetContext(Context(CHROME))
+	r, err := client.SetContext(Context(Chrome))
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
 	t.Log(r.Value)
 
-	r, err = client.SetContext(Context(CONTENT))
+	r, err = client.SetContext(Context(Content))
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -376,7 +374,7 @@ func GetPageSourceTest(t *testing.T) {
 }
 
 func SetScriptTimoutTest(t *testing.T) {
-	r, err := client.SetScriptTimeout(TIMEOUT)
+	r, err := client.SetScriptTimeout(Timeout)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -385,7 +383,7 @@ func SetScriptTimoutTest(t *testing.T) {
 }
 
 func SetPageTimoutTest(t *testing.T) {
-	r, err := client.SetPageLoadTimeout(TIMEOUT)
+	r, err := client.SetPageLoadTimeout(Timeout)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -394,7 +392,7 @@ func SetPageTimoutTest(t *testing.T) {
 }
 
 func SetSearchTimoutTest(t *testing.T) {
-	r, err := client.SetImplicitTimout(TIMEOUT)
+	r, err := client.SetImplicitTimout(Timeout)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -408,8 +406,8 @@ func GetTimeoutsTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	if r["pageLoad"] != TIMEOUT {
-		t.Fatalf("pageLoad TIMEOUT value, was expected to be: %#v", TIMEOUT)
+	if r["pageLoad"] != Timeout {
+		t.Fatalf("pageLoad TIMEOUT value, was expected to be: %#v", Timeout)
 	}
 
 	t.Log(r)
@@ -424,8 +422,8 @@ func PageSourceTest(t *testing.T) {
 
 func ExecuteScriptWithoutFunctionTest(t *testing.T) {
 	script := "return (document.readyState == 'complete');"
-	args := []interface{}{}
-	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
+	args := []any{}
+	r, err := client.ExecuteScript(script, args, Timeout, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -435,8 +433,8 @@ func ExecuteScriptWithoutFunctionTest(t *testing.T) {
 
 func ExecuteScriptTest(t *testing.T) {
 	script := "function testMyGoMarionetteClient() { return 'yes'; } return testMyGoMarionetteClient();"
-	args := []interface{}{}
-	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
+	args := []any{}
+	r, err := client.ExecuteScript(script, args, Timeout, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -446,8 +444,8 @@ func ExecuteScriptTest(t *testing.T) {
 
 func ExecuteScriptWithArgsTest(t *testing.T) {
 	script := "function testMyGoMarionetteClientArgs(a, b) { return a + b; }; return testMyGoMarionetteClientArgs(arguments[0], arguments[1]);"
-	args := []interface{}{1, 3}
-	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
+	args := []any{1, 3}
+	r, err := client.ExecuteScript(script, args, Timeout, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -461,7 +459,7 @@ func ExecuteAsyncScriptWithArgsTest(t *testing.T) {
 		"let result = testMyGoMarionetteClientArgs(arguments[0], arguments[1]);" +
 		"resolve(result);"
 
-	args := []interface{}{3, 3}
+	args := []any{3, 3}
 	r, err := client.ExecuteAsyncScript(script, args, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
@@ -481,8 +479,12 @@ func GetTitleTest(t *testing.T) {
 }
 
 func FindElementTest(t *testing.T) {
-	navigateLocal("table.html")
-	element, err := client.FindElement(By(Id), "the-table")
+	_, err := navigateLocal("table.html")
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	element, err := client.FindElement(Id, "the-table")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -532,7 +534,7 @@ func FindElementTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	collection, err := element.FindElements(By(CssSelector), CSS_SELECTOR_LI)
+	collection, err := element.FindElements(CssSelector, CssSelectorTagTd)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -543,7 +545,7 @@ func FindElementTest(t *testing.T) {
 
 	t.Logf("%T %#v", collection, collection)
 
-	el, err := element.FindElement(By(CssSelector), CSS_SELECTOR_LI)
+	el, err := element.FindElement(CssSelector, CssSelectorTagTd)
 	if el == nil || err != nil {
 		t.FailNow()
 	}
@@ -551,13 +553,17 @@ func FindElementTest(t *testing.T) {
 }
 
 func SendKeysTest(t *testing.T) {
-	navigateLocal("form.html")
-	e, err := client.FindElement(By(Id), "email")
+	_, err := navigateLocal("form.html")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
 
-	var test string = "teste@example.com"
+	e, err := client.FindElement(Id, "email")
+	if err != nil {
+		t.Fatalf("%#v", err)
+	}
+
+	var test = "teste@example.com"
 	err = e.SendKeys(test)
 	if err != nil {
 		t.Fatalf("%#v", err)
@@ -578,8 +584,12 @@ func SendKeysTest(t *testing.T) {
 }
 
 func FindElementsTest(t *testing.T) {
-	navigateLocal("ul.html")
-	elements, err := client.FindElements(By(CssSelector), CSS_SELECTOR_LI)
+	_, err := navigateLocal("ul.html")
+	if err != nil {
+		t.Fatalf("failed to navigate local: %#v", err)
+	}
+
+	elements, err := client.FindElements(CssSelector, CssSelectorTagTd)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}
@@ -678,19 +688,38 @@ func SwitchToParentFrameTest(t *testing.T) {
 }
 
 func NavigatorMethodsTest(t *testing.T) {
-	client.SetContext(Context(CONTENT))
+	_, err := client.SetContext(Context(Content))
+	if err != nil {
+		t.Fatalf("failed to set context: %#v", err)
+	}
+
 	url1 := "https://www.google.pt/"
 	url2 := "https://www.mercedes-benz.com/en/"
 
-	client.Navigate(url1)
+	_, err = client.Navigate(url1)
+	if err != nil {
+		t.Fatalf("failed to navigate url1: %#v", err)
+	}
+
 	sleep := time.Duration(2) * time.Second
 	time.Sleep(sleep)
 
-	client.Navigate(url2)
+	_, err = client.Navigate(url2)
+	if err != nil {
+		t.Fatalf("failed to navigate url2: %#v", err)
+	}
+
 	time.Sleep(sleep)
 
-	client.Back()
-	client.Refresh()
+	err = client.Back()
+	if err != nil {
+		t.Fatalf("failed to navigate back btn: %#v", err)
+	}
+
+	err = client.Refresh()
+	if err != nil {
+		t.Fatalf("failed to refresh: %#v", err)
+	}
 	time.Sleep(sleep)
 
 	firstUrl, err := client.Url()
@@ -702,10 +731,14 @@ func NavigatorMethodsTest(t *testing.T) {
 		t.Fatalf("Expected url %v - received url %v", url1, firstUrl)
 	}
 
-	client.Forward()
+	err = client.Forward()
+	if err != nil {
+		t.Fatalf("failed to navigate forward btn: %#v", err)
+	}
+
 	secondUrl, err := client.Url()
 	if err != nil {
-		t.Fatalf("%#v", err)
+		t.Fatalf("failed to get current url: %#v", err)
 	}
 
 	if secondUrl != url2 {
@@ -714,37 +747,45 @@ func NavigatorMethodsTest(t *testing.T) {
 }
 
 func PromptTest(t *testing.T) {
-	navigateLocal("ul.html")
-	var text string = "marionette is cool or what - prompt?"
-	var script string = "prompt('" + text + "');"
-	args := []interface{}{}
-
-	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
+	_, err := navigateLocal("ul.html")
 	if err != nil {
-		t.Fatalf("%#v", err)
+		t.Fatalf("failed to navigate local: %#v", err)
+	}
+
+	var text = "marionette is cool or what - prompt?"
+	var script = "prompt('" + text + "');"
+	args := []any{}
+
+	r, err := client.ExecuteScript(script, args, Timeout, false)
+	if err != nil {
+		t.Fatalf("failed to execute script: %#v", err)
 	}
 
 	err = client.SendAlertText("yeah!")
 	if err != nil {
-		t.Fatalf("%#v", err)
+		t.Fatalf("failed to send alert text: %#v", err)
 	}
 
 	time.Sleep(time.Duration(5) * time.Second)
 
 	err = client.AcceptAlert()
 	if err != nil {
-		t.Fatalf("%#v", err)
+		t.Fatalf("failed to accept alert: %#v", err)
 	}
 
 	t.Log(r.Value)
 }
 
 func AlertTest(t *testing.T) {
-	navigateLocal("table.html")
-	var text string = "marionette is cool or what?"
-	var script string = "alert('" + text + "');"
-	args := []interface{}{}
-	r, err := client.ExecuteScript(script, args, TIMEOUT, false)
+	_, err := navigateLocal("table.html")
+	if err != nil {
+		t.Fatalf("failed to navigate local: %#v", err)
+	}
+
+	var text = "marionette is cool or what?"
+	var script = "alert('" + text + "');"
+	args := []any{}
+	r, err := client.ExecuteScript(script, args, Timeout, false)
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}

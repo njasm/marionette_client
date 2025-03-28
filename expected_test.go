@@ -35,7 +35,7 @@ func ElementIsPresentFalseTest(t *testing.T) {
 	fake := new(fakeFinder)
 	fake.ReturnError = true
 
-	fun := ElementIsPresent(By(Id), "")
+	fun := ElementIsPresent(Id, "")
 
 	r, _, _ := fun(fake)
 	if r {
@@ -46,7 +46,7 @@ func ElementIsPresentFalseTest(t *testing.T) {
 // required test in sequential main client test: client_test.go
 func NotPresentTest(t *testing.T) {
 	timeout := time.Duration(5) * time.Second
-	condition := ElementIsNotPresent(By(Id), "non-existing-element")
+	condition := ElementIsNotPresent(Id, "non-existing-element")
 	ok, _, _ := Wait(client).For(timeout).Until(condition)
 
 	if !ok {
