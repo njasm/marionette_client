@@ -53,13 +53,14 @@ jobs:
         wget $FIREFOX_SOURCE_URL
         
         export FF_FILENAME=$(ls firefox*)
+        echo "FF_FILENAME: " $FF_FILENAME
         extension="${FF_FILENAME##*.}"
         if [ "$extension" = "xz" ]; then
           export $TAR_FLAGS = "-Jvxf"
         else
           export $TAR_FLAGS = "-jvxf"
         fi
-        
+        echo "TAR_FLAGS: " $TAR_FLAGS
         mkdir -p $HOME/firefox
         tar $TAR_FLAGS /tmp/$FF_FILENAME -C $HOME/
 
