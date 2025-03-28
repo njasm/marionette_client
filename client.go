@@ -50,7 +50,7 @@ func (c *Client) Connect(host string, port int) error {
 
 // NewSession create new session
 func (c *Client) NewSession(sessionId string, cap *Capabilities) (*Response, error) {
-	data := map[string]interface{}{
+	data := map[string]any{
 		"sessionId":    sessionId,
 		"capabilities": cap,
 	}
@@ -109,7 +109,7 @@ func (c *Client) GetCapabilities() (*Capabilities, error) {
 
 	// newer versions
 	if capabilities, exist := d["value"]; exist {
-		if value, ok := capabilities.(map[string]interface{}); ok {
+		if value, ok := capabilities.(map[string]any); ok {
 			var finalCap = Capabilities{}
 			bytes, _ := json.Marshal(value["capabilities"])
 			err = json.Unmarshal(bytes, &finalCap)
@@ -317,7 +317,7 @@ func (c *Client) GetWindowHandles() ([]string, error) {
 
 // SwitchToWindow switch to specific window.
 func (c *Client) SwitchToWindow(name string) error {
-	_, err := c.transport.Send("WebDriver:SwitchToWindow", map[string]interface{}{"focus": true, "handle": name})
+	_, err := c.transport.Send("WebDriver:SwitchToWindow", map[string]any{"focus": true, "handle": name})
 	if err != nil {
 		return err
 	}
@@ -343,7 +343,7 @@ func (c *Client) GetWindowRect() (rect *WindowRect, err error) {
 
 // SetWindowRect sets window position and size
 func (c *Client) SetWindowRect(rect WindowRect) error {
-	_, err := c.transport.Send("WebDriver:SetWindowRect", map[string]interface{}{"x": rect.X, "y": rect.Y, "width": math.Floor(rect.Width), "height": math.Floor(rect.Height)})
+	_, err := c.transport.Send("WebDriver:SetWindowRect", map[string]any{"x": rect.X, "y": rect.Y, "width": math.Floor(rect.Width), "height": math.Floor(rect.Height)})
 	if err != nil {
 		return err
 	}
@@ -418,7 +418,7 @@ func (c *Client) FullscreenWindow() (rect *WindowRect, err error) {
 // return {"handle": string, "type": string}
 // Handle and type of the new browsing context.
 func (c *Client) NewWindow(focus bool, typ string, private bool) (*Response, error) {
-	r, err := c.transport.Send("WebDriver:NewWindow", map[string]interface{}{"focus": focus, "type": typ, "private": private})
+	r, err := c.transport.Send("WebDriver:NewWindow", map[string]any{"focus": focus, "type": typ, "private": private})
 	if err != nil {
 		return nil, err
 	}
@@ -472,7 +472,7 @@ func (c *Client) SwitchToFrame(by By, value string) error {
 		return err
 	}
 
-	_, err = c.transport.Send("WebDriver:SwitchToFrame", map[string]interface{}{"element": frame.Id(), "focus": true})
+	_, err = c.transport.Send("WebDriver:SwitchToFrame", map[string]any{"element": frame.Id(), "focus": true})
 	if err != nil {
 		return err
 	}
@@ -496,7 +496,7 @@ func (c *Client) SwitchToParentFrame() error {
 
 // AddCookie Adds a cookie
 func (c *Client) AddCookie(cookie Cookie) (*Response, error) {
-	r, err := c.transport.Send("WebDriver:AddCookie", map[string]interface{}{"cookie": cookie})
+	r, err := c.transport.Send("WebDriver:AddCookie", map[string]any{"cookie": cookie})
 	if err != nil {
 		return nil, err
 	}
@@ -519,7 +519,7 @@ func (c *Client) GetCookies() ([]Cookie, error) {
 
 // DeleteCookie Deletes cookie by name
 func (c *Client) DeleteCookie(name string) (error, error) {
-	_, err := c.transport.Send("WebDriver:DeleteCookie", map[string]interface{}{"name": name})
+	_, err := c.transport.Send("WebDriver:DeleteCookie", map[string]any{"name": name})
 	return err, nil
 }
 
@@ -534,7 +534,7 @@ func (c *Client) DeleteAllCookies() error {
 //////////////////
 
 func isElementEnabled(c *Client, id string) bool {
-	r, err := c.transport.Send("WebDriver:IsElementEnabled", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:IsElementEnabled", map[string]any{"id": id})
 	if err != nil {
 		return false
 	}
@@ -543,7 +543,7 @@ func isElementEnabled(c *Client, id string) bool {
 }
 
 func isElementSelected(c *Client, id string) bool {
-	r, err := c.transport.Send("WebDriver:IsElementSelected", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:IsElementSelected", map[string]any{"id": id})
 	if err != nil {
 		return false
 	}
@@ -552,7 +552,7 @@ func isElementSelected(c *Client, id string) bool {
 }
 
 func isElementDisplayed(c *Client, id string) bool {
-	r, err := c.transport.Send("WebDriver:IsElementDisplayed", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:IsElementDisplayed", map[string]any{"id": id})
 	if err != nil {
 		return false
 	}
@@ -561,7 +561,7 @@ func isElementDisplayed(c *Client, id string) bool {
 }
 
 func getElementTagName(c *Client, id string) string {
-	r, err := c.transport.Send("WebDriver:GetElementTagName", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:GetElementTagName", map[string]any{"id": id})
 	if err != nil {
 		return ""
 	}
@@ -573,7 +573,7 @@ func getElementTagName(c *Client, id string) string {
 }
 
 func getElementText(c *Client, id string) string {
-	r, err := c.transport.Send("WebDriver:GetElementText", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:GetElementText", map[string]any{"id": id})
 	if err != nil {
 		return ""
 	}
@@ -585,7 +585,7 @@ func getElementText(c *Client, id string) string {
 }
 
 func getElementAttribute(c *Client, id string, name string) string {
-	r, err := c.transport.Send("WebDriver:GetElementAttribute", map[string]interface{}{"id": id, "name": name})
+	r, err := c.transport.Send("WebDriver:GetElementAttribute", map[string]any{"id": id, "name": name})
 	if err != nil {
 		return ""
 	}
@@ -597,7 +597,7 @@ func getElementAttribute(c *Client, id string, name string) string {
 }
 
 func getElementProperty(c *Client, id string, name string) string {
-	r, err := c.transport.Send("WebDriver:GetElementProperty", map[string]interface{}{"id": id, "name": name})
+	r, err := c.transport.Send("WebDriver:GetElementProperty", map[string]any{"id": id, "name": name})
 	if err != nil {
 		return ""
 	}
@@ -609,7 +609,7 @@ func getElementProperty(c *Client, id string, name string) string {
 }
 
 func getElementCssPropertyValue(c *Client, id string, property string) string {
-	r, err := c.transport.Send("WebDriver:GetElementCSSValue", map[string]interface{}{"id": id, "propertyName": property})
+	r, err := c.transport.Send("WebDriver:GetElementCSSValue", map[string]any{"id": id, "propertyName": property})
 	if err != nil {
 		return ""
 	}
@@ -621,7 +621,7 @@ func getElementCssPropertyValue(c *Client, id string, property string) string {
 }
 
 func getElementRect(c *Client, id string) (*ElementRect, error) {
-	r, err := c.transport.Send("WebDriver:GetElementRect", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:GetElementRect", map[string]any{"id": id})
 	if err != nil {
 		return nil, err
 	}
@@ -636,12 +636,12 @@ func getElementRect(c *Client, id string) (*ElementRect, error) {
 }
 
 func clickElement(c *Client, id string) {
-	r, err := c.transport.Send("WebDriver:ElementClick", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:ElementClick", map[string]any{"id": id})
 	if err != nil {
 		return
 	}
 
-	var d = map[string]interface{}{}
+	var d = map[string]any{}
 	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	//return d
@@ -653,25 +653,25 @@ func sendKeysToElement(c *Client, id string, keys string) error {
 	//	slice = append(slice, fmt.Sprintf("%c", v))
 	//}
 	//
-	//r, err := c.transport.Send("sendKeysToElement", map[string]interface{}{"id": id, "value": slice})
-	r, err := c.transport.Send("WebDriver:ElementSendKeys", map[string]interface{}{"id": id, "text": keys})
+	//r, err := c.transport.Send("sendKeysToElement", map[string]any{"id": id, "value": slice})
+	r, err := c.transport.Send("WebDriver:ElementSendKeys", map[string]any{"id": id, "text": keys})
 	if err != nil {
 		return err
 	}
 
-	var d = map[string]interface{}{}
+	var d = map[string]any{}
 	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	return nil
 }
 
 func clearElement(c *Client, id string) {
-	r, err := c.transport.Send("WebDriver:ElementClear", map[string]interface{}{"id": id})
+	r, err := c.transport.Send("WebDriver:ElementClear", map[string]any{"id": id})
 	if err != nil {
 		return
 	}
 
-	var d = map[string]interface{}{}
+	var d = map[string]any{}
 	_ = json.Unmarshal([]byte(r.Value), &d)
 
 	//return d
@@ -683,11 +683,11 @@ func (c *Client) FindElements(by By, value string) ([]*WebElement, error) {
 }
 
 func findElements(c *Client, by By, value string, startNode *string) ([]*WebElement, error) {
-	var params map[string]interface{}
+	var params map[string]any
 	if startNode == nil || *startNode == "" {
-		params = map[string]interface{}{"using": fmt.Sprint(by), "value": value}
+		params = map[string]any{"using": fmt.Sprint(by), "value": value}
 	} else {
-		params = map[string]interface{}{"using": fmt.Sprint(by), "value": value, "element": *startNode}
+		params = map[string]any{"using": fmt.Sprint(by), "value": value, "element": *startNode}
 	}
 
 	response, err := c.transport.Send("WebDriver:FindElements", params)
@@ -789,8 +789,8 @@ func (c *Client) PageSource() (*Response, error) {
 }
 
 // ExecuteScript Execute JS Script
-func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, newSandbox bool) (*Response, error) {
-	parameters := map[string]interface{}{}
+func (c *Client) ExecuteScript(script string, args []any, timeout uint, newSandbox bool) (*Response, error) {
+	parameters := map[string]any{}
 	parameters["scriptTimeout"] = timeout
 	parameters["script"] = script
 	parameters["args"] = args
@@ -807,8 +807,8 @@ func (c *Client) ExecuteScript(script string, args []interface{}, timeout uint, 
 
 // ExecuteAsyncScript Execute JS Script Async
 // TODO: Add missing arguments/options
-func (c *Client) ExecuteAsyncScript(script string, args []interface{}, newSandbox bool) (*Response, error) {
-	parameters := map[string]interface{}{}
+func (c *Client) ExecuteAsyncScript(script string, args []any, newSandbox bool) (*Response, error) {
+	parameters := map[string]any{}
 	parameters["script"] = script
 	parameters["args"] = args
 
@@ -848,7 +848,7 @@ func (c *Client) AcceptAlert() error {
 
 // TextFromAlert gets text from the dialog
 func (c *Client) TextFromAlert() (string, error) {
-	r, err := c.transport.Send("WebDriver:GetAlertText", map[string]interface{}{"key": "value"})
+	r, err := c.transport.Send("WebDriver:GetAlertText", map[string]any{"key": "value"})
 	if err != nil {
 		return "", err
 	}
@@ -861,7 +861,7 @@ func (c *Client) TextFromAlert() (string, error) {
 
 // SendAlertText sends text to a dialog
 func (c *Client) SendAlertText(keys string) error {
-	_, err := c.transport.Send("WebDriver:SendAlertText", map[string]interface{}{"text": keys})
+	_, err := c.transport.Send("WebDriver:SendAlertText", map[string]any{"text": keys})
 	if err != nil {
 		return err
 	}

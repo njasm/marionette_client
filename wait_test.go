@@ -12,7 +12,7 @@ func TestWait(t *testing.T) {
 }
 
 func UntilErrorTest(t *testing.T) {
-	var errorMsg string = "the Error message."
+	var errorMsg = "the Error message."
 	timeout := time.Duration(5) * time.Second
 	condition := func(c Finder) (bool, *WebElement, error) {
 		return false, nil, errors.New(errorMsg)
@@ -37,13 +37,19 @@ func UntilConditionNeverOccuredTest(t *testing.T) {
 }
 
 func WaitForUntilIntegrationTest(t *testing.T) {
-	client.SetContext(Context(CONTENT))
-	client.Navigate("http://www.w3schools.com/xml/tryit.asp?filename=tryajax_get")
+	_, err := client.SetContext(Content)
+	if err != nil {
+		t.Fatalf("failed to set context: %#v", err)
+	}
+
+	_, err = client.Navigate("https://www.w3schools.com/xml/tryit.asp?filename=tryajax_get")
+	if err != nil {
+		t.Fatalf("failed to navigate: %#v", err)
+	}
 
 	timeout := time.Duration(10) * time.Second
-	condition := ElementIsPresent(By(CssSelector), "a.w3-button.w3-bar-item.topnav-icons.fa.fa-rotate")
+	condition := ElementIsPresent(CssSelector, "a.w3-button.w3-bar-item.topnav-icons.fa.fa-rotate")
 	ok, v, err := Wait(client).For(timeout).Until(condition)
-
 	if err != nil || !ok {
 		t.Fatalf("%#v", err)
 	}

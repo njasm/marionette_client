@@ -23,7 +23,7 @@ type Decoder interface {
 }
 
 type Encoder interface {
-	Encode(t Transporter, command string, values interface{}) ([]byte, error)
+	Encode(t Transporter, command string, values any) ([]byte, error)
 }
 
 type DecoderEncoder interface {
@@ -33,8 +33,8 @@ type DecoderEncoder interface {
 
 type ProtoV3DecoderEncoder struct{}
 
-func (e ProtoV3DecoderEncoder) Encode(t Transporter, command string, values interface{}) ([]byte, error) {
-	message := make([]interface{}, 4)
+func (e ProtoV3DecoderEncoder) Encode(t Transporter, command string, values any) ([]byte, error) {
+	message := make([]any, 4)
 	message[0] = 0
 	message[1] = t.MessageID()
 	message[2] = command
@@ -54,7 +54,7 @@ func (e ProtoV3DecoderEncoder) Encode(t Transporter, command string, values inte
 }
 
 func (e ProtoV3DecoderEncoder) Decode(buf []byte, r *Response) error {
-	var v []interface{}
+	var v []any
 	if err := json.Unmarshal(buf, &v); err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (e ProtoV3DecoderEncoder) Decode(buf []byte, r *Response) error {
 	// error found on response?
 	if v[2] != nil {
 		re := &DriverError{}
-		for key, value := range v[2].(map[string]interface{}) {
+		for key, value := range v[2].(map[string]any) {
 			if key == "error" {
 				re.ErrorType = value.(string)
 			}
@@ -94,7 +94,7 @@ func (e ProtoV3DecoderEncoder) Decode(buf []byte, r *Response) error {
 	}
 
 	// It's a JSON Object
-	result, found := v[3].(map[string]interface{})
+	result, found := v[3].(map[string]any)
 	if found {
 		resultBytes, err := json.Marshal(result)
 		if err != nil {
@@ -106,7 +106,7 @@ func (e ProtoV3DecoderEncoder) Decode(buf []byte, r *Response) error {
 
 	if !found {
 		// JSON Array
-		result, found := v[3].([]interface{})
+		result, found := v[3].([]any)
 		if found {
 			resultBytes, err := json.Marshal(result)
 			if err != nil {

@@ -1,5 +1,10 @@
 package marionette_client
 
+import "fmt"
+
+var _ fmt.Stringer = (*DriverError)(nil)
+var _ error = (*DriverError)(nil)
+
 type DriverError struct {
 	ErrorType  string `json:"Error"`
 	Message    string

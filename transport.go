@@ -14,7 +14,7 @@ type Transporter interface {
 	MessageID() int
 	Connect(host string, port int) error
 	Close() error
-	Send(command string, values interface{}) (*Response, error)
+	Send(command string, values any) (*Response, error)
 	Receive() ([]byte, error)
 }
 
@@ -91,7 +91,7 @@ func (t *MarionetteTransport) Close() error {
 	return err
 }
 
-func (t *MarionetteTransport) Send(command string, values interface{}) (*Response, error) {
+func (t *MarionetteTransport) Send(command string, values any) (*Response, error) {
 	t.messageID = t.messageID + 1 // next message Id
 	buf, err := t.de.Encode(t, command, values)
 	if err != nil {

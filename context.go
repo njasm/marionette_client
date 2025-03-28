@@ -3,8 +3,8 @@ package marionette_client
 type Context int
 
 const (
-	CHROME Context = 1 + iota
-	CONTENT
+	Chrome Context = 1 + iota
+	Content
 )
 
 var contexts = [...]string{

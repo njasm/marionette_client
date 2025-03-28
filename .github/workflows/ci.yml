@@ -58,10 +58,13 @@ jobs:
         sleep 10
 
     - name: Confirm Marionette TCP port is open (ubuntu-latest)
-      run: netstat -ptln
+      run: netstat -ptln | grep -n3 2828
+
+    - name: Run Linter
+      run: make golint-ci
 
     - name: Run Tests
-      run: go test -test.v -race -coverprofile=coverage.txt -covermode=atomic
+      run: make test-coverage
 
     - name: Convert coverage to lcov
       uses: jandelgado/gcov2lcov-action@v1.0.5
