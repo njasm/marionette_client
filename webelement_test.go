@@ -160,3 +160,64 @@ func TestWebElementUnmarshalJSONSuccess(t *testing.T) {
 		t.Fatalf("unexpected id %q", element.Id())
 	}
 }
+
+func TestWebElementGetShadowRoot(t *testing.T) {
+	transport := &recordingTransport{response: &Response{Value: `{"value":{"element-6066-11e4-a52e-4f735466cecf":"shadow-root-id"}}`}}
+	client := NewClient()
+	client.Transport(transport)
+	element := &WebElement{id: "element-id", c: client}
+
+	shadowRoot, err := element.GetShadowRoot()
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if shadowRoot.Id() != "shadow-root-id" {
+		t.Fatalf("unexpected shadow root id %q", shadowRoot.Id())
+	}
+	if transport.command != "WebDriver:GetShadowRoot" || !reflect.DeepEqual(transport.values, map[string]any{"id": "element-id"}) {
+		t.Fatalf("unexpected call: command=%q values=%#v", transport.command, transport.values)
+	}
+
+	transport.err = errors.New("transport failed")
+	if _, err = element.GetShadowRoot(); err == nil {
+		t.Fatal("expected transport error")
+	}
+}
+
+func TestWebElementComputedLabel(t *testing.T) {
+	transport := &recordingTransport{response: &Response{Value: `{"value":"Submit button"}`}}
+	client := NewClient()
+	client.Transport(transport)
+	element := &WebElement{id: "element-id", c: client}
+
+	if label := element.ComputedLabel(); label != "Submit button" {
+		t.Fatalf("unexpected label %q", label)
+	}
+	if transport.command != "WebDriver:GetComputedLabel" || !reflect.DeepEqual(transport.values, map[string]any{"id": "element-id"}) {
+		t.Fatalf("unexpected call: command=%q values=%#v", transport.command, transport.values)
+	}
+
+	transport.err = errors.New("transport failed")
+	if element.ComputedLabel() != "" {
+		t.Fatal("value wrapper must return an empty string after transport errors")
+	}
+}
+
+func TestWebElementComputedRole(t *testing.T) {
+	transport := &recordingTransport{response: &Response{Value: `{"value":"button"}`}}
+	client := NewClient()
+	client.Transport(transport)
+	element := &WebElement{id: "element-id", c: client}
+
+	if role := element.ComputedRole(); role != "button" {
+		t.Fatalf("unexpected role %q", role)
+	}
+	if transport.command != "WebDriver:GetComputedRole" || !reflect.DeepEqual(transport.values, map[string]any{"id": "element-id"}) {
+		t.Fatalf("unexpected call: command=%q values=%#v", transport.command, transport.values)
+	}
+
+	transport.err = errors.New("transport failed")
+	if element.ComputedRole() != "" {
+		t.Fatal("value wrapper must return an empty string after transport errors")
+	}
+}

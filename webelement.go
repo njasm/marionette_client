@@ -119,6 +119,18 @@ func (e *WebElement) Screenshot() (string, error) {
 	return takeScreenshot(e.c, &id)
 }
 
+func (e *WebElement) GetShadowRoot() (*WebElement, error) {
+	return getShadowRoot(e.c, e.id)
+}
+
+func (e *WebElement) ComputedLabel() string {
+	return getComputedLabel(e.c, e.id)
+}
+
+func (e *WebElement) ComputedRole() string {
+	return getComputedRole(e.c, e.id)
+}
+
 func (e *WebElement) UnmarshalJSON(data []byte) error {
 	var d map[string]map[string]string
 	err := json.Unmarshal(data, &d)

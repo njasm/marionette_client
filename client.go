@@ -738,6 +738,47 @@ func findElement(c *Client, by By, value string, startNode *string) (*WebElement
 	return e, nil
 }
 
+// FindElementFromShadowRoot Find an element using the indicated search strategy inside a shadow root.
+func (c *Client) FindElementFromShadowRoot(shadowRootId string, by By, value string) (*WebElement, error) {
+	params := map[string]string{"using": fmt.Sprint(by), "value": value, "shadowRoot": shadowRootId}
+
+	response, err := c.transport.Send("WebDriver:FindElementFromShadowRoot", params)
+	if err != nil {
+		return nil, err
+	}
+
+	var e = &WebElement{c: c}
+	err = json.Unmarshal([]byte(response.Value), &e)
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+// FindElementsFromShadowRoot Find elements using the indicated search strategy inside a shadow root.
+func (c *Client) FindElementsFromShadowRoot(shadowRootId string, by By, value string) ([]*WebElement, error) {
+	params := map[string]any{"using": fmt.Sprint(by), "value": value, "shadowRoot": shadowRootId}
+
+	response, err := c.transport.Send("WebDriver:FindElementsFromShadowRoot", params)
+	if err != nil {
+		return nil, err
+	}
+
+	var d []map[string]string
+	err = json.Unmarshal([]byte(response.Value), &d)
+	if err != nil {
+		return nil, err
+	}
+
+	var e []*WebElement
+	for _, v := range d {
+		e = append(e, &WebElement{c: c, id: v[WebdriverElementKey]})
+	}
+
+	return e, nil
+}
+
 // GetActiveElement Returns the page's active element.
 func (c *Client) GetActiveElement() (*WebElement, error) {
 	return getActiveElement(c)
@@ -756,6 +797,45 @@ func getActiveElement(c *Client) (*WebElement, error) {
 	}
 
 	return e, nil
+}
+
+func getShadowRoot(c *Client, id string) (*WebElement, error) {
+	r, err := c.transport.Send("WebDriver:GetShadowRoot", map[string]any{"id": id})
+	if err != nil {
+		return nil, err
+	}
+
+	var e = &WebElement{c: c}
+	err = json.Unmarshal([]byte(r.Value), e)
+	if err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+
+func getComputedLabel(c *Client, id string) string {
+	r, err := c.transport.Send("WebDriver:GetComputedLabel", map[string]any{"id": id})
+	if err != nil {
+		return ""
+	}
+
+	var d = map[string]string{}
+	_ = json.Unmarshal([]byte(r.Value), &d)
+
+	return d["value"]
+}
+
+func getComputedRole(c *Client, id string) string {
+	r, err := c.transport.Send("WebDriver:GetComputedRole", map[string]any{"id": id})
+	if err != nil {
+		return ""
+	}
+
+	var d = map[string]string{}
+	_ = json.Unmarshal([]byte(r.Value), &d)
+
+	return d["value"]
 }
 
 func takeScreenshot(c *Client, startNode *string) (string, error) {
@@ -886,4 +966,56 @@ func (c *Client) Quit() (*Response, error) {
 // Screenshot takes a screenshot of the page.
 func (c *Client) Screenshot() (string, error) {
 	return takeScreenshot(c, nil)
+}
+
+// Print generates a PDF representation of the page.
+//
+// param: orientation string
+// Optional page orientation. Can be one of `portrait` or `landscape`. Defaults to `portrait`.
+//
+// param: scale float64
+// Optional page scale factor. Defaults to 1.0.
+//
+// param: background bool
+// Optional flag to include background graphics. Defaults to false.
+//
+// param: width float64
+// Optional page width in centimeters.
+//
+// param: height float64
+// Optional page height in centimeters.
+//
+// param: top float64
+// Optional top margin in centimeters.
+//
+// param: bottom float64
+// Optional bottom margin in centimeters.
+//
+// param: left float64
+// Optional left margin in centimeters.
+//
+// param: right float64
+// Optional right margin in centimeters.
+//
+// param: shrinkToFit bool
+// Optional flag to shrink the page content to fit the page width. Defaults to true.
+//
+// param: pageRanges []string
+// Optional array of page ranges to print, e.g. ["1-3", "5"].
+//
+// return string
+// Base64-encoded PDF data.
+func (c *Client) Print(options map[string]any) (string, error) {
+	r, err := c.transport.Send("WebDriver:Print", options)
+	if err != nil {
+		return "", err
+	}
+
+	var d = map[string]string{}
+	err = json.Unmarshal([]byte(r.Value), &d)
+	if err != nil {
+		return "", err
+	}
+
+	return d["value"], nil
 }

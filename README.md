@@ -16,9 +16,7 @@ Marionette shares much of its API with WebDriver and adds commands for interacti
 ## Resources
 - [Marionette documentation](https://firefox-source-docs.mozilla.org/testing/marionette/)
 - [W3C WebDriver specification](https://w3c.github.io/webdriver/)
-- [Marionette protocol support](PROTOCOL_SUPPORT.md) for the current command inventory and implementation gaps
-
-See [Marionette protocol support](PROTOCOL_SUPPORT.md) for the current command inventory and implementation gaps.
+- See [Marionette protocol support](PROTOCOL_SUPPORT.md) for the current command inventory and implementation gaps.
 
 ## Examples
 This is an incomplete list. See the tests for more examples.
@@ -138,20 +136,20 @@ if err != nil {
 fmt.Printf("%#v", rect)
 	
 // size
-w, h, err := element.Size()
+size, err := element.Size()
 if err != nil {
 	// handle your errors
 }
 
-fmt.Printf("width: %f, height: %f", w, h)
+fmt.Printf("width: %f, height: %f", size.Width, size.Height)
 
 //location
-x, y, err := element.Location()
+point, err := element.Location()
 if err != nil {
     // handle your errors
 }
 
-fmt.Printf("x: %v, y: %v", x, y)
+fmt.Printf("x: %v, y: %v", point.X, point.Y)
 ```
 
 #### Find Elements
@@ -172,6 +170,65 @@ for _, e := range collection {
    	println(e.Attribute("id"))
    	println(e.CssValue("text-decoration"))
    	e.Click()
+}
+```
+
+#### Shadow DOM
+```go
+// Get the shadow root of a custom element
+host, err := client.FindElement(marionette.CssSelector, "my-custom-element")
+if err != nil {
+	return err
+}
+
+shadowRoot, err := host.GetShadowRoot()
+if err != nil {
+	return err
+}
+
+// Find elements inside the shadow root
+button, err := client.FindElementFromShadowRoot(shadowRoot.Id(), marionette.CssSelector, "button")
+if err != nil {
+	return err
+}
+
+items, err := client.FindElementsFromShadowRoot(shadowRoot.Id(), marionette.CssSelector, "li")
+if err != nil {
+	return err
+}
+```
+
+#### Computed accessibility properties
+```go
+element, err := client.FindElement(marionette.CssSelector, "[role='button']")
+if err != nil {
+	return err
+}
+
+label := element.ComputedLabel()
+role := element.ComputedRole()
+fmt.Printf("accessible label: %s, role: %s\n", label, role)
+```
+
+#### Print to PDF
+```go
+pdf, err := client.Print(map[string]any{
+	"orientation": "landscape",
+	"scale":       0.8,
+	"background":  true,
+})
+if err != nil {
+	return err
+}
+
+// pdf is a base64-encoded string
+decoded, err := base64.StdEncoding.DecodeString(pdf)
+if err != nil {
+	return err
+}
+
+if err = os.WriteFile("page.pdf", decoded, 0644); err != nil {
+	return err
 }
 ```
 
@@ -222,7 +279,7 @@ By default, the harness runs `firefox` from `PATH`. Set `FIREFOX_BIN` to use a s
 `FIREFOX_VERSION` to require a matching version:
 
 ```sh
-FIREFOX_BIN=/path/to/firefox FIREFOX_VERSION=141.0.3 make test
+FIREFOX_BIN=/path/to/firefox FIREFOX_VERSION=155.0.1 make test
 ```
 
 This automatic Firefox lifecycle applies only to the repository's tests. Applications using the library must start or
