@@ -1,5 +1,7 @@
 package marionette_client
 
+import "errors"
+
 func ElementIsPresent(by By, value string) func(f Finder) (bool, *WebElement, error) {
 	return func(f Finder) (bool, *WebElement, error) {
 		result := true
@@ -14,12 +16,15 @@ func ElementIsPresent(by By, value string) func(f Finder) (bool, *WebElement, er
 
 func ElementIsNotPresent(by By, value string) func(f Finder) (bool, *WebElement, error) {
 	return func(f Finder) (bool, *WebElement, error) {
-		result := false
 		v, e := f.FindElement(by, value)
 		if e != nil {
-			result = true
+			var driverError *DriverError
+			if errors.As(e, &driverError) && driverError.ErrorType == "no such element" {
+				return true, nil, nil
+			}
+			return false, nil, e
 		}
 
-		return result, v, e
+		return false, v, nil
 	}
 }
