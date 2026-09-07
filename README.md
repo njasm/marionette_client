@@ -5,56 +5,67 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://choosealicense.com/licenses/mit/)
 
 # marionette_client
-Mozilla's Gecko Marionette client in golang
+Mozilla Gecko Marionette client for Go.
 
 ## What is Marionette
-"Marionette is an automation driver for Mozilla's Gecko engine. It can remotely control either the UI, or the internal 
-JavaScript of a Gecko platform, such as Firefox. It can control both the chrome (i.e. menus and functions) or the content 
-(the webpage loaded inside the browsing context), giving a high level of control and ability to replicate user actions. 
-In addition to performing actions on the browser, Marionette can also read the properties and attributes of the DOM.
+Marionette is an automation driver for Mozilla's Gecko engine. It can remotely control either the UI or the internal
+JavaScript of a Gecko application such as Firefox. It can control both the chrome (menus and browser functions) and the
+content loaded in a browsing context, allowing callers to reproduce user actions and inspect the DOM.
 
-If this sounds similar to Selenium/WebDriver then you're correct! Marionette shares much of the same ethos and API as 
-Selenium/WebDriver, with additional commands to interact with Gecko's chrome interface. Its goal is to replicate what 
-Selenium does for web content: to enable the tester to have the ability to send commands to remotely control a user agent." 
+Marionette shares much of its API with WebDriver and adds commands for interacting with Gecko's chrome interface.
 
 ## Resources
-https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette 
-
-https://w3c.github.io/webdriver/webdriver-spec.html
+- [Marionette documentation](https://firefox-source-docs.mozilla.org/testing/marionette/)
+- [W3C WebDriver specification](https://w3c.github.io/webdriver/)
+- [Marionette protocol support](PROTOCOL_SUPPORT.md) for the current command inventory and implementation gaps
 
 See [Marionette protocol support](PROTOCOL_SUPPORT.md) for the current command inventory and implementation gaps.
 
 ## Examples
-Incomplete list. Check the tests for more examples.
+This is an incomplete list. See the tests for more examples.
 
 #### Instantiate the client
 ```go
 client := NewClient()
-// this are the default marionette values for hostname, and port 
+// An empty host and zero port use Marionette's defaults.
 client.Connect("", 0)
-// let marionette generate the Session ID with it's default Capabilities
-client.NewSession("", nil) 
-	
+// Let Marionette generate the session ID with its default capabilities.
+client.NewSession("", nil)
 ```
 
 #### Navigate to page
 ```go
-client.Navigate("http://www.google.com/")
+client.Navigate("http://localhost:8080/")
 ```
 
 #### Perform mouse actions
 ```go
-target, err := client.FindElement(Id, "button-id")
+import (
+	"time"
+
+	marionette "github.com/njasm/marionette_client"
+)
+
+target, err := client.FindElement(marionette.Id, "button-id")
 if err != nil {
-	// handle your errors
+	return err
 }
 
-_, err = client.PerformActions(MouseActions("mouse",
-	PointerMove(0, 0, 100*time.Millisecond, ElementOrigin(target)),
-	PointerDown(0),
-	PointerUp(0),
+_, err = client.PerformActions(marionette.MouseActions("mouse",
+	marionette.PointerMove(0, 0, 100*time.Millisecond, marionette.ElementOrigin(target)),
+	marionette.PointerDown(0),
+	marionette.Pause(50*time.Millisecond),
+	marionette.PointerUp(0),
 ))
+if err != nil {
+	return err
+}
 ```
+
+The example moves the mouse to the center of `target`, presses the primary button, pauses, and releases it. Pointer
+moves can also use `ViewportOrigin()` for viewport-relative coordinates or `PointerOriginCurrent()` for coordinates
+relative to the current pointer position. `PerformActions` validates source IDs, origins, durations, buttons, and empty
+sequences before sending `WebDriver:PerformActions` to Firefox.
 
 #### Change Contexts
 ```go
@@ -66,7 +77,7 @@ client.SetContext(Context(CONTENT))
 
 #### Find Element
 ```go
-element, err := client.FindElement(By(ID), "html-element-id-attribute")
+element, err := client.FindElement(Id, "html-element-id-attribute")
 if err != nil {
 	// handle your errors
 }
@@ -109,13 +120,13 @@ fmt.Printf("x: %v, y: %v", x, y)
 
 #### Find Elements
 ```go
-collection, err := element.FindElements(By(TAG_NAME), "li")
+collection, err := element.FindElements(TagName, "li")
 if err != nil {
 	// handle your errors
 }
 
 // else
-for var e := range collection {
+for _, e := range collection {
 	println(e.Id())
    	println(e.Enabled())
    	println(e.Selected())
@@ -142,10 +153,10 @@ if err == nil {
 
 #### Wait(), Until() Expected condition is true.
 ```go
-client.Navigate("http://www.w3schools.com/ajax/tryit.asp?filename=tryajax_get")
+client.Navigate("http://localhost:8080/content-loaded-later.html")
 
-timeout := time.Duration(10) * time.Second
-condition := ElementIsPresent(By(ID), "stackH")
+timeout := 10 * time.Second
+condition := ElementIsPresent(Id, "loaded-element")
 ok, webElement, err := Wait(client).For(timeout).Until(condition)
 
 if !ok {
@@ -157,3 +168,26 @@ if !ok {
 // cool, we've the element, let's click on it!
 webElement.Click()
 ```
+
+## Running tests
+
+Run the complete suite with:
+
+```sh
+make test
+```
+
+The integration test harness starts its own headless Firefox instance; do not start Firefox or reserve Marionette port
+`2828` beforehand. For each complete test run, the harness creates a fresh temporary profile, supplies that profile to
+Firefox with `--profile`, and launches it with `--headless`, `--marionette`, `--remote-allow-system-access`,
+`--no-remote`, and `--new-instance`. It waits for Marionette to become ready and stops Firefox during test cleanup.
+
+By default, the harness runs `firefox` from `PATH`. Set `FIREFOX_BIN` to use a specific executable and optionally set
+`FIREFOX_VERSION` to require a matching version:
+
+```sh
+FIREFOX_BIN=/path/to/firefox FIREFOX_VERSION=141.0.3 make test
+```
+
+This automatic Firefox lifecycle applies only to the repository's tests. Applications using the library must start or
+otherwise provide a Marionette-enabled Firefox instance before calling `Client.Connect`.
