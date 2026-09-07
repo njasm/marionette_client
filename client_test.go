@@ -341,16 +341,11 @@ func DeleteAllCookiesTest(t *testing.T) {
 }
 
 func GetSessionCapabilitiesTest(t *testing.T) {
-	r, err := client.GetCapabilities()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	if r.BrowserName != "firefox" {
+	if client.Capabilities.BrowserName != "firefox" {
 		t.Fatal("Capabilities: Browser Name doesn't have the expected 'firefox' name")
 	}
 
-	t.Log(r)
+	t.Log(client.Capabilities)
 }
 
 func ScreenshotTest(t *testing.T) {
