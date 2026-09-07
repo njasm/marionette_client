@@ -647,14 +647,14 @@ func clickElement(c *Client, id string) {
 	//return d
 }
 
-func sendKeysToElement(c *Client, id string, keys string) error {
+func sendKeysToElement(c *Client, id string, keys ...string) error {
 	//slice := make([]string, 0)
 	//for _, v := range keys {
 	//	slice = append(slice, fmt.Sprintf("%c", v))
 	//}
 	//
 	//r, err := c.transport.Send("sendKeysToElement", map[string]any{"id": id, "value": slice})
-	r, err := c.transport.Send("WebDriver:ElementSendKeys", map[string]any{"id": id, "text": keys})
+	r, err := c.transport.Send("WebDriver:ElementSendKeys", map[string]any{"id": id, "text": strings.Join(keys, "")})
 	if err != nil {
 		return err
 	}

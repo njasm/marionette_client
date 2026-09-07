@@ -147,6 +147,7 @@ func TestInit(t *testing.T) {
 		t.Run("FindElementTest", FindElementTest)
 
 		t.Run("SendKeysTest", SendKeysTest)
+		t.Run("SpecialKeysTest", SpecialKeysTest)
 		t.Run("PerformActionsTest", PerformActionsTest)
 		t.Run("ReleaseActionsTest", ReleaseActionsTest)
 		t.Run("FindElementsTest", FindElementsTest)
@@ -652,6 +653,42 @@ func SendKeysTest(t *testing.T) {
 	e.Clear()
 	if e.Text() != "" {
 		t.Fatalf("Elements text should be empty. found: %#v", e.Text())
+	}
+}
+
+func SpecialKeysTest(t *testing.T) {
+	_, err := navigateLocal("form.html")
+	if err != nil {
+		t.Fatalf("failed to navigate local: %#v", err)
+	}
+
+	element, err := client.FindElement(Id, "email")
+	if err != nil {
+		t.Fatalf("failed to find email input: %#v", err)
+	}
+	if err = element.SendKeys("abcdef", KeyControl, "a", KeyNull, KeyBackspace); err != nil {
+		t.Fatalf("failed to send special keys to element: %#v", err)
+	}
+	if value := element.Property("value"); value != "" {
+		t.Fatalf("expected Control+A and Backspace to clear the input, got %q", value)
+	}
+
+	if err = element.SendKeys("abcdef"); err != nil {
+		t.Fatalf("failed to reset input: %#v", err)
+	}
+	_, err = client.PerformActions(KeyboardActions("keyboard",
+		KeyDownAction(KeyControl),
+		KeyDownAction("a"),
+		KeyUpAction("a"),
+		KeyUpAction(KeyControl),
+		KeyDownAction(KeyDelete),
+		KeyUpAction(KeyDelete),
+	))
+	if err != nil {
+		t.Fatalf("failed to perform keyboard actions: %#v", err)
+	}
+	if value := element.Property("value"); value != "" {
+		t.Fatalf("expected keyboard actions to clear the input, got %q", value)
 	}
 }
 

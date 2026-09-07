@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 type PointerOrigin struct {
@@ -51,12 +52,36 @@ func Pause(duration time.Duration) PointerAction {
 }
 
 type ActionSequence struct {
-	id      string
-	actions []PointerAction
+	id             string
+	typeName       string
+	pointerActions []PointerAction
+	keyActions     []KeyAction
 }
 
 func MouseActions(id string, actions ...PointerAction) ActionSequence {
-	return ActionSequence{id: id, actions: actions}
+	return ActionSequence{id: id, typeName: "pointer", pointerActions: actions}
+}
+
+type KeyAction struct {
+	typeName string
+	value    string
+	duration time.Duration
+}
+
+func KeyDownAction(value string) KeyAction {
+	return KeyAction{typeName: "keyDown", value: value}
+}
+
+func KeyUpAction(value string) KeyAction {
+	return KeyAction{typeName: "keyUp", value: value}
+}
+
+func KeyboardPause(duration time.Duration) KeyAction {
+	return KeyAction{typeName: "pause", duration: duration}
+}
+
+func KeyboardActions(id string, actions ...KeyAction) ActionSequence {
+	return ActionSequence{id: id, typeName: "key", keyActions: actions}
 }
 
 func (a PointerAction) MarshalJSON() ([]byte, error) {
@@ -83,12 +108,24 @@ func (a PointerAction) MarshalJSON() ([]byte, error) {
 }
 
 func (s ActionSequence) MarshalJSON() ([]byte, error) {
-	return json.Marshal(map[string]any{
-		"type":       "pointer",
-		"id":         s.id,
-		"parameters": map[string]string{"pointerType": "mouse"},
-		"actions":    s.actions,
-	})
+	value := map[string]any{"type": s.typeName, "id": s.id}
+	if s.typeName == "pointer" {
+		value["parameters"] = map[string]string{"pointerType": "mouse"}
+		value["actions"] = s.pointerActions
+	} else {
+		value["actions"] = s.keyActions
+	}
+	return json.Marshal(value)
+}
+
+func (a KeyAction) MarshalJSON() ([]byte, error) {
+	value := map[string]any{"type": a.typeName}
+	if a.typeName == "pause" {
+		value["duration"] = a.duration.Milliseconds()
+	} else {
+		value["value"] = a.value
+	}
+	return json.Marshal(value)
 }
 
 func (c *Client) PerformActions(actions ...ActionSequence) (*Response, error) {
@@ -105,17 +142,35 @@ func (c *Client) PerformActions(actions ...ActionSequence) (*Response, error) {
 			return nil, fmt.Errorf("action sequence id %q is duplicated", sequence.id)
 		}
 		ids[sequence.id] = struct{}{}
-		if len(sequence.actions) == 0 {
+		if sequence.actionCount() == 0 {
 			return nil, fmt.Errorf("action sequence %q has no actions", sequence.id)
 		}
-		for actionIndex, action := range sequence.actions {
-			if err := validatePointerAction(action); err != nil {
-				return nil, fmt.Errorf("action sequence %q action %d: %w", sequence.id, actionIndex, err)
+		switch sequence.typeName {
+		case "pointer":
+			for actionIndex, action := range sequence.pointerActions {
+				if err := validatePointerAction(action); err != nil {
+					return nil, fmt.Errorf("action sequence %q action %d: %w", sequence.id, actionIndex, err)
+				}
 			}
+		case "key":
+			for actionIndex, action := range sequence.keyActions {
+				if err := validateKeyAction(action); err != nil {
+					return nil, fmt.Errorf("action sequence %q action %d: %w", sequence.id, actionIndex, err)
+				}
+			}
+		default:
+			return nil, fmt.Errorf("action sequence %q has an invalid type", sequence.id)
 		}
 	}
 
 	return c.transport.Send("WebDriver:PerformActions", map[string]any{"actions": actions})
+}
+
+func (s ActionSequence) actionCount() int {
+	if s.typeName == "pointer" {
+		return len(s.pointerActions)
+	}
+	return len(s.keyActions)
 }
 
 // ReleaseActions releases all depressed input-source actions and clears their state.
@@ -155,5 +210,22 @@ func validatePointerAction(action PointerAction) error {
 		return nil
 	default:
 		return errors.New("pointer action type is invalid")
+	}
+}
+
+func validateKeyAction(action KeyAction) error {
+	switch action.typeName {
+	case "keyDown", "keyUp":
+		if !utf8.ValidString(action.value) || utf8.RuneCountInString(action.value) != 1 {
+			return errors.New("key value must contain exactly one Unicode code point")
+		}
+		return nil
+	case "pause":
+		if action.duration < 0 {
+			return errors.New("duration cannot be negative")
+		}
+		return nil
+	default:
+		return errors.New("key action type is invalid")
 	}
 }

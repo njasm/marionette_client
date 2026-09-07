@@ -74,6 +74,36 @@ sequences before sending `WebDriver:PerformActions` to Firefox.
 `ReleaseActions` sends `WebDriver:ReleaseActions`, which releases any depressed buttons and clears all stored input
 sources. It is useful for cleanup after a sequence fails before its matching button release.
 
+#### Send special keys
+WebDriver special keys are exported as string constants, so they can be mixed with ordinary text. `KeyNull` releases
+all modifiers in an element key sequence.
+
+```go
+input, err := client.FindElement(marionette.Id, "search")
+if err != nil {
+	return err
+}
+
+// Select all text, release Control, and delete the selection.
+if err = input.SendKeys(marionette.KeyControl, "a", marionette.KeyNull, marionette.KeyBackspace); err != nil {
+	return err
+}
+```
+
+The constants cover the complete WebDriver key set exposed by Selenium's Python `Keys`, including modifiers, arrows,
+navigation and editing keys, number-pad keys, `F1` through `F12`, Meta/Command, right-side modifiers, and aliases.
+
+Keyboard sources can also be synchronized with other sources through `PerformActions`:
+
+```go
+_, err = client.PerformActions(marionette.KeyboardActions("keyboard",
+	marionette.KeyDownAction(marionette.KeyControl),
+	marionette.KeyDownAction("a"),
+	marionette.KeyUpAction("a"),
+	marionette.KeyUpAction(marionette.KeyControl),
+))
+```
+
 #### Change Contexts
 ```go
 client.SetContext(Context(CHROME))

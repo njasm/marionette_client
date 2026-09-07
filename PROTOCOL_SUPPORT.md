@@ -52,7 +52,7 @@ the current registry. Priorities apply only to missing public commands.
 | `WebDriver:GetShadowRoot` | — | missing | P2 |
 | `WebDriver:ElementClick` | `WebElement.Click` | supported | — |
 | `WebDriver:ElementClear` | `WebElement.Clear` | supported | — |
-| `WebDriver:ElementSendKeys` | `WebElement.SendKeys` | supported | — |
+| `WebDriver:ElementSendKeys` | `WebElement.SendKeys` (text and complete special-key set) | supported | — |
 | `WebDriver:GetElementAttribute` | `WebElement.Attribute` | supported | — |
 | `WebDriver:GetElementCSSValue` | `WebElement.CssValue` | supported | — |
 | `WebDriver:GetElementProperty` | `WebElement.Property` | supported | — |
@@ -69,7 +69,7 @@ the current registry. Priorities apply only to missing public commands.
 
 | Firefox command | Go API | Status | Priority |
 |---|---|---|---|
-| `WebDriver:PerformActions` | `Client.PerformActions` (mouse) | supported | — |
+| `WebDriver:PerformActions` | `Client.PerformActions` (mouse and keyboard) | supported | — |
 | `WebDriver:ReleaseActions` | `Client.ReleaseActions` | supported | — |
 | `WebDriver:AddCookie` | `Client.AddCookie` | supported | — |
 | `WebDriver:GetCookies` | `Client.GetCookies` | supported | — |
@@ -129,7 +129,8 @@ as the basis for new APIs; capabilities are returned by `WebDriver:NewSession`.
 
 ## Recommended implementation order
 
-Completed baseline: `WebDriver:PerformActions` with typed mouse input and `WebDriver:ReleaseActions`.
+Completed baseline: `WebDriver:PerformActions` with typed mouse and keyboard input, the complete WebDriver special-key
+set for element entry, and `WebDriver:ReleaseActions`.
 
 1. P2: shadow-root access, computed accessibility properties, and print.
 2. P3: WebAuthn virtual-authenticator support.
