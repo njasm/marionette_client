@@ -340,26 +340,12 @@ func DeleteAllCookiesTest(t *testing.T) {
 	_, _ = client.Navigate(TargetUrl)
 }
 
-//func TestConnectWithActiveConnection(t *testing.T) {
-//	err := client.Connect("", 0)
-//	if err == nil {
-//		t.Fatalf("%#v", err)
-//	}
-//
-//	t.Log("No Error..")
-//}
-
 func GetSessionCapabilitiesTest(t *testing.T) {
-	r, err := client.GetCapabilities()
-	if err != nil {
-		t.Fatalf("%#v", err)
-	}
-
-	if r.BrowserName != "firefox" {
+	if client.Capabilities.BrowserName != "firefox" {
 		t.Fatal("Capabilities: Browser Name doesn't have the expected 'firefox' name")
 	}
 
-	t.Log(r)
+	t.Log(client.Capabilities)
 }
 
 func ScreenshotTest(t *testing.T) {
@@ -642,17 +628,13 @@ func SendKeysTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	/* FIXME: Text is not yet set. investigate.
-	time.Sleep(time.Second * 5)
-	if e.Text() != test {
-		t.Fatalf("Elements text is not: %#v, it's: %#v", test, e.Text())
+	if value := e.Property("value"); value != test {
+		t.Fatalf("element value is not %q, got %q", test, value)
 	}
-	time.Sleep(time.Second * 10)
-	*/
 
 	e.Clear()
-	if e.Text() != "" {
-		t.Fatalf("Elements text should be empty. found: %#v", e.Text())
+	if value := e.Property("value"); value != "" {
+		t.Fatalf("element value should be empty, got %q", value)
 	}
 }
 
@@ -982,35 +964,28 @@ func WindowRectTest(t *testing.T) {
 		t.Fatalf("Size differs. expected: %v, actual: %v", expectedRect, *actualRect)
 	}
 
-	_, err = client.MinimizeWindow()
+	minimizedRect, err := client.MinimizeWindow()
 	if err != nil {
 		t.Fatal("Unable to Minimize window")
 	}
+	assertValidWindowRect(t, minimizedRect)
 
-	// FIXME: On CI MinimizeWindow command return the last WindowRect struct
-	// this might be cos the lack of a window manager? - Need further investigation
-
-	// sizes are expected to differ
-	//if mr.Width == actualRect.Width || mr.Height == actualRect.Height {
-	//	t.Fatalf("Size DOES NOT differs. actual: %v, mr: %v", actualRect, mr)
-	//}
-
-	_, err = client.MaximizeWindow()
+	maximizedRect, err := client.MaximizeWindow()
 	if err != nil {
 		t.Fatal("Unable to Maximize window")
 	}
-
-	// FIXME: On CI MaximizeWindow command return the last WindowRect struct
-	// this might be cos the lack of a window manager? - Need further investigation
-
-	// sizes are expected to differ once again
-	//if wr.Width == mr.Width || wr.Height == mr.Height {
-	//	t.Fatalf("Size DOES NOT differs. wr: %v, mr: %v", wr, mr)
-	//}
+	assertValidWindowRect(t, maximizedRect)
 
 	_, err = client.FullscreenWindow()
 	if err != nil {
 		t.Fatal("Unable to Fullscreen window")
+	}
+}
+
+func assertValidWindowRect(t *testing.T, rect *WindowRect) {
+	t.Helper()
+	if rect == nil || rect.Width < 0 || rect.Height < 0 {
+		t.Fatalf("invalid window rectangle: %#v", rect)
 	}
 }
 

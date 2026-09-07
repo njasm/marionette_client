@@ -37,6 +37,9 @@ func (w *Waiter) Until(f func(c Finder) (bool, *WebElement, error)) (bool, *WebE
 
 		// if we have an ok, from the finder f, return it
 		ok, value, err := f(w.f)
+		if err != nil {
+			return false, nil, err
+		}
 		if ok {
 			return ok, value, err
 		}

@@ -176,9 +176,7 @@ func messageLength(c net.Conn) (int, error) {
 	for {
 		_, err := c.Read(tmp)
 		if err != nil {
-			if err != io.EOF {
-				return 0, err
-			}
+			return 0, err
 		}
 
 		if string(tmp) != ":" {

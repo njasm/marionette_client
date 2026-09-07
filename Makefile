@@ -2,7 +2,7 @@ SHELL:=/bin/bash
 
 .PHONY: golint-ci
 golint-ci:
-	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:v2.0.1 golangci-lint run -v --timeout=5m
+	docker run --rm -v $(shell pwd):/app -w /app golangci/golangci-lint:v2.13.2 golangci-lint run -v --timeout=5m
 
 
 .PHONY: test

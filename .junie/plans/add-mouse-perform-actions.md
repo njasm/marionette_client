@@ -163,3 +163,18 @@ Callers can send the complete WebDriver key set, including modifier and non-char
 - Add transport-independent serialization and validation tests.
 - Add ordered Firefox integration coverage for modifier and non-character behavior.
 - Update the support matrix and usage documentation.
+
+### ✓ Step 9: Increase meaningful unit coverage and restore disabled tests
+Transport, protocol, wait, and element behavior has deterministic branch coverage, and previously disabled tests use reliable assertions.
+
+- Add transport-independent tests for connection lifecycle, framing, protocol encoding/decoding, wait conditions, and element wrappers.
+- Correct `Waiter.Until` so condition errors propagate immediately and restore its disabled error test.
+- Restore active-connection and element-entry tests using isolated transports and element property assertions.
+- Keep headless window-state checks limited to reliable command and rectangle validation.
+- Run focused tests and the complete local Firefox 141.0.3 suite.
+
+### * Step 10: Add Firefox 155.0.1 to GitHub Actions
+CI downloads and exercises Firefox 155.0.1 alongside the existing supported versions without requiring a local installation.
+
+- Extend the Firefox version matrix while preserving the Go matrix and self-managed browser lifecycle.
+- Validate workflow syntax and rerun transport-independent tests after the CI change.
