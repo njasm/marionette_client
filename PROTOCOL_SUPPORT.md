@@ -129,7 +129,8 @@ as the basis for new APIs; capabilities are returned by `WebDriver:NewSession`.
 
 ## Recommended implementation order
 
-1. P0: `WebDriver:PerformActions` with typed mouse input.
-2. P1: `WebDriver:ReleaseActions` to clear persisted input state.
-3. P2: shadow-root access, computed accessibility properties, and print.
-4. P3: WebAuthn virtual-authenticator support.
+Completed baseline: `WebDriver:PerformActions` with typed mouse input.
+
+1. P1: `WebDriver:ReleaseActions` to clear persisted input state.
+2. P2: shadow-root access, computed accessibility properties, and print.
+3. P3: WebAuthn virtual-authenticator support.

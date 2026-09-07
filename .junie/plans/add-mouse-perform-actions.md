@@ -137,3 +137,10 @@ GitHub Actions installs and launches Firefox 141.0.3 with the flags required by 
 - Inspect the current workflow and preserve its supported Go matrix.
 - Add Firefox 141.0.3 installation and configure the test helper to use the installed binary.
 - Validate workflow syntax and rerun local transport-independent checks after the CI change.
+
+### ✓ Step 6: Refresh usage and test documentation
+The README documents mouse actions and makes the self-managed Firefox test lifecycle explicit.
+
+- Add or revise the `PerformActions` example to match the public typed API.
+- Review existing documentation for stale setup and test instructions.
+- Explain that integration tests launch Firefox with a fresh temporary profile and the required command-line flags.
