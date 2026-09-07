@@ -19,6 +19,8 @@ Marionette shares much of its API with WebDriver and adds commands for interacti
 - [W3C WebDriver specification](https://w3c.github.io/webdriver/)
 - [Marionette protocol support](PROTOCOL_SUPPORT.md) for the current command inventory and implementation gaps
 
+See [Marionette protocol support](PROTOCOL_SUPPORT.md) for the current command inventory and implementation gaps.
+
 ## Examples
 This is an incomplete list. See the tests for more examples.
 
