@@ -22,6 +22,8 @@ https://developer.mozilla.org/en-US/docs/Mozilla/QA/Marionette
 
 https://w3c.github.io/webdriver/webdriver-spec.html
 
+See [Marionette protocol support](PROTOCOL_SUPPORT.md) for the current command inventory and implementation gaps.
+
 ## Examples
 Incomplete list. Check the tests for more examples.
 
@@ -38,6 +40,20 @@ client.NewSession("", nil)
 #### Navigate to page
 ```go
 client.Navigate("http://www.google.com/")
+```
+
+#### Perform mouse actions
+```go
+target, err := client.FindElement(Id, "button-id")
+if err != nil {
+	// handle your errors
+}
+
+_, err = client.PerformActions(MouseActions("mouse",
+	PointerMove(0, 0, 100*time.Millisecond, ElementOrigin(target)),
+	PointerDown(0),
+	PointerUp(0),
+))
 ```
 
 #### Change Contexts

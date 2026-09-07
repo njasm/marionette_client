@@ -1,8 +1,13 @@
 package marionette_client
 
 import (
-	"fmt"
+	"bytes"
+	"net"
+	"net/http"
+	"net/http/httptest"
 	"os"
+	"os/exec"
+	"strings"
 	"testing"
 	"time"
 )
@@ -10,34 +15,99 @@ import (
 const (
 	TestdataFolder   = "testdata"
 	WwwFolder        = "html"
-	TargetUrl        = "https://www.abola.pt/"
 	CssSelectorTagTd = "td"
 	Timeout          = 5000 // milliseconds
 )
 
 var client *Client
+var testServer *httptest.Server
+var TargetUrl string
 
 func navigateLocal(page string) (*Response, error) {
-	pwd, err := os.Getwd()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	fmt.Println(pwd)
-
-	var schema = "file://" + pwd + "/" + TestdataFolder + "/" + WwwFolder + "/"
-	return client.Navigate(schema + page)
+	return client.Navigate(TargetUrl + page)
 }
 
 func init() {
+	testServer = httptest.NewServer(http.FileServer(http.Dir(TestdataFolder + "/" + WwwFolder)))
+	TargetUrl = testServer.URL + "/"
 	client = NewClient()
 	client.Transport(&MarionetteTransport{})
 	RunningInDebugMode = true
 }
 
+func startFirefox(t *testing.T) {
+	t.Helper()
+
+	if connection, err := net.DialTimeout("tcp", "127.0.0.1:2828", 200*time.Millisecond); err == nil {
+		_ = connection.Close()
+		t.Fatal("Marionette port 2828 is already in use; stop the existing Firefox instance before running the tests")
+	}
+
+	firefoxBinary := os.Getenv("FIREFOX_BIN")
+	if firefoxBinary == "" {
+		firefoxBinary = "firefox"
+	}
+	version, err := exec.Command(firefoxBinary, "--version").CombinedOutput()
+	if err != nil {
+		t.Fatalf("failed to get Firefox version from %q: %v: %s", firefoxBinary, err, version)
+	}
+	t.Log(strings.TrimSpace(string(version)))
+	if expected := os.Getenv("FIREFOX_VERSION"); expected != "" && !bytes.Contains(version, []byte(expected)) {
+		t.Fatalf("expected Firefox %s, got %s", expected, strings.TrimSpace(string(version)))
+	}
+
+	profile := t.TempDir()
+	command := exec.Command(firefoxBinary,
+		"--headless",
+		"--marionette",
+		"--remote-allow-system-access",
+		"--no-remote",
+		"--new-instance",
+		"--profile", profile,
+	)
+	var output bytes.Buffer
+	command.Stdout = &output
+	command.Stderr = &output
+	command.Env = append(os.Environ(), "MOZ_HEADLESS=1")
+	if err := command.Start(); err != nil {
+		t.Fatalf("failed to start Firefox: %v", err)
+	}
+
+	exited := make(chan error, 1)
+	go func() {
+		exited <- command.Wait()
+	}()
+	t.Cleanup(func() {
+		select {
+		case <-exited:
+			return
+		default:
+			_ = command.Process.Kill()
+			<-exited
+		}
+	})
+
+	deadline := time.Now().Add(30 * time.Second)
+	for time.Now().Before(deadline) {
+		select {
+		case err := <-exited:
+			t.Fatalf("Firefox exited before Marionette was ready: %v\n%s", err, output.String())
+		default:
+		}
+		connection, err := net.DialTimeout("tcp", "127.0.0.1:2828", 200*time.Millisecond)
+		if err == nil {
+			_ = connection.Close()
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	t.Fatal("Firefox did not open Marionette port 2828 within 30 seconds")
+}
+
 // we don't want parallel execution we need sequence.
 func TestInit(t *testing.T) {
+	startFirefox(t)
 	t.Run("sequence", func(t *testing.T) {
 		t.Run("NewSessionTest", NewSessionTest)
 		t.Run("GetSessionIDTest", GetSessionIDTest)
@@ -77,6 +147,7 @@ func TestInit(t *testing.T) {
 		t.Run("FindElementTest", FindElementTest)
 
 		t.Run("SendKeysTest", SendKeysTest)
+		t.Run("PerformActionsTest", PerformActionsTest)
 		t.Run("FindElementsTest", FindElementsTest)
 
 		t.Run("NewWindowTest", NewWindowTest)
@@ -214,7 +285,7 @@ func DeleteCookieTest(t *testing.T) {
 
 func DeleteAllCookiesTest(t *testing.T) {
 	// set browser in a controlled webpage
-	_, _ = client.Navigate("http://example.com")
+	_, _ = client.Navigate(TargetUrl)
 
 	// clear all visible cookies now
 	cookies, err := client.GetCookies()
@@ -583,6 +654,31 @@ func SendKeysTest(t *testing.T) {
 	}
 }
 
+func PerformActionsTest(t *testing.T) {
+	_, err := navigateLocal("form.html")
+	if err != nil {
+		t.Fatalf("failed to navigate local: %#v", err)
+	}
+
+	target, err := client.FindElement(Id, "mouse-action-target")
+	if err != nil {
+		t.Fatalf("failed to find mouse target: %#v", err)
+	}
+
+	_, err = client.PerformActions(MouseActions("mouse",
+		PointerMove(0, 0, 100*time.Millisecond, ElementOrigin(target)),
+		PointerDown(0),
+		PointerUp(0),
+	))
+	if err != nil {
+		t.Fatalf("failed to perform mouse actions: %#v", err)
+	}
+
+	if state := target.Attribute("data-mouse-state"); state != "clicked" {
+		t.Fatalf("expected mouse target to be clicked, got state %q", state)
+	}
+}
+
 func FindElementsTest(t *testing.T) {
 	_, err := navigateLocal("ul.html")
 	if err != nil {
@@ -693,8 +789,8 @@ func NavigatorMethodsTest(t *testing.T) {
 		t.Fatalf("failed to set context: %#v", err)
 	}
 
-	url1 := "https://www.google.pt/"
-	url2 := "https://www.mercedes-benz.com/en/"
+	url1 := TargetUrl + "ul.html?history=first"
+	url2 := TargetUrl + "table.html?history=second"
 
 	_, err = client.Navigate(url1)
 	if err != nil {
@@ -752,14 +848,11 @@ func PromptTest(t *testing.T) {
 		t.Fatalf("failed to navigate local: %#v", err)
 	}
 
-	var text = "marionette is cool or what - prompt?"
-	var script = "prompt('" + text + "');"
-	args := []any{}
-
-	r, err := client.ExecuteScript(script, args, Timeout, false)
+	trigger, err := client.FindElement(Id, "prompt-trigger")
 	if err != nil {
-		t.Fatalf("failed to execute script: %#v", err)
+		t.Fatalf("failed to find prompt trigger: %#v", err)
 	}
+	trigger.Click()
 
 	err = client.SendAlertText("yeah!")
 	if err != nil {
@@ -773,22 +866,20 @@ func PromptTest(t *testing.T) {
 		t.Fatalf("failed to accept alert: %#v", err)
 	}
 
-	t.Log(r.Value)
 }
 
 func AlertTest(t *testing.T) {
-	_, err := navigateLocal("table.html")
+	_, err := navigateLocal("ul.html")
 	if err != nil {
 		t.Fatalf("failed to navigate local: %#v", err)
 	}
 
 	var text = "marionette is cool or what?"
-	var script = "alert('" + text + "');"
-	args := []any{}
-	r, err := client.ExecuteScript(script, args, Timeout, false)
+	trigger, err := client.FindElement(Id, "alert-trigger")
 	if err != nil {
-		t.Fatalf("%#v", err)
+		t.Fatalf("failed to find alert trigger: %#v", err)
 	}
+	trigger.Click()
 
 	textFromdialog, err := client.TextFromAlert()
 	if err != nil {
@@ -806,7 +897,6 @@ func AlertTest(t *testing.T) {
 		t.Fatalf("%#v", err)
 	}
 
-	t.Log(r.Value)
 }
 
 func WindowRectTest(t *testing.T) {

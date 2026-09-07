@@ -28,7 +28,7 @@ func UntilErrorTest(t *testing.T) {
 }
 
 func UntilConditionNeverOccuredTest(t *testing.T) {
-	timeout := time.Duration(11) * time.Minute
+	timeout := 20 * time.Millisecond
 	condition := func(c Finder) (bool, *WebElement, error) {
 		return false, nil, nil
 	}
@@ -45,13 +45,13 @@ func WaitForUntilIntegrationTest(t *testing.T) {
 		t.Fatalf("failed to set context: %#v", err)
 	}
 
-	_, err = client.Navigate("https://www.w3schools.com/xml/tryit.asp?filename=tryajax_get")
+	_, err = navigateLocal("ul.html")
 	if err != nil {
 		t.Fatalf("failed to navigate: %#v", err)
 	}
 
 	timeout := time.Duration(10) * time.Second
-	condition := ElementIsPresent(CssSelector, "a.w3-button.w3-bar-item.topnav-icons.fa.fa-rotate")
+	condition := ElementIsPresent(Id, "delayed-frame-link")
 	ok, v, err := Wait(client).For(timeout).Until(condition)
 	if err != nil || !ok {
 		t.Fatalf("%#v", err)
@@ -59,7 +59,7 @@ func WaitForUntilIntegrationTest(t *testing.T) {
 
 	v.Click()
 
-	err = client.SwitchToFrame(Id, "iframeResult")
+	err = client.SwitchToFrame(Id, "test-frame")
 	if err != nil {
 		t.Fatalf("%#v", err)
 	}

@@ -3,6 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Unordered List</title>
+    <script>
+        window.addEventListener('load', function () {
+            window.setTimeout(function () {
+                var link = document.createElement('a');
+                link.id = 'delayed-frame-link';
+                link.href = '#test-frame';
+                link.textContent = 'Frame ready';
+                document.body.appendChild(link);
+            }, 100);
+        });
+    </script>
 </head>
 <body>
 <ul style="width: 75%; font-weight: bold;">
@@ -10,5 +21,8 @@
     <li>Second</li>
     <li>third</li>
 </ul>
+<button id="prompt-trigger" type="button" onclick="prompt('marionette is cool or what - prompt?')">Prompt</button>
+<button id="alert-trigger" type="button" onclick="alert('marionette is cool or what?')">Alert</button>
+<iframe id="test-frame" src="form.html"></iframe>
 </body>
 </html>

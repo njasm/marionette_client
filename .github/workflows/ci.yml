@@ -27,7 +27,7 @@ jobs:
         # field of the coveralls app job below.
         os: [ ubuntu-latest ]
         go: [ 1.22.x ]
-        firefox: [ "131.0.3", "132.0", "136.0.3" ]
+        firefox: [ "139.0.4", "140.0.4", "141.0.3" ]
     runs-on: ${{ matrix.os }}
     env:
       FIREFOX_VERSION: ${{ matrix.firefox }}
@@ -47,35 +47,16 @@ jobs:
 
     - name: Download and install Firefox
       run: |
-
         export FIREFOX_SOURCE_URL="https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION&lang=en-US&os=linux64"
         cd /tmp
         wget -O firefox.tar.z $FIREFOX_SOURCE_URL
-
-        if [ "$FIREFOX_VERSION" = "136.0.3" ]; then
-          export TAR_FLAGS="-Jvxf"
-        else
-          export TAR_FLAGS="-jvxf"
-        fi
-        
-        echo "TAR_FLAGS: " $TAR_FLAGS
-        mkdir -p $HOME/firefox
-        tar $TAR_FLAGS /tmp/firefox.tar.z -C $HOME/
-
-    - name: Startup Firefox in Headless mode
-      run: |
-        $HOME/firefox/firefox --version
-        $HOME/firefox/firefox -marionette > /dev/null 2>&1 &
-        sleep 10
-
-    - name: Confirm Marionette TCP port is open (ubuntu-latest)
-      run: netstat -ptln | grep -n3 2828
+        tar -xf /tmp/firefox.tar.z -C $HOME/
 
     - name: Run Linter
       run: make golint-ci
 
     - name: Run Tests
-      run: make test-coverage
+      run: FIREFOX_BIN="$HOME/firefox/firefox" make test-coverage
 
     - name: Convert coverage to lcov
       uses: jandelgado/gcov2lcov-action@v1.0.5
