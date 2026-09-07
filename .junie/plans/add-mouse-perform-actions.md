@@ -173,7 +173,7 @@ Transport, protocol, wait, and element behavior has deterministic branch coverag
 - Keep headless window-state checks limited to reliable command and rectangle validation.
 - Run focused tests and the complete local Firefox 141.0.3 suite.
 
-### * Step 10: Add Firefox 155.0.1 to GitHub Actions
+### ✓ Step 10: Add Firefox 155.0.1 to GitHub Actions
 CI downloads and exercises Firefox 155.0.1 alongside the existing supported versions without requiring a local installation.
 
 - Extend the Firefox version matrix while preserving the Go matrix and self-managed browser lifecycle.

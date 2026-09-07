@@ -2,11 +2,13 @@ package marionette_client
 
 import (
 	"bytes"
+	"errors"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"os/exec"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -1004,4 +1006,84 @@ func QuitTest(t *testing.T) {
 	}
 
 	t.Log(r.Value)
+}
+
+func TestClientFindElementFromShadowRoot(t *testing.T) {
+	transport := &recordingTransport{response: &Response{Value: `{"value":{"element-6066-11e4-a52e-4f735466cecf":"element-id"}}`}}
+	client := NewClient()
+	client.Transport(transport)
+
+	element, err := client.FindElementFromShadowRoot("shadow-root-id", CssSelector, "button")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if element.Id() != "element-id" {
+		t.Fatalf("unexpected element id %q", element.Id())
+	}
+	expectedValues := map[string]string{"using": "css selector", "value": "button", "shadowRoot": "shadow-root-id"}
+	if transport.command != "WebDriver:FindElementFromShadowRoot" || !reflect.DeepEqual(transport.values, expectedValues) {
+		t.Fatalf("unexpected call: command=%q values=%#v", transport.command, transport.values)
+	}
+
+	transport.err = errors.New("transport failed")
+	if _, err = client.FindElementFromShadowRoot("shadow-root-id", CssSelector, "button"); err == nil {
+		t.Fatal("expected transport error")
+	}
+}
+
+func TestClientFindElementsFromShadowRoot(t *testing.T) {
+	transport := &recordingTransport{response: &Response{Value: `[{"element-6066-11e4-a52e-4f735466cecf":"el-1"},{"element-6066-11e4-a52e-4f735466cecf":"el-2"}]`}}
+	client := NewClient()
+	client.Transport(transport)
+
+	elements, err := client.FindElementsFromShadowRoot("shadow-root-id", CssSelector, "button")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if len(elements) != 2 {
+		t.Fatalf("expected 2 elements, got %d", len(elements))
+	}
+	if elements[0].Id() != "el-1" || elements[1].Id() != "el-2" {
+		t.Fatalf("unexpected element ids: %q, %q", elements[0].Id(), elements[1].Id())
+	}
+	expectedValues := map[string]any{"using": "css selector", "value": "button", "shadowRoot": "shadow-root-id"}
+	if transport.command != "WebDriver:FindElementsFromShadowRoot" || !reflect.DeepEqual(transport.values, expectedValues) {
+		t.Fatalf("unexpected call: command=%q values=%#v", transport.command, transport.values)
+	}
+
+	transport.err = errors.New("transport failed")
+	if _, err = client.FindElementsFromShadowRoot("shadow-root-id", CssSelector, "button"); err == nil {
+		t.Fatal("expected transport error")
+	}
+}
+
+func TestClientPrint(t *testing.T) {
+	transport := &recordingTransport{response: &Response{Value: `{"value":"base64-pdf-data"}`}}
+	client := NewClient()
+	client.Transport(transport)
+
+	options := map[string]any{
+		"orientation": "landscape",
+		"scale":       1.5,
+	}
+	pdf, err := client.Print(options)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if pdf != "base64-pdf-data" {
+		t.Fatalf("unexpected pdf data %q", pdf)
+	}
+	if transport.command != "WebDriver:Print" || !reflect.DeepEqual(transport.values, options) {
+		t.Fatalf("unexpected call: command=%q values=%#v", transport.command, transport.values)
+	}
+
+	transport.response = &Response{Value: "invalid"}
+	if _, err = client.Print(nil); err == nil {
+		t.Fatal("expected malformed response error")
+	}
+
+	transport.err = errors.New("transport failed")
+	if _, err = client.Print(nil); err == nil {
+		t.Fatal("expected transport error")
+	}
 }

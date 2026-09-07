@@ -47,9 +47,9 @@ the current registry. Priorities apply only to missing public commands.
 | `WebDriver:FindElement` | `Client.FindElement`, `WebElement.FindElement` | supported | — |
 | `WebDriver:FindElements` | `Client.FindElements`, `WebElement.FindElements` | supported | — |
 | `WebDriver:GetActiveElement` | `Client.GetActiveElement`, `WebElement.GetActiveElement` | supported | — |
-| `WebDriver:FindElementFromShadowRoot` | — | missing | P2 |
-| `WebDriver:FindElementsFromShadowRoot` | — | missing | P2 |
-| `WebDriver:GetShadowRoot` | — | missing | P2 |
+| `WebDriver:FindElementFromShadowRoot` | `Client.FindElementFromShadowRoot` | supported | — |
+| `WebDriver:FindElementsFromShadowRoot` | `Client.FindElementsFromShadowRoot` | supported | — |
+| `WebDriver:GetShadowRoot` | `WebElement.GetShadowRoot` | supported | — |
 | `WebDriver:ElementClick` | `WebElement.Click` | supported | — |
 | `WebDriver:ElementClear` | `WebElement.Clear` | supported | — |
 | `WebDriver:ElementSendKeys` | `WebElement.SendKeys` (text and complete special-key set) | supported | — |
@@ -62,8 +62,8 @@ the current registry. Priorities apply only to missing public commands.
 | `WebDriver:IsElementDisplayed` | `WebElement.Displayed` | supported | — |
 | `WebDriver:IsElementEnabled` | `WebElement.Enabled` | supported | — |
 | `WebDriver:IsElementSelected` | `WebElement.Selected` | supported | — |
-| `WebDriver:GetComputedLabel` | — | missing | P2 |
-| `WebDriver:GetComputedRole` | — | missing | P2 |
+| `WebDriver:GetComputedLabel` | `WebElement.ComputedLabel` | supported | — |
+| `WebDriver:GetComputedRole` | `WebElement.ComputedRole` | supported | — |
 
 ## Actions, cookies, capture, and prompts
 
@@ -76,7 +76,7 @@ the current registry. Priorities apply only to missing public commands.
 | `WebDriver:DeleteCookie` | `Client.DeleteCookie` | supported | — |
 | `WebDriver:DeleteAllCookies` | `Client.DeleteAllCookies` | supported | — |
 | `WebDriver:TakeScreenshot` | `Client.Screenshot`, `WebElement.Screenshot` | supported | — |
-| `WebDriver:Print` | — | missing | P2 |
+| `WebDriver:Print` | `Client.Print` | supported | — |
 | `WebDriver:DismissAlert` | `Client.DismissAlert` | supported | — |
 | `WebDriver:AcceptAlert` | `Client.AcceptAlert` | supported | — |
 | `WebDriver:GetAlertText` | `Client.TextFromAlert` | supported | — |
@@ -132,5 +132,8 @@ as the basis for new APIs; capabilities are returned by `WebDriver:NewSession`.
 Completed baseline: `WebDriver:PerformActions` with typed mouse and keyboard input, the complete WebDriver special-key
 set for element entry, and `WebDriver:ReleaseActions`.
 
-1. P2: shadow-root access, computed accessibility properties, and print.
-2. P3: WebAuthn virtual-authenticator support.
+Completed P2: shadow-root access (`WebElement.GetShadowRoot`, `Client.FindElementFromShadowRoot`,
+`Client.FindElementsFromShadowRoot`), computed accessibility properties (`WebElement.ComputedLabel`,
+`WebElement.ComputedRole`), and print (`Client.Print`).
+
+1. P3: WebAuthn virtual-authenticator support.
