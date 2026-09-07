@@ -14,7 +14,7 @@ func TestMarionetteTransportConnectAndClose(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer listener.Close()
+	defer func() { _ = listener.Close() }()
 
 	serverError := make(chan error, 1)
 	go func() {
@@ -23,7 +23,7 @@ func TestMarionetteTransportConnectAndClose(t *testing.T) {
 			serverError <- acceptErr
 			return
 		}
-		defer conn.Close()
+		defer func() { _ = conn.Close() }()
 		greeting := `{"applicationType":"gecko","marionetteProtocol":3}`
 		if _, writeErr := fmt.Fprintf(conn, "%d:%s", len(greeting), greeting); writeErr != nil {
 			serverError <- writeErr
@@ -57,8 +57,8 @@ func TestMarionetteTransportConnectAndClose(t *testing.T) {
 
 func TestMarionetteTransportSend(t *testing.T) {
 	clientConn, serverConn := net.Pipe()
-	defer clientConn.Close()
-	defer serverConn.Close()
+	defer func() { _ = clientConn.Close() }()
+	defer func() { _ = serverConn.Close() }()
 
 	serverError := make(chan error, 1)
 	go func() {
@@ -98,8 +98,8 @@ func TestMarionetteTransportSend(t *testing.T) {
 func TestMarionetteFramingErrors(t *testing.T) {
 	t.Run("invalid length", func(t *testing.T) {
 		conn, peer := net.Pipe()
-		defer conn.Close()
-		defer peer.Close()
+		defer func() { _ = conn.Close() }()
+		defer func() { _ = peer.Close() }()
 		go func() { _, _ = io.WriteString(peer, "invalid:") }()
 		if _, err := read(conn); err == nil {
 			t.Fatal("expected invalid message length to fail")
@@ -108,7 +108,7 @@ func TestMarionetteFramingErrors(t *testing.T) {
 
 	t.Run("short body", func(t *testing.T) {
 		conn, peer := net.Pipe()
-		defer conn.Close()
+		defer func() { _ = conn.Close() }()
 		go func() {
 			_, _ = io.WriteString(peer, "5:abc")
 			_ = peer.Close()
@@ -120,7 +120,7 @@ func TestMarionetteFramingErrors(t *testing.T) {
 
 	t.Run("missing length", func(t *testing.T) {
 		conn, peer := net.Pipe()
-		defer conn.Close()
+		defer func() { _ = conn.Close() }()
 		_ = peer.Close()
 		if _, err := messageLength(conn); err != io.EOF {
 			t.Fatalf("expected EOF, got %v", err)
@@ -130,8 +130,8 @@ func TestMarionetteFramingErrors(t *testing.T) {
 
 func TestWriteFramesRawBytes(t *testing.T) {
 	conn, peer := net.Pipe()
-	defer conn.Close()
-	defer peer.Close()
+	defer func() { _ = conn.Close() }()
+	defer func() { _ = peer.Close() }()
 	written := make(chan error, 1)
 	go func() {
 		_, err := write(conn, []byte("payload"))
