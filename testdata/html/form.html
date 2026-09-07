@@ -8,10 +8,16 @@
             var newLocation = '/common/page/3';
             window.location = newLocation;
         }
+
+        function recordMouseClick(event) {
+            event.currentTarget.setAttribute('data-mouse-state', 'clicked');
+        }
     </script>
 </head>
 <body>
 There should be a form here:
+
+<button type="button" id="mouse-action-target" data-mouse-state="waiting" onclick="recordMouseClick(event)">Mouse action target</button>
 
 <form method="get" action="resultPage.html" name="login">
     <input type="email" id="email"/>
