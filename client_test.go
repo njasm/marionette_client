@@ -148,6 +148,7 @@ func TestInit(t *testing.T) {
 
 		t.Run("SendKeysTest", SendKeysTest)
 		t.Run("PerformActionsTest", PerformActionsTest)
+		t.Run("ReleaseActionsTest", ReleaseActionsTest)
 		t.Run("FindElementsTest", FindElementsTest)
 
 		t.Run("NewWindowTest", NewWindowTest)
@@ -676,6 +677,36 @@ func PerformActionsTest(t *testing.T) {
 
 	if state := target.Attribute("data-mouse-state"); state != "clicked" {
 		t.Fatalf("expected mouse target to be clicked, got state %q", state)
+	}
+}
+
+func ReleaseActionsTest(t *testing.T) {
+	_, err := navigateLocal("form.html")
+	if err != nil {
+		t.Fatalf("failed to navigate local: %#v", err)
+	}
+
+	target, err := client.FindElement(Id, "mouse-action-target")
+	if err != nil {
+		t.Fatalf("failed to find mouse target: %#v", err)
+	}
+
+	_, err = client.PerformActions(MouseActions("mouse",
+		PointerMove(0, 0, 100*time.Millisecond, ElementOrigin(target)),
+		PointerDown(0),
+	))
+	if err != nil {
+		t.Fatalf("failed to press mouse button: %#v", err)
+	}
+	if state := target.Attribute("data-mouse-down"); state != "pressed" {
+		t.Fatalf("expected mouse button to be pressed, got state %q", state)
+	}
+
+	if _, err = client.ReleaseActions(); err != nil {
+		t.Fatalf("failed to release actions: %#v", err)
+	}
+	if state := target.Attribute("data-mouse-up"); state != "released" {
+		t.Fatalf("expected mouse button to be released, got state %q", state)
 	}
 }
 

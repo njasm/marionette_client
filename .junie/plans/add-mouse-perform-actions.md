@@ -144,3 +144,11 @@ The README documents mouse actions and makes the self-managed Firefox test lifec
 - Add or revise the `PerformActions` example to match the public typed API.
 - Review existing documentation for stale setup and test instructions.
 - Explain that integration tests launch Firefox with a fresh temporary profile and the required command-line flags.
+
+### ✓ Step 7: Implement and test release actions
+Callers can clear persisted input-source state through `WebDriver:ReleaseActions`.
+
+- Add `Client.ReleaseActions` using the existing transport boundary and Firefox command name.
+- Add transport-independent tests for the exact command, payload, response, and error propagation.
+- Add ordered Firefox integration coverage that releases an active mouse button and verifies the resulting DOM event state.
+- Update the support matrix and usage documentation to reflect the completed command.

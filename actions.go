@@ -118,6 +118,11 @@ func (c *Client) PerformActions(actions ...ActionSequence) (*Response, error) {
 	return c.transport.Send("WebDriver:PerformActions", map[string]any{"actions": actions})
 }
 
+// ReleaseActions releases all depressed input-source actions and clears their state.
+func (c *Client) ReleaseActions() (*Response, error) {
+	return c.transport.Send("WebDriver:ReleaseActions", nil)
+}
+
 func validatePointerAction(action PointerAction) error {
 	switch action.typeName {
 	case "pointerMove":

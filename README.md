@@ -60,12 +60,19 @@ _, err = client.PerformActions(marionette.MouseActions("mouse",
 if err != nil {
 	return err
 }
+
+// Release any depressed buttons and clear Firefox's stored input-source state.
+if _, err = client.ReleaseActions(); err != nil {
+	return err
+}
 ```
 
 The example moves the mouse to the center of `target`, presses the primary button, pauses, and releases it. Pointer
 moves can also use `ViewportOrigin()` for viewport-relative coordinates or `PointerOriginCurrent()` for coordinates
 relative to the current pointer position. `PerformActions` validates source IDs, origins, durations, buttons, and empty
 sequences before sending `WebDriver:PerformActions` to Firefox.
+`ReleaseActions` sends `WebDriver:ReleaseActions`, which releases any depressed buttons and clears all stored input
+sources. It is useful for cleanup after a sequence fails before its matching button release.
 
 #### Change Contexts
 ```go

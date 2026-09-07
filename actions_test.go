@@ -9,9 +9,10 @@ import (
 )
 
 type recordingTransport struct {
-	command string
-	values  any
-	err     error
+	command  string
+	values   any
+	response *Response
+	err      error
 }
 
 func (t *recordingTransport) MessageID() int            { return 0 }
@@ -23,6 +24,9 @@ func (t *recordingTransport) Send(command string, values any) (*Response, error)
 	t.values = values
 	if t.err != nil {
 		return nil, t.err
+	}
+	if t.response != nil {
+		return t.response, nil
 	}
 	return &Response{Value: "{}"}, nil
 }
@@ -110,6 +114,38 @@ func TestPerformActionsPropagatesTransportError(t *testing.T) {
 	client.Transport(&recordingTransport{err: expected})
 
 	_, err := client.PerformActions(MouseActions("mouse", Pause(0)))
+	if !errors.Is(err, expected) {
+		t.Fatalf("expected transport error, got %v", err)
+	}
+}
+
+func TestReleaseActions(t *testing.T) {
+	expected := &Response{Value: "released"}
+	transport := &recordingTransport{response: expected}
+	client := NewClient()
+	client.Transport(transport)
+
+	response, err := client.ReleaseActions()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if response != expected {
+		t.Fatalf("expected response %#v, got %#v", expected, response)
+	}
+	if transport.command != "WebDriver:ReleaseActions" {
+		t.Fatalf("unexpected command %q", transport.command)
+	}
+	if transport.values != nil {
+		t.Fatalf("expected nil payload, got %#v", transport.values)
+	}
+}
+
+func TestReleaseActionsPropagatesTransportError(t *testing.T) {
+	expected := errors.New("transport failed")
+	client := NewClient()
+	client.Transport(&recordingTransport{err: expected})
+
+	_, err := client.ReleaseActions()
 	if !errors.Is(err, expected) {
 		t.Fatalf("expected transport error, got %v", err)
 	}
