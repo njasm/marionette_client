@@ -12,12 +12,20 @@
         function recordMouseClick(event) {
             event.currentTarget.setAttribute('data-mouse-state', 'clicked');
         }
+
+        function recordMouseDown(event) {
+            event.currentTarget.setAttribute('data-mouse-down', 'pressed');
+        }
+
+        function recordMouseUp(event) {
+            event.currentTarget.setAttribute('data-mouse-up', 'released');
+        }
     </script>
 </head>
 <body>
 There should be a form here:
 
-<button type="button" id="mouse-action-target" data-mouse-state="waiting" onclick="recordMouseClick(event)">Mouse action target</button>
+<button type="button" id="mouse-action-target" data-mouse-state="waiting" data-mouse-down="waiting" data-mouse-up="waiting" onclick="recordMouseClick(event)" onmousedown="recordMouseDown(event)" onmouseup="recordMouseUp(event)">Mouse action target</button>
 
 <form method="get" action="resultPage.html" name="login">
     <input type="email" id="email"/>

@@ -147,7 +147,9 @@ func TestInit(t *testing.T) {
 		t.Run("FindElementTest", FindElementTest)
 
 		t.Run("SendKeysTest", SendKeysTest)
+		t.Run("SpecialKeysTest", SpecialKeysTest)
 		t.Run("PerformActionsTest", PerformActionsTest)
+		t.Run("ReleaseActionsTest", ReleaseActionsTest)
 		t.Run("FindElementsTest", FindElementsTest)
 
 		t.Run("NewWindowTest", NewWindowTest)
@@ -654,6 +656,42 @@ func SendKeysTest(t *testing.T) {
 	}
 }
 
+func SpecialKeysTest(t *testing.T) {
+	_, err := navigateLocal("form.html")
+	if err != nil {
+		t.Fatalf("failed to navigate local: %#v", err)
+	}
+
+	element, err := client.FindElement(Id, "email")
+	if err != nil {
+		t.Fatalf("failed to find email input: %#v", err)
+	}
+	if err = element.SendKeys("abcdef", KeyControl, "a", KeyNull, KeyBackspace); err != nil {
+		t.Fatalf("failed to send special keys to element: %#v", err)
+	}
+	if value := element.Property("value"); value != "" {
+		t.Fatalf("expected Control+A and Backspace to clear the input, got %q", value)
+	}
+
+	if err = element.SendKeys("abcdef"); err != nil {
+		t.Fatalf("failed to reset input: %#v", err)
+	}
+	_, err = client.PerformActions(KeyboardActions("keyboard",
+		KeyDownAction(KeyControl),
+		KeyDownAction("a"),
+		KeyUpAction("a"),
+		KeyUpAction(KeyControl),
+		KeyDownAction(KeyDelete),
+		KeyUpAction(KeyDelete),
+	))
+	if err != nil {
+		t.Fatalf("failed to perform keyboard actions: %#v", err)
+	}
+	if value := element.Property("value"); value != "" {
+		t.Fatalf("expected keyboard actions to clear the input, got %q", value)
+	}
+}
+
 func PerformActionsTest(t *testing.T) {
 	_, err := navigateLocal("form.html")
 	if err != nil {
@@ -676,6 +714,36 @@ func PerformActionsTest(t *testing.T) {
 
 	if state := target.Attribute("data-mouse-state"); state != "clicked" {
 		t.Fatalf("expected mouse target to be clicked, got state %q", state)
+	}
+}
+
+func ReleaseActionsTest(t *testing.T) {
+	_, err := navigateLocal("form.html")
+	if err != nil {
+		t.Fatalf("failed to navigate local: %#v", err)
+	}
+
+	target, err := client.FindElement(Id, "mouse-action-target")
+	if err != nil {
+		t.Fatalf("failed to find mouse target: %#v", err)
+	}
+
+	_, err = client.PerformActions(MouseActions("mouse",
+		PointerMove(0, 0, 100*time.Millisecond, ElementOrigin(target)),
+		PointerDown(0),
+	))
+	if err != nil {
+		t.Fatalf("failed to press mouse button: %#v", err)
+	}
+	if state := target.Attribute("data-mouse-down"); state != "pressed" {
+		t.Fatalf("expected mouse button to be pressed, got state %q", state)
+	}
+
+	if _, err = client.ReleaseActions(); err != nil {
+		t.Fatalf("failed to release actions: %#v", err)
+	}
+	if state := target.Attribute("data-mouse-up"); state != "released" {
+		t.Fatalf("expected mouse button to be released, got state %q", state)
 	}
 }
 

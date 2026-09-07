@@ -5,7 +5,7 @@ sessionId: session-260907-124925-msvq
 # Requirements
 
 ### Overview & Goals
-Compare the library’s command surface with the current Firefox Marionette command registry in `remote/marionette/driver.sys.mjs`, record the gaps, and implement the first missing feature: W3C `WebDriver:PerformActions` for mouse pointer input.
+Compare the library’s command surface with the current Firefox Marionette command registry in `remote/marionette/driver.sys.mjs`, record the gaps, implement W3C `WebDriver:PerformActions` for mouse pointer input, and add the complete WebDriver special-key set for element entry and keyboard actions.
 
 ### Scope
 #### In Scope
@@ -13,11 +13,13 @@ Compare the library’s command surface with the current Firefox Marionette comm
 - Add a public, typed API for mouse action sources and the W3C actions `pointerMove`, `pointerDown`, `pointerUp`, and `pause`.
 - Support pointer move origins of `viewport`, current `pointer`, and a `WebElement` reference.
 - Send multiple synchronized action sources/ticks through `WebDriver:PerformActions`.
+- Support the complete special-key catalog exposed by the official Python WebDriver client, including modifiers and non-character keys.
+- Support typed keyboard action sources with key-down, key-up, and pause actions.
 - Verify JSON payloads without Firefox and mouse behavior in the existing ordered Firefox integration suite.
 - Document a minimal usage example.
 
 #### Out of Scope
-- Keyboard, touch/pen, and wheel action builders.
+- Touch/pen and wheel action builders.
 - Implementing all other commands discovered by the audit.
 - Refactoring the Marionette transport or protocol framing.
 
@@ -144,3 +146,20 @@ The README documents mouse actions and makes the self-managed Firefox test lifec
 - Add or revise the `PerformActions` example to match the public typed API.
 - Review existing documentation for stale setup and test instructions.
 - Explain that integration tests launch Firefox with a fresh temporary profile and the required command-line flags.
+
+### ✓ Step 7: Implement and test release actions
+Callers can clear persisted input-source state through `WebDriver:ReleaseActions`.
+
+- Add `Client.ReleaseActions` using the existing transport boundary and Firefox command name.
+- Add transport-independent tests for the exact command, payload, response, and error propagation.
+- Add ordered Firefox integration coverage that releases an active mouse button and verifies the resulting DOM event state.
+- Update the support matrix and usage documentation to reflect the completed command.
+
+### ✓ Step 8: Add WebDriver special-key support
+Callers can send the complete WebDriver key set, including modifier and non-character keys, through typed public constants.
+
+- Add typed constants for every WebDriver keyboard key code used by official clients.
+- Support special keys through element key entry and keyboard action sequences where appropriate.
+- Add transport-independent serialization and validation tests.
+- Add ordered Firefox integration coverage for modifier and non-character behavior.
+- Update the support matrix and usage documentation.

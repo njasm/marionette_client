@@ -1,7 +1,6 @@
 [![Go Reference](https://pkg.go.dev/badge/marionette_client.svg)](https://pkg.go.dev/github.com/njasm/marionette_client)
 [![CI](https://github.com/njasm/marionette_client/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/njasm/marionette_client/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/njasm/marionette_client/badge.svg?branch=master)](https://coveralls.io/github/njasm/marionette_client?branch=master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/njasm/marionette_client)](https://goreportcard.com/report/github.com/njasm/marionette_client)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://choosealicense.com/licenses/mit/)
 
 # marionette_client
@@ -60,12 +59,49 @@ _, err = client.PerformActions(marionette.MouseActions("mouse",
 if err != nil {
 	return err
 }
+
+// Release any depressed buttons and clear Firefox's stored input-source state.
+if _, err = client.ReleaseActions(); err != nil {
+	return err
+}
 ```
 
 The example moves the mouse to the center of `target`, presses the primary button, pauses, and releases it. Pointer
 moves can also use `ViewportOrigin()` for viewport-relative coordinates or `PointerOriginCurrent()` for coordinates
 relative to the current pointer position. `PerformActions` validates source IDs, origins, durations, buttons, and empty
 sequences before sending `WebDriver:PerformActions` to Firefox.
+`ReleaseActions` sends `WebDriver:ReleaseActions`, which releases any depressed buttons and clears all stored input
+sources. It is useful for cleanup after a sequence fails before its matching button release.
+
+#### Send special keys
+WebDriver special keys are exported as string constants, so they can be mixed with ordinary text. `KeyNull` releases
+all modifiers in an element key sequence.
+
+```go
+input, err := client.FindElement(marionette.Id, "search")
+if err != nil {
+	return err
+}
+
+// Select all text, release Control, and delete the selection.
+if err = input.SendKeys(marionette.KeyControl, "a", marionette.KeyNull, marionette.KeyBackspace); err != nil {
+	return err
+}
+```
+
+The constants cover the complete WebDriver key set exposed by Selenium's Python `Keys`, including modifiers, arrows,
+navigation and editing keys, number-pad keys, `F1` through `F12`, Meta/Command, right-side modifiers, and aliases.
+
+Keyboard sources can also be synchronized with other sources through `PerformActions`:
+
+```go
+_, err = client.PerformActions(marionette.KeyboardActions("keyboard",
+	marionette.KeyDownAction(marionette.KeyControl),
+	marionette.KeyDownAction("a"),
+	marionette.KeyUpAction("a"),
+	marionette.KeyUpAction(marionette.KeyControl),
+))
+```
 
 #### Change Contexts
 ```go
